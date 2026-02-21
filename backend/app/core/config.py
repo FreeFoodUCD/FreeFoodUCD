@@ -19,10 +19,14 @@ class Settings(BaseSettings):
     # Apify
     APIFY_API_TOKEN: str
     
-    # Twilio (WhatsApp)
-    TWILIO_ACCOUNT_SID: str
-    TWILIO_AUTH_TOKEN: str
-    TWILIO_WHATSAPP_NUMBER: str
+    # Twilio (WhatsApp) - Optional, not used anymore
+    TWILIO_ACCOUNT_SID: Optional[str] = None
+    TWILIO_AUTH_TOKEN: Optional[str] = None
+    TWILIO_WHATSAPP_NUMBER: Optional[str] = None
+    
+    # Resend (Old) - Optional, not used anymore
+    RESEND_API_KEY: Optional[str] = None
+    RESEND_FROM_EMAIL: Optional[str] = None
     
     # Email Service (Brevo/Sendinblue)
     BREVO_API_KEY: str
