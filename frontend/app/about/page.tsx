@@ -56,44 +56,6 @@ export default function AboutPage() {
             </div>
           </div>
 
-          {/* Features */}
-          <div className="mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-              why it's great
-            </h2>
-            <div className="space-y-6">
-              <div className="flex gap-4">
-                <Zap className="w-8 h-8 text-primary flex-shrink-0" />
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-1">instant alerts</h3>
-                  <p className="text-gray-600">
-                    get notified within minutes, not hours
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex gap-4">
-                <Bell className="w-8 h-8 text-primary flex-shrink-0" />
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-1">smart filtering</h3>
-                  <p className="text-gray-600">
-                    only UCD campus events with confirmed free food
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex gap-4">
-                <Shield className="w-8 h-8 text-primary flex-shrink-0" />
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-1">privacy first</h3>
-                  <p className="text-gray-600">
-                    no spam, unsubscribe anytime, your data stays private
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
           {/* The Story */}
           <div className="mb-16">
             <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
