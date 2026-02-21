@@ -165,13 +165,28 @@ async def seed_societies(
 ):
     """Seed UCD societies into the database."""
     societies_data = [
-        {"name": "UCD Law Society", "instagram_handle": "ucdlawsoc"},
-        {"name": "UCD Computer Science Society", "instagram_handle": "ucdcompsci"},
-        {"name": "UCD Business Society", "instagram_handle": "ucdbusiness"},
-        {"name": "UCD Engineering Society", "instagram_handle": "ucdengineering"},
+        {"name": "UCD Mechsoc", "instagram_handle": "ucdmechsoc"},
+        {"name": "UCD IndSoc", "instagram_handle": "ucdindsoc"},
+        {"name": "UCD Arabic Culture & Language Society", "instagram_handle": "ucd.aclsoc"},
+        {"name": "UCD Politics & International Relations Society", "instagram_handle": "ucdpolsoc"},
+        {"name": "UCD Engineering Society", "instagram_handle": "ucdengsoc"},
+        {"name": "UCD Japanese Society", "instagram_handle": "ucdjsoc"},
+        {"name": "UCD Malaysian Society", "instagram_handle": "ucdmsoc"},
+        {"name": "UCD Islamic Society", "instagram_handle": "ucdisoc"},
+        {"name": "UCD French Society", "instagram_handle": "ucdfrenchsoc"},
+        {"name": "UCD Mathematical Society", "instagram_handle": "ucdmathsoc"},
         {"name": "UCD Medical Society", "instagram_handle": "ucdmedsoc"},
-        {"name": "UCD Drama Society", "instagram_handle": "ucddramasoc"},
-        {"name": "UCD Music Society", "instagram_handle": "ucdmusicsoc"},
+        {"name": "UCD Veterinary Nursing Society", "instagram_handle": "ucdvnsoc"},
+        {"name": "UCD Law Society", "instagram_handle": "ucdlawsoc"},
+        {"name": "UCD Social Sciences Students", "instagram_handle": "ucdsocscistudents"},
+        {"name": "UCD Film & Video Society", "instagram_handle": "ucdfilmsoc"},
+        {"name": "UCD GameSoc", "instagram_handle": "ucdgamesociety"},
+        {"name": "UCD Science Society", "instagram_handle": "ucdscisoc"},
+        {"name": "UCD Chem Eng Soc", "instagram_handle": "ucdchemengsoc"},
+        {"name": "UCD ElecSoc", "instagram_handle": "ucd.elecsoc"},
+        {"name": "UCD Africa Society", "instagram_handle": "ucdafricasociety"},
+        {"name": "UCD Food Society", "instagram_handle": "ucdfoodsoc"},
+        {"name": "UCD Dance Society", "instagram_handle": "ucddancesoc"},
     ]
     
     added = 0
