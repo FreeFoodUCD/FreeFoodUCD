@@ -313,7 +313,7 @@ async def test_scrape(
 
 @router.put("/societies/{society_id}")
 async def update_society(
-    society_id: int,
+    society_id: str,
     name: Optional[str] = None,
     instagram_handle: Optional[str] = None,
     is_active: Optional[bool] = None,
