@@ -158,4 +158,133 @@ async def delete_all_events(
         "deleted_count": result.rowcount
     }
 
+@router.post("/seed-societies")
+async def seed_societies(
+    db: AsyncSession = Depends(get_db),
+    _: bool = Depends(verify_admin_key)
+):
+    """Seed UCD societies into the database."""
+    societies_data = [
+        {"name": "UCD Law Society", "instagram_handle": "ucdlawsoc"},
+        {"name": "UCD Computer Science Society", "instagram_handle": "ucdcompsci"},
+        {"name": "UCD Business Society", "instagram_handle": "ucdbusiness"},
+        {"name": "UCD Engineering Society", "instagram_handle": "ucdengineering"},
+        {"name": "UCD Medical Society", "instagram_handle": "ucdmedsoc"},
+        {"name": "UCD Drama Society", "instagram_handle": "ucddramasoc"},
+        {"name": "UCD Music Society", "instagram_handle": "ucdmusicsoc"},
+    ]
+    
+    added = 0
+    skipped = 0
+    
+    for society_data in societies_data:
+        # Check if society already exists
+        result = await db.execute(
+            select(Society).where(Society.instagram_handle == society_data["instagram_handle"])
+        )
+        existing = result.scalar_one_or_none()
+        
+        if existing:
+            skipped += 1
+            continue
+        
+        # Create new society
+        society = Society(
+            name=society_data["name"],
+            instagram_handle=society_data["instagram_handle"],
+            is_active=True,
+            scrape_posts=True,
+            scrape_stories=False
+        )
+        db.add(society)
+        added += 1
+    
+    await db.commit()
+    
+    return {
+        "message": "Societies seeded successfully",
+        "added": added,
+        "skipped": skipped,
+        "total": len(societies_data)
+    }
+
+
+@router.post("/scrape-now")
+async def trigger_scrape(
+    society_handle: Optional[str] = None,
+    _: bool = Depends(verify_admin_key)
+):
+    """
+    Trigger immediate scraping.
+    If society_handle provided, scrapes only that society.
+    Otherwise, scrapes all active societies.
+    """
+    from app.workers.scraping_tasks import scrape_all_posts, scrape_society_posts
+    from app.db.base import async_session_maker
+    
+    if society_handle:
+        # Scrape specific society
+        async with async_session_maker() as session:
+            result = await session.execute(
+                select(Society).where(Society.instagram_handle == society_handle)
+            )
+            society = result.scalar_one_or_none()
+            
+            if not society:
+                raise HTTPException(status_code=404, detail=f"Society @{society_handle} not found")
+            
+            # Trigger Celery task
+            task = scrape_society_posts.delay(str(society.id))
+            
+            return {
+                "message": f"Scraping triggered for @{society_handle}",
+                "society": society.name,
+                "task_id": task.id,
+                "status": "queued"
+            }
+    else:
+        # Scrape all societies
+        task = scrape_all_posts.delay()
+        
+        return {
+            "message": "Scraping triggered for all active societies",
+            "task_id": task.id,
+            "status": "queued"
+        }
+
+
+@router.get("/scrape-test")
+async def test_scrape(
+    society_handle: str = "ucdlawsoc",
+    _: bool = Depends(verify_admin_key)
+):
+    """
+    Test scraping without saving to database.
+    Returns raw scraped data for inspection.
+    """
+    from app.services.scraper.apify_scraper import ApifyInstagramScraper
+    from app.core.config import settings
+    
+    try:
+        scraper = ApifyInstagramScraper(api_token=settings.APIFY_API_TOKEN)
+        posts = await scraper.scrape_posts(society_handle, max_posts=3)
+        
+        return {
+            "message": f"Successfully scraped @{society_handle}",
+            "posts_found": len(posts),
+            "posts": [
+                {
+                    "url": post["url"],
+                    "caption_preview": post["caption"][:200] + "..." if len(post["caption"]) > 200 else post["caption"],
+                    "caption_length": len(post["caption"]),
+                    "has_image": bool(post.get("image_url")),
+                    "timestamp": post["timestamp"].isoformat() if post.get("timestamp") else None
+                }
+                for post in posts
+            ]
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Scraping failed: {str(e)}")
+
+
 # Made with Bob
