@@ -7,8 +7,8 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { Event } from '@/lib/types';
-import Link from 'next/link';
-import { Bell } from 'lucide-react';
+import { Mail, Check, AlertCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 // Mock data for development
 const MOCK_EVENTS: Event[] = [
@@ -34,57 +34,16 @@ const MOCK_EVENTS: Event[] = [
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
-  {
-    id: '2',
-    title: 'Free Breakfast & Career Talk',
-    location: 'O\'Brien Centre for Science',
-    start_time: new Date(Date.now() + 18 * 60 * 60 * 1000).toISOString(),
-    end_time: new Date(Date.now() + 20 * 60 * 60 * 1000).toISOString(),
-    society_id: '2',
-    source_type: 'post',
-    source_url: 'https://instagram.com/p/example',
-    is_free_food: true,
-    society: {
-      id: '2',
-      name: 'UCD Computer Science Society',
-      instagram_handle: 'ucdcompsci',
-      is_active: true,
-      scrape_posts: true,
-      scrape_stories: true,
-      created_at: new Date().toISOString(),
-    },
-    notified: false,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '3',
-    title: 'Taco Tuesday Social',
-    location: 'Student Centre',
-    start_time: new Date(Date.now() + 26 * 60 * 60 * 1000).toISOString(),
-    end_time: new Date(Date.now() + 28 * 60 * 60 * 1000).toISOString(),
-    society_id: '3',
-    source_type: 'story',
-    is_free_food: true,
-    society: {
-      id: '3',
-      name: 'UCD Business Society',
-      instagram_handle: 'ucdbusiness',
-      is_active: true,
-      scrape_posts: true,
-      scrape_stories: true,
-      created_at: new Date().toISOString(),
-    },
-    notified: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
 ];
 
 export default function Home() {
-  const [useMockData] = useState(false); // Changed to false to use real API
+  const router = useRouter();
+  const [useMockData] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   // Fetch events from API
   const { data, isLoading, error } = useQuery({
@@ -93,7 +52,6 @@ export default function Home() {
     enabled: !useMockData,
   });
 
-  // Fallback to mock data if API fails or returns empty
   const events = useMockData || (!isLoading && !error && data?.items && data.items.length === 0)
     ? MOCK_EVENTS
     : (data?.items || []);
@@ -108,44 +66,106 @@ export default function Home() {
     setTimeout(() => setSelectedEvent(null), 300);
   };
 
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+
+    try {
+      await api.signup({ email });
+      setSubmitStatus('success');
+      setEmail('');
+      // Redirect to verification page after 1 second
+      setTimeout(() => {
+        router.push('/signup');
+      }, 1000);
+    } catch (err: any) {
+      setSubmitStatus('error');
+      console.error('Signup error:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <Header />
       
-      {/* Hero Section - Minimal & Playful */}
-      <section className="pt-24 pb-8 px-4">
+      {/* Hero Section with Email Signup */}
+      <section className="pt-24 pb-12 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          {/* Playful Headline */}
+          {/* Headline */}
           <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
-            cuz who doesn't want <span className="text-primary">free food</span>
+            never miss <span className="text-primary">free food</span> again
           </h1>
 
           {/* Tagline */}
           <p className="text-xl md:text-2xl text-gray-600 mb-10">
-            whatsapp or email alerts
+            instant email alerts when UCD societies post about free food
           </p>
 
-          {/* Single CTA */}
-          <Link
-            href="/signup"
-            className="inline-flex items-center gap-2 px-10 py-5 rounded-xl bg-primary text-white text-xl font-semibold hover:bg-primary-dark transition-all shadow-lg hover:shadow-xl hover:scale-105"
-          >
-            sign me up
-          </Link>
+          {/* Email Signup Form */}
+          <div className="max-w-md mx-auto">
+            <form onSubmit={handleEmailSubmit} className="space-y-4">
+              <div className="flex gap-3">
+                <div className="flex-1 relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="your@ucd.ie"
+                    required
+                    className="w-full pl-12 pr-4 py-4 rounded-xl border-2 border-gray-200 focus:border-primary focus:outline-none text-lg"
+                    disabled={isSubmitting || submitStatus === 'success'}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={isSubmitting || submitStatus === 'success'}
+                  className="px-8 py-4 rounded-xl bg-primary text-white text-lg font-semibold hover:bg-primary-dark transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? 'sending...' : submitStatus === 'success' ? 'sent!' : 'sign up'}
+                </button>
+              </div>
+
+              {/* Status Messages */}
+              {submitStatus === 'success' && (
+                <div className="flex items-center gap-2 text-green-600 bg-green-50 px-4 py-3 rounded-lg">
+                  <Check className="w-5 h-5" />
+                  <span>check your email for verification code!</span>
+                </div>
+              )}
+
+              {submitStatus === 'error' && (
+                <div className="flex items-center gap-2 text-red-600 bg-red-50 px-4 py-3 rounded-lg">
+                  <AlertCircle className="w-5 h-5" />
+                  <span>something went wrong. try again?</span>
+                </div>
+              )}
+            </form>
+
+            <p className="text-sm text-gray-500 mt-4">
+              free forever • no spam • unsubscribe anytime
+            </p>
+          </div>
         </div>
       </section>
 
-      {/* Events Preview - Visible Without Scrolling */}
+      {/* Events Preview */}
       <section className="px-4 pb-12">
         <div className="max-w-7xl mx-auto">
           {/* Section Header */}
-          <div className="text-center mb-6">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
               what's happening now 👀
             </h2>
+            <p className="text-gray-600">
+              recent free food events from UCD societies
+            </p>
           </div>
 
-          {/* Event Grid - Show partial cards */}
+          {/* Event Grid */}
           {isLoading && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[...Array(3)].map((_, i) => (
@@ -167,16 +187,9 @@ export default function Home() {
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 no events right now
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-600">
                 be the first to know when they drop
               </p>
-              <Link
-                href="/signup"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary text-white font-semibold hover:bg-primary-dark transition-colors"
-              >
-                <Bell className="w-5 h-5" />
-                get notified
-              </Link>
             </div>
           )}
 

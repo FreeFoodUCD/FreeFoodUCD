@@ -2,7 +2,7 @@
 
 import { Header } from '@/components/Header';
 import { useState, useEffect } from 'react';
-import { Instagram, CheckCircle, Clock } from 'lucide-react';
+import { Instagram } from 'lucide-react';
 import { api } from '@/lib/api';
 import { Society } from '@/lib/types';
 
@@ -32,14 +32,14 @@ export default function SocietiesPage() {
       <Header />
       
       <main className="pt-24 pb-16 px-4">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
               monitored societies
             </h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              we track these UCD societies 24/7 for free food announcements
+            <p className="text-lg text-gray-600">
+              we track these {societies.length} UCD societies for free food announcements
             </p>
           </div>
 
@@ -58,89 +58,55 @@ export default function SocietiesPage() {
             </div>
           )}
 
-          {/* Societies Grid */}
+          {/* Societies List - Simple Design */}
           {!loading && !error && (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+              <div className="space-y-3 mb-12">
                 {societies.map((society) => (
-                  <div
+                  <a
                     key={society.id}
-                    className="p-6 rounded-2xl border-2 border-gray-200 hover:border-primary hover:shadow-lg transition-all"
+                    href={`https://instagram.com/${society.instagram_handle}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between p-4 rounded-lg hover:bg-gray-50 transition-colors group"
                   >
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">
+                    <div className="flex items-center gap-3">
+                      <Instagram className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" />
+                      <div>
+                        <h3 className="font-semibold text-gray-900 group-hover:text-primary transition-colors">
                           {society.name}
                         </h3>
-                        <a
-                          href={`https://instagram.com/${society.instagram_handle}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 text-gray-600 hover:text-primary transition-colors"
-                        >
-                          <Instagram className="w-4 h-4" />
-                          <span className="text-sm">@{society.instagram_handle}</span>
-                        </a>
+                        <p className="text-sm text-gray-500">
+                          @{society.instagram_handle}
+                        </p>
                       </div>
-                      {society.is_active && (
-                        <div className="flex items-center gap-1 text-green-600 text-sm">
-                          <CheckCircle className="w-4 h-4" />
-                          <span>active</span>
-                        </div>
-                      )}
                     </div>
-
-                    <div className="space-y-2 text-sm text-gray-600">
-                      {society.scrape_posts && (
-                        <div className="flex items-center gap-2">
-                          <Clock className="w-4 h-4" />
-                          <span>monitoring posts</span>
-                        </div>
-                      )}
-                      {society.scrape_stories && (
-                        <div className="flex items-center gap-2">
-                          <Clock className="w-4 h-4" />
-                          <span>monitoring stories</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                    {society.is_active && (
+                      <span className="text-xs font-medium text-green-600 bg-green-50 px-3 py-1 rounded-full">
+                        active
+                      </span>
+                    )}
+                  </a>
                 ))}
               </div>
 
               {/* Stats */}
-              <div className="bg-gray-50 rounded-2xl p-8 text-center">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                  <div>
-                    <div className="text-4xl font-bold text-primary mb-2">
-                      {societies.length}
-                    </div>
-                    <div className="text-gray-600">societies tracked</div>
-                  </div>
-                  <div>
-                    <div className="text-4xl font-bold text-primary mb-2">
-                      {societies.filter(s => s.scrape_stories).length}
-                    </div>
-                    <div className="text-gray-600">story monitoring</div>
-                  </div>
-                  <div>
-                    <div className="text-4xl font-bold text-primary mb-2">
-                      {societies.filter(s => s.is_active).length}
-                    </div>
-                    <div className="text-gray-600">currently active</div>
-                  </div>
+              <div className="bg-gray-50 rounded-xl p-8 text-center">
+                <div className="text-4xl font-bold text-primary mb-2">
+                  {societies.length}
                 </div>
+                <div className="text-gray-600">societies monitored 24/7</div>
               </div>
             </>
           )}
 
           {/* Missing Society CTA */}
-          <div className="mt-12 text-center bg-primary/5 rounded-2xl p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+          <div className="mt-12 text-center bg-primary/5 rounded-xl p-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">
               missing a society?
             </h2>
             <p className="text-gray-600 mb-6">
-              let us know and we'll add them to our monitoring list
+              let us know and we'll add them
             </p>
             <a
               href="mailto:hello@freefooducd.ie"

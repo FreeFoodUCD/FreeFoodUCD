@@ -50,16 +50,8 @@ export function Header() {
           </Link>
         </nav>
 
-        {/* CTA Button */}
+        {/* Mobile Menu Button */}
         <div className="flex items-center gap-3">
-          <Link
-            href="/signup"
-            className="px-4 py-2 rounded-lg bg-white text-primary text-sm font-semibold hover:bg-gray-50 transition-colors"
-          >
-            Get Alerts
-          </Link>
-
-          {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="md:hidden p-2 text-white hover:text-white/80"
