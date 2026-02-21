@@ -227,44 +227,53 @@ async def seed_societies(
 @router.post("/scrape-now")
 async def trigger_scrape(
     society_handle: Optional[str] = None,
+    db: AsyncSession = Depends(get_db),
     _: bool = Depends(verify_admin_key)
 ):
     """
-    Trigger immediate scraping.
+    Trigger immediate scraping (runs synchronously for Railway).
     If society_handle provided, scrapes only that society.
     Otherwise, scrapes all active societies.
     """
-    from app.workers.scraping_tasks import scrape_all_posts, scrape_society_posts
-    from app.db.base import async_session_maker
+    from app.workers.scraping_tasks import _scrape_society_posts_async
     
     if society_handle:
-        # Scrape specific society
-        async with async_session_maker() as session:
-            result = await session.execute(
-                select(Society).where(Society.instagram_handle == society_handle)
-            )
-            society = result.scalar_one_or_none()
-            
-            if not society:
-                raise HTTPException(status_code=404, detail=f"Society @{society_handle} not found")
-            
-            # Trigger Celery task
-            task = scrape_society_posts.delay(str(society.id))
-            
-            return {
-                "message": f"Scraping triggered for @{society_handle}",
-                "society": society.name,
-                "task_id": task.id,
-                "status": "queued"
-            }
-    else:
-        # Scrape all societies
-        task = scrape_all_posts.delay()
+        # Scrape specific society synchronously
+        result = await db.execute(
+            select(Society).where(Society.instagram_handle == society_handle)
+        )
+        society = result.scalar_one_or_none()
+        
+        if not society:
+            raise HTTPException(status_code=404, detail=f"Society @{society_handle} not found")
+        
+        # Run scraping synchronously (no Celery needed)
+        scrape_result = await _scrape_society_posts_async(str(society.id))
         
         return {
-            "message": "Scraping triggered for all active societies",
-            "task_id": task.id,
-            "status": "queued"
+            "message": f"Scraping completed for @{society_handle}",
+            "society": society.name,
+            "result": scrape_result,
+            "status": "completed"
+        }
+    else:
+        # Scrape all societies synchronously
+        query = select(Society).where(Society.is_active == True, Society.scrape_posts == True)
+        result = await db.execute(query)
+        societies = result.scalars().all()
+        
+        results = []
+        for society in societies:
+            try:
+                scrape_result = await _scrape_society_posts_async(str(society.id))
+                results.append(scrape_result)
+            except Exception as e:
+                results.append({"society": society.instagram_handle, "error": str(e)})
+        
+        return {
+            "message": f"Scraping completed for {len(societies)} societies",
+            "results": results,
+            "status": "completed"
         }
 
 
