@@ -231,8 +231,11 @@ async def _scrape_society_posts_async(society_id: str):
                 new_posts += 1
                 posts_found += 1
                 
-                # Trigger NLP processing
-                process_scraped_content.delay('post', str(post.id))
+                # Process NLP synchronously (no Celery on Railway)
+                try:
+                    await _process_scraped_content_async('post', str(post.id))
+                except Exception as nlp_error:
+                    logger.error(f"NLP processing failed for post {post.id}: {nlp_error}")
                 
                 logger.info(f"New post from @{society.instagram_handle}: {post_data['url']}")
             
@@ -347,9 +350,12 @@ async def _process_scraped_content_async(content_type: str, content_id: str):
             await session.commit()
             await session.refresh(event)
             
-            # Trigger notifications
-            from app.workers.notification_tasks import notify_event
-            notify_event.delay(str(event.id))
+            # Send notifications synchronously (no Celery on Railway)
+            try:
+                from app.workers.notification_tasks import _notify_event_async
+                await _notify_event_async(str(event.id))
+            except Exception as notif_error:
+                logger.error(f"Notification failed for event {event.id}: {notif_error}")
             
             return {
                 "event_created": True,
