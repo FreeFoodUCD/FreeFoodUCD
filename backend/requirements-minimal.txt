@@ -1,0 +1,11 @@
+# Minimal requirements for testing notifications
+# Use this for quick testing without full setup
+
+# WhatsApp
+twilio==8.11.0
+
+# Email
+resend==0.8.0
+
+# Utilities
+python-dotenv==1.0.0
