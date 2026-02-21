@@ -24,10 +24,10 @@ class Settings(BaseSettings):
     TWILIO_AUTH_TOKEN: str
     TWILIO_WHATSAPP_NUMBER: str
     
-    # Email Service (Resend)
-    RESEND_API_KEY: str
-    RESEND_FROM_EMAIL: str
-    RESEND_FROM_NAME: str = "FreeFood UCD"
+    # Email Service (Brevo/Sendinblue)
+    BREVO_API_KEY: str
+    BREVO_FROM_EMAIL: str
+    BREVO_FROM_NAME: str = "FreeFood UCD"
     
     # AWS S3 (Optional - for production)
     AWS_ACCESS_KEY_ID: Optional[str] = None

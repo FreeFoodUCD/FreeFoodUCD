@@ -10,8 +10,7 @@ import string
 
 from app.db.base import get_db
 from app.db.models import User, UserSocietyPreference
-from app.services.notifications.whatsapp import WhatsAppService
-from app.services.notifications.email import EmailService
+from app.services.notifications import brevo
 
 router = APIRouter()
 
@@ -19,13 +18,11 @@ router = APIRouter()
 # Pydantic schemas
 class UserSignupRequest(BaseModel):
     """User signup request schema."""
-    phone_number: Optional[str] = Field(None, description="Phone number with country code (e.g., +353871234567)")
-    email: Optional[EmailStr] = Field(None, description="Email address")
+    email: EmailStr = Field(..., description="Email address")
     
     class Config:
         json_schema_extra = {
             "example": {
-                "phone_number": "+353871234567",
                 "email": "student@ucd.ie"
             }
         }
@@ -62,8 +59,7 @@ class SocietyPreferenceUpdate(BaseModel):
 
 class VerifyCodeRequest(BaseModel):
     """Verification code request."""
-    phone_number: Optional[str] = None
-    email: Optional[EmailStr] = None
+    email: EmailStr
     code: str = Field(..., min_length=6, max_length=6)
 
 
@@ -78,38 +74,18 @@ async def signup_user(
     db: AsyncSession = Depends(get_db)
 ):
     """
-    Sign up a new user for notifications.
-    
-    At least one of phone_number or email must be provided.
-    Sends verification code via WhatsApp or Email.
+    Sign up a new user for email notifications.
+    Sends verification code via email.
     """
-    if not user_data.phone_number and not user_data.email:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="At least one of phone_number or email must be provided"
-        )
-    
     # Check if user already exists
-    existing_user = None
-    if user_data.phone_number:
-        query = select(User).where(User.phone_number == user_data.phone_number)
-        result = await db.execute(query)
-        existing_user = result.scalar_one_or_none()
-        if existing_user:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="already_signed_up"
-            )
-    
-    if user_data.email:
-        query = select(User).where(User.email == user_data.email)
-        result = await db.execute(query)
-        existing_user = result.scalar_one_or_none()
-        if existing_user:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="already_signed_up"
-            )
+    query = select(User).where(User.email == user_data.email)
+    result = await db.execute(query)
+    existing_user = result.scalar_one_or_none()
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="already_signed_up"
+        )
     
     # Generate verification code
     verification_code = generate_verification_code()
@@ -117,33 +93,22 @@ async def signup_user(
     
     # Create new user
     new_user = User(
-        phone_number=user_data.phone_number,
+        phone_number=None,
         email=user_data.email,
         whatsapp_verified=False,
         email_verified=False,
         verification_code=verification_code,
         verification_code_expires=code_expires,
-        notification_preferences={"whatsapp": True, "email": True}
+        notification_preferences={"email": True}
     )
     
     db.add(new_user)
     await db.commit()
     await db.refresh(new_user)
     
-    # Send verification code
+    # Send verification code via Brevo
     try:
-        if user_data.phone_number:
-            whatsapp_service = WhatsAppService()
-            await whatsapp_service.send_verification_code(
-                user_data.phone_number,
-                verification_code
-            )
-        elif user_data.email:
-            email_service = EmailService()
-            await email_service.send_verification_code(
-                user_data.email,
-                verification_code
-            )
+        await brevo.send_verification_email(user_data.email, verification_code)
     except Exception as e:
         # Log error but don't fail signup
         print(f"Error sending verification code: {e}")
@@ -260,24 +225,12 @@ async def verify_user(
     db: AsyncSession = Depends(get_db)
 ):
     """
-    Verify user with code sent via WhatsApp/Email.
+    Verify user with code sent via email.
     """
-    if not verify_data.phone_number and not verify_data.email:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="At least one of phone_number or email must be provided"
-        )
-    
     # Find user
-    user = None
-    if verify_data.phone_number:
-        query = select(User).where(User.phone_number == verify_data.phone_number)
-        result = await db.execute(query)
-        user = result.scalar_one_or_none()
-    elif verify_data.email:
-        query = select(User).where(User.email == verify_data.email)
-        result = await db.execute(query)
-        user = result.scalar_one_or_none()
+    query = select(User).where(User.email == verify_data.email)
+    result = await db.execute(query)
+    user = result.scalar_one_or_none()
     
     if not user:
         raise HTTPException(
@@ -286,9 +239,7 @@ async def verify_user(
         )
     
     # Check if already verified
-    if verify_data.phone_number and user.whatsapp_verified:
-        return {"message": "Already verified", "verified": True}
-    if verify_data.email and user.email_verified:
+    if user.email_verified:
         return {"message": "Already verified", "verified": True}
     
     # Check verification code
@@ -313,10 +264,7 @@ async def verify_user(
         )
     
     # Mark as verified
-    if verify_data.phone_number:
-        user.whatsapp_verified = True
-    elif verify_data.email:
-        user.email_verified = True
+    user.email_verified = True
     
     # Clear verification code
     user.verification_code = None
@@ -325,14 +273,9 @@ async def verify_user(
     await db.commit()
     await db.refresh(user)
     
-    # Send welcome message
+    # Send welcome email
     try:
-        if verify_data.phone_number:
-            whatsapp_service = WhatsAppService()
-            await whatsapp_service.send_welcome_message(verify_data.phone_number)
-        elif verify_data.email:
-            email_service = EmailService()
-            await email_service.send_welcome_email(verify_data.email)
+        await brevo.send_welcome_email(verify_data.email)
     except Exception as e:
         print(f"Error sending welcome message: {e}")
     
