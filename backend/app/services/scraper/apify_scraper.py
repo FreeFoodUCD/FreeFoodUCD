@@ -62,9 +62,16 @@ class ApifyInstagramScraper:
             logger.info(f"Running Apify actor with input: {run_input}")
             run = self.client.actor(self.actor_id).call(run_input=run_input)
             
+            # Log run details
+            logger.info(f"Apify run completed. Run ID: {run.get('id')}, Status: {run.get('status')}")
+            logger.info(f"Dataset ID: {run.get('defaultDatasetId')}")
+            
             # Fetch results from the Actor's dataset
             posts = []
-            for item in self.client.dataset(run["defaultDatasetId"]).iterate_items():
+            dataset_items = list(self.client.dataset(run["defaultDatasetId"]).iterate_items())
+            logger.info(f"Apify dataset returned {len(dataset_items)} items for @{username}")
+            
+            for item in dataset_items:
                 try:
                     # Debug: Log the raw item structure
                     logger.debug(f"Raw Apify item keys: {item.keys()}")
