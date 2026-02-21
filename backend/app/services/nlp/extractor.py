@@ -25,13 +25,14 @@ class EventExtractor:
             r'(\d{1,2})\.(\d{2})',  # 18.30
         ]
         
-        # Free food keywords (expanded based on real data)
+        # Free food keywords (very permissive - UCD societies usually offer free food)
         self.free_food_keywords = [
             'free food', 'free pizza', 'free', 'pizza', 'refreshments',
             'snacks', 'food', 'drinks', 'lunch', 'dinner', 'breakfast',
             'catering', 'buffet', 'nibbles', 'tea', 'coffee', 'cookies',
             'dessert', 'potluck', 'iftar', 'break the fast', 'provided',
-            'complimentary', 'food and drinks'
+            'complimentary', 'food and drinks', 'italian food', 'snack',
+            'study session', 'banquet', 'flavour', 'join us'
         ]
         
         # Date keywords
@@ -134,11 +135,8 @@ class EventExtractor:
             logger.info(f"Rejected: Paid event indicator detected ({indicator})")
             return None
         
-        # Step 5: Require UCD campus location
+        # Step 5: Check for UCD campus location (more flexible)
         has_ucd_location = self._has_ucd_location(text_lower)
-        if not has_ucd_location:
-            logger.info("Rejected: No UCD campus location found")
-            return None
         
         # Step 6: Extract event details
         time = self._extract_time(text)
@@ -146,12 +144,17 @@ class EventExtractor:
         location = self._extract_location(text)
         
         # Calculate confidence score
-        confidence = self._calculate_confidence(time, date, location)
+        confidence = self._calculate_confidence(time, date, location, has_ucd_location)
         
-        # Require minimum confidence (increased threshold)
-        if confidence < 0.5:
+        # Lower threshold - UCD societies post on campus by default
+        # If no explicit location but has time/date, still accept (assume on campus)
+        if confidence < 0.3:
             logger.debug(f"Rejected: Low confidence ({confidence})")
             return None
+        
+        # Warn if no UCD location but still accept if other signals strong
+        if not has_ucd_location:
+            logger.warning("No explicit UCD location, but accepting based on other signals")
         
         # Combine date and time
         start_time = self._combine_datetime(date, time)
@@ -198,16 +201,27 @@ class EventExtractor:
     
     def _is_paid_event(self, text: str) -> Tuple[bool, str]:
         """Check if text indicates a paid event."""
-        # Special case: "sign up" alone is OK if no cost mentioned
+        # UCD society membership is €2 - this is NOT a paid event indicator
+        # Only reject if tickets/entry fees are mentioned, not membership
+        
+        # Ignore €2 membership fee mentions
+        if '€2' in text and ('ucard' in text or 'membership' in text or 'sign up' in text):
+            return False, ""
+        
+        # Ignore "sign up" alone
         if 'sign up' in text and '€' not in text and 'ticket' not in text:
             return False, ""
         
+        # Check for actual paid event indicators
         for indicator in self.paid_event_indicators:
             if indicator in text:
-                # Special handling for "ball" - only reject if it seems like a formal ball
+                # Special handling for "ball" - only reject if formal ball
                 if indicator == 'ball' and ('ticket' in text or '€' in text or 'formal' in text):
                     return True, indicator
-                elif indicator != 'ball':
+                # Ignore € if it's just €2 for membership
+                elif indicator == '€' and '€2' in text:
+                    continue
+                elif indicator != 'ball' and indicator != '€':
                     return True, indicator
         return False, ""
     
@@ -339,12 +353,12 @@ class EventExtractor:
         
         return None
     
-    def _calculate_confidence(self, time: Optional[Dict], date: Optional[datetime], location: Optional[Dict]) -> float:
+    def _calculate_confidence(self, time: Optional[Dict], date: Optional[datetime], location: Optional[Dict], has_ucd_location: bool = False) -> float:
         """Calculate confidence score for extracted event."""
         score = 0.0
         
-        # Base score for being detected as free food
-        score += 0.3
+        # Base score for being detected as free food from UCD society
+        score += 0.4  # Increased base score
         
         # Time found
         if time:
@@ -363,6 +377,9 @@ class EventExtractor:
             # Bonus for room number
             if location.get('room'):
                 score += 0.1
+        elif has_ucd_location:
+            # Has UCD mention but no specific location extracted
+            score += 0.1
         
         return min(score, 1.0)
     
