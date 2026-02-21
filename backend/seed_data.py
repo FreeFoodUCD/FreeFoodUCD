@@ -19,8 +19,8 @@ async def seed_societies():
             "is_active": True
         },
         {
-            "name": "UCD Computer Science Society",
-            "instagram_handle": "ucdcompsci",
+            "name": "UCD Netsoc (Computer Science Society)",
+            "instagram_handle": "ucdnetsoc",
             "is_active": True
         },
         {

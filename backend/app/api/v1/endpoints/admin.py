@@ -311,4 +311,68 @@ async def test_scrape(
         raise HTTPException(status_code=500, detail=f"Scraping failed: {str(e)}")
 
 
+@router.put("/societies/{society_id}")
+async def update_society(
+    society_id: int,
+    name: Optional[str] = None,
+    instagram_handle: Optional[str] = None,
+    is_active: Optional[bool] = None,
+    db: AsyncSession = Depends(get_db),
+    _: bool = Depends(verify_admin_key)
+):
+    """
+    Update society details.
+    Provide only the fields you want to update.
+    """
+    result = await db.execute(select(Society).where(Society.id == society_id))
+    society = result.scalar_one_or_none()
+    
+    if not society:
+        raise HTTPException(status_code=404, detail="Society not found")
+    
+    # Update provided fields
+    if name is not None:
+        society.name = name
+    if instagram_handle is not None:
+        society.instagram_handle = instagram_handle
+    if is_active is not None:
+        society.is_active = is_active
+    
+    await db.commit()
+    await db.refresh(society)
+    
+    return {
+        "message": "Society updated successfully",
+        "society": {
+            "id": society.id,
+            "name": society.name,
+            "instagram_handle": society.instagram_handle,
+            "is_active": society.is_active
+        }
+    }
+
+
+@router.get("/societies")
+async def list_societies(
+    db: AsyncSession = Depends(get_db),
+    _: bool = Depends(verify_admin_key)
+):
+    """List all societies with their IDs."""
+    result = await db.execute(select(Society))
+    societies = result.scalars().all()
+    
+    return {
+        "total": len(societies),
+        "societies": [
+            {
+                "id": society.id,
+                "name": society.name,
+                "instagram_handle": society.instagram_handle,
+                "is_active": society.is_active
+            }
+            for society in societies
+        ]
+    }
+
+
 # Made with Bob
