@@ -37,6 +37,7 @@ class Settings(BaseSettings):
     
     # Application
     SECRET_KEY: str
+    ADMIN_API_KEY: str = "change-this-in-production"
     ENVIRONMENT: str = "development"
     LOG_LEVEL: str = "INFO"
     API_V1_PREFIX: str = "/api/v1"

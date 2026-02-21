@@ -4,9 +4,14 @@ from sqlalchemy import select
 from typing import Optional
 from uuid import UUID
 from pydantic import BaseModel, EmailStr, Field
+from datetime import datetime, timedelta
+import random
+import string
 
 from app.db.base import get_db
 from app.db.models import User, UserSocietyPreference
+from app.services.notifications.whatsapp import WhatsAppService
+from app.services.notifications.email import EmailService
 
 router = APIRouter()
 
@@ -55,6 +60,18 @@ class SocietyPreferenceUpdate(BaseModel):
     notify: bool
 
 
+class VerifyCodeRequest(BaseModel):
+    """Verification code request."""
+    phone_number: Optional[str] = None
+    email: Optional[EmailStr] = None
+    code: str = Field(..., min_length=6, max_length=6)
+
+
+def generate_verification_code() -> str:
+    """Generate a 6-digit verification code."""
+    return ''.join(random.choices(string.digits, k=6))
+
+
 @router.post("/users/signup", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 async def signup_user(
     user_data: UserSignupRequest,
@@ -64,6 +81,7 @@ async def signup_user(
     Sign up a new user for notifications.
     
     At least one of phone_number or email must be provided.
+    Sends verification code via WhatsApp or Email.
     """
     if not user_data.phone_number and not user_data.email:
         raise HTTPException(
@@ -72,14 +90,15 @@ async def signup_user(
         )
     
     # Check if user already exists
+    existing_user = None
     if user_data.phone_number:
         query = select(User).where(User.phone_number == user_data.phone_number)
         result = await db.execute(query)
         existing_user = result.scalar_one_or_none()
         if existing_user:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="User with this phone number already exists"
+                status_code=status.HTTP_409_CONFLICT,
+                detail="already_signed_up"
             )
     
     if user_data.email:
@@ -88,9 +107,13 @@ async def signup_user(
         existing_user = result.scalar_one_or_none()
         if existing_user:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="User with this email already exists"
+                status_code=status.HTTP_409_CONFLICT,
+                detail="already_signed_up"
             )
+    
+    # Generate verification code
+    verification_code = generate_verification_code()
+    code_expires = datetime.utcnow() + timedelta(minutes=10)
     
     # Create new user
     new_user = User(
@@ -98,6 +121,8 @@ async def signup_user(
         email=user_data.email,
         whatsapp_verified=False,
         email_verified=False,
+        verification_code=verification_code,
+        verification_code_expires=code_expires,
         notification_preferences={"whatsapp": True, "email": True}
     )
     
@@ -105,7 +130,23 @@ async def signup_user(
     await db.commit()
     await db.refresh(new_user)
     
-    # TODO: Send verification code via WhatsApp/Email
+    # Send verification code
+    try:
+        if user_data.phone_number:
+            whatsapp_service = WhatsAppService()
+            await whatsapp_service.send_verification_code(
+                user_data.phone_number,
+                verification_code
+            )
+        elif user_data.email:
+            email_service = EmailService()
+            await email_service.send_verification_code(
+                user_data.email,
+                verification_code
+            )
+    except Exception as e:
+        # Log error but don't fail signup
+        print(f"Error sending verification code: {e}")
     
     return UserResponse(
         id=new_user.id,
@@ -211,3 +252,92 @@ async def update_society_preference(
     return {"message": "Society preference updated successfully"}
 
 # Made with Bob
+
+
+@router.post("/users/verify")
+async def verify_user(
+    verify_data: VerifyCodeRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Verify user with code sent via WhatsApp/Email.
+    """
+    if not verify_data.phone_number and not verify_data.email:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="At least one of phone_number or email must be provided"
+        )
+    
+    # Find user
+    user = None
+    if verify_data.phone_number:
+        query = select(User).where(User.phone_number == verify_data.phone_number)
+        result = await db.execute(query)
+        user = result.scalar_one_or_none()
+    elif verify_data.email:
+        query = select(User).where(User.email == verify_data.email)
+        result = await db.execute(query)
+        user = result.scalar_one_or_none()
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Check if already verified
+    if verify_data.phone_number and user.whatsapp_verified:
+        return {"message": "Already verified", "verified": True}
+    if verify_data.email and user.email_verified:
+        return {"message": "Already verified", "verified": True}
+    
+    # Check verification code
+    if not user.verification_code or not user.verification_code_expires:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No verification code found. Please request a new one."
+        )
+    
+    # Check if code expired
+    if datetime.utcnow() > user.verification_code_expires:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Verification code expired. Please request a new one."
+        )
+    
+    # Verify code
+    if user.verification_code != verify_data.code:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid verification code"
+        )
+    
+    # Mark as verified
+    if verify_data.phone_number:
+        user.whatsapp_verified = True
+    elif verify_data.email:
+        user.email_verified = True
+    
+    # Clear verification code
+    user.verification_code = None
+    user.verification_code_expires = None
+    
+    await db.commit()
+    await db.refresh(user)
+    
+    # Send welcome message
+    try:
+        if verify_data.phone_number:
+            whatsapp_service = WhatsAppService()
+            await whatsapp_service.send_welcome_message(verify_data.phone_number)
+        elif verify_data.email:
+            email_service = EmailService()
+            await email_service.send_welcome_email(verify_data.email)
+    except Exception as e:
+        print(f"Error sending welcome message: {e}")
+    
+    return {
+        "message": "Verification successful",
+        "verified": True,
+        "user_id": str(user.id)
+    }

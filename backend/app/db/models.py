@@ -104,6 +104,8 @@ class User(Base):
     phone_number = Column(String(20), unique=True, index=True)
     whatsapp_verified = Column(Boolean, default=False)
     email_verified = Column(Boolean, default=False)
+    verification_code = Column(String(6))
+    verification_code_expires = Column(DateTime(timezone=True))
     notification_preferences = Column(
         JSONB,
         default={"whatsapp": True, "email": True},
