@@ -1,5 +1,5 @@
 from pydantic_settings import BaseSettings
-from typing import List
+from typing import List, Optional
 
 
 class Settings(BaseSettings):
@@ -12,9 +12,12 @@ class Settings(BaseSettings):
     # Redis
     REDIS_URL: str
     
-    # Instagram
-    INSTAGRAM_USERNAME: str
-    INSTAGRAM_PASSWORD: str
+    # Instagram (Legacy - not used with Apify)
+    INSTAGRAM_USERNAME: Optional[str] = None
+    INSTAGRAM_PASSWORD: Optional[str] = None
+    
+    # Apify
+    APIFY_API_TOKEN: str
     
     # Twilio (WhatsApp)
     TWILIO_ACCOUNT_SID: str
@@ -26,10 +29,10 @@ class Settings(BaseSettings):
     RESEND_FROM_EMAIL: str
     RESEND_FROM_NAME: str = "FreeFood UCD"
     
-    # AWS S3
-    AWS_ACCESS_KEY_ID: str
-    AWS_SECRET_ACCESS_KEY: str
-    AWS_S3_BUCKET: str
+    # AWS S3 (Optional - for production)
+    AWS_ACCESS_KEY_ID: Optional[str] = None
+    AWS_SECRET_ACCESS_KEY: Optional[str] = None
+    AWS_S3_BUCKET: Optional[str] = None
     AWS_REGION: str = "eu-west-1"
     
     # Application
@@ -49,6 +52,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = True
+        extra = "ignore"  # Ignore extra fields in .env
 
 
 settings = Settings()

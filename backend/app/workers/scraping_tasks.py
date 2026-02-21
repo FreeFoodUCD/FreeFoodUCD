@@ -3,12 +3,28 @@ from app.workers.celery_app import celery_app
 from app.db.base import async_session_maker
 from app.db.models import Society, Post, Story, Event, ScrapingLog
 from app.services.nlp.extractor import EventExtractor
+from app.services.scraper.apify_scraper import ApifyInstagramScraper
 from sqlalchemy import select
 from datetime import datetime, timedelta
 import logging
 import asyncio
+import hashlib
 
 logger = logging.getLogger(__name__)
+
+# Global scraper instance
+_scraper_instance = None
+
+
+def get_scraper():
+    """Get or create the global Apify scraper instance."""
+    global _scraper_instance
+    if _scraper_instance is None:
+        from app.core.config import settings
+        _scraper_instance = ApifyInstagramScraper(
+            api_token=settings.APIFY_API_TOKEN
+        )
+    return _scraper_instance
 
 
 @celery_app.task(bind=True, max_retries=3)
@@ -170,13 +186,60 @@ async def _scrape_society_posts_async(society_id: str):
             return {"error": "Society not found"}
         
         try:
-            # TODO: Implement actual post scraping
+            logger.info(f"Scraping posts for @{society.instagram_handle}")
+            
+            # Get Apify scraper instance
+            scraper = get_scraper()
+            
+            # Scrape last 3 posts (societies post 2-3 times/week)
+            # Apify handles authentication automatically
+            posts_data = await scraper.scrape_posts(society.instagram_handle, max_posts=3)
+            
             posts_found = 0
+            new_posts = 0
             
-            logger.info(f"Would scrape posts for @{society.instagram_handle}")
+            for post_data in posts_data:
+                # Extract post ID from URL (e.g., https://instagram.com/p/ABC123/)
+                post_id = post_data['url'].split('/p/')[-1].rstrip('/')
+                
+                # Check if post already exists
+                existing_query = select(Post).where(
+                    Post.society_id == society.id,
+                    Post.instagram_post_id == post_id
+                )
+                result = await session.execute(existing_query)
+                existing_post = result.scalar_one_or_none()
+                
+                if existing_post:
+                    logger.debug(f"Post already exists: {post_data['url']}")
+                    continue
+                
+                # Create new post
+                post = Post(
+                    society_id=society.id,
+                    instagram_post_id=post_id,
+                    caption=post_data['caption'],
+                    media_urls=[post_data.get('image_url')] if post_data.get('image_url') else [],
+                    source_url=post_data['url'],
+                    detected_at=post_data['timestamp'],
+                    processed=False
+                )
+                
+                session.add(post)
+                await session.flush()  # Get post ID
+                
+                new_posts += 1
+                posts_found += 1
+                
+                # Trigger NLP processing
+                process_scraped_content.delay('post', str(post.id))
+                
+                logger.info(f"New post from @{society.instagram_handle}: {post_data['url']}")
             
+            # Update last check time
             society.last_post_check = datetime.now()
             
+            # Log scraping activity
             log = ScrapingLog(
                 society_id=society.id,
                 scrape_type='post',
@@ -187,13 +250,17 @@ async def _scrape_society_posts_async(society_id: str):
             session.add(log)
             await session.commit()
             
+            logger.info(f"Scraped {posts_found} posts from @{society.instagram_handle} ({new_posts} new)")
+            
             return {
                 "society": society.instagram_handle,
                 "posts_found": posts_found,
+                "new_posts": new_posts,
                 "status": "success"
             }
             
         except Exception as e:
+            logger.error(f"Error scraping posts for @{society.instagram_handle}: {e}")
             log = ScrapingLog(
                 society_id=society.id,
                 scrape_type='post',
@@ -230,12 +297,27 @@ async def _process_scraped_content_async(content_type: str, content_id: str):
             text = content.story_text if content else None
         else:
             content = await session.get(Post, content_id)
-            text = content.caption if content else None
+            text = content.caption if content else ""
+            
+            # Extract text from images using OCR
+            if content and content.media_urls:
+                from app.services.ocr.image_text_extractor import ImageTextExtractor
+                ocr = ImageTextExtractor()
+                
+                logger.info(f"Extracting text from {len(content.media_urls)} images")
+                ocr_text = ocr.extract_text_from_urls(content.media_urls)
+                
+                if ocr_text:
+                    # Combine caption and OCR text
+                    text = f"{text}\n\n[Image Text]\n{ocr_text}"
+                    logger.info(f"Combined text length: {len(text)} chars")
         
         if not content or not text:
-            return {"error": "Content not found"}
+            logger.warning(f"No text found for {content_type} {content_id}")
+            return {"error": "Content not found or empty"}
         
         # Extract event
+        logger.info(f"Processing {content_type} {content_id} with {len(text)} chars")
         event_data = extractor.extract_event(text, content_type)
         
         if event_data:

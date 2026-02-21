@@ -1,7 +1,10 @@
 import re
 from datetime import datetime, timedelta
-from typing import Optional, Dict, List
+from typing import Optional, Dict, List, Tuple
 import pytz
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class EventExtractor:
@@ -10,6 +13,9 @@ class EventExtractor:
     def __init__(self):
         self.timezone = pytz.timezone('Europe/Dublin')
         self.ucd_buildings = self.load_ucd_buildings()
+        self.other_colleges = self.load_other_colleges()
+        self.off_campus_venues = self.load_off_campus_venues()
+        self.paid_event_indicators = self.load_paid_indicators()
         
         # Time patterns
         self.time_patterns = [
@@ -19,11 +25,13 @@ class EventExtractor:
             r'(\d{1,2})\.(\d{2})',  # 18.30
         ]
         
-        # Free food keywords
+        # Free food keywords (expanded based on real data)
         self.free_food_keywords = [
             'free food', 'free pizza', 'free', 'pizza', 'refreshments',
             'snacks', 'food', 'drinks', 'lunch', 'dinner', 'breakfast',
-            'catering', 'buffet', 'nibbles'
+            'catering', 'buffet', 'nibbles', 'tea', 'coffee', 'cookies',
+            'dessert', 'potluck', 'iftar', 'break the fast', 'provided',
+            'complimentary', 'food and drinks'
         ]
         
         # Date keywords
@@ -49,15 +57,53 @@ class EventExtractor:
             'Quinn School', 'Sutherland School', 'Moore Centre',
             'Roebuck Castle', 'Belfield', 'Arts Building',
             'Agriculture Building', 'Veterinary', 'Smurfit',
-            'Lochlann Quinn', 'Health Sciences', 'Conway Institute'
+            'Lochlann Quinn', 'Health Sciences', 'Conway Institute',
+            'Astra Hall', 'UCD', 'campus'
+        ]
+    
+    def load_other_colleges(self) -> List[str]:
+        """Load list of other Irish colleges to reject."""
+        return [
+            'dcu', 'trinity', 'tcd', 'maynooth', 'mu', 'nuig', 'ucc', 'ul',
+            'dublin city university', 'trinity college', 'maynooth university'
+        ]
+    
+    def load_off_campus_venues(self) -> List[str]:
+        """Load list of off-campus venues to reject."""
+        return [
+            # Pubs/Bars
+            'pub', 'bar', 'brewery', 'tavern',
+            'kennedy\'s', 'doyle\'s', 'sinnott\'s',
+            'johnnie fox\'s', 'blue light', 'taylors',
+            'three rock', 'pub crawl',
+            
+            # Restaurants/Cafes
+            'restaurant', 'cafe', 'bistro', 'grill', 'diner',
+            'nando\'s', 'supermac\'s', 'eddie rocket\'s',
+            
+            # Dublin Areas (off-campus)
+            'soho', 'temple bar', 'grafton street', 'o\'connell street',
+            'rathmines', 'ranelagh', 'dundrum', 'city centre',
+            'dublin 2', 'dublin 4', 'dublin mountains',
+            
+            # Social outings
+            'night out', 'mixer at', 'meet at', 'heading to'
+        ]
+    
+    def load_paid_indicators(self) -> List[str]:
+        """Load list of paid event indicators."""
+        return [
+            'ticket', 'tickets', 'entry fee', 'admission',
+            '€', 'euro', 'cost', 'price', 'pay',
+            'book now', 'register', 'ball', 'gala', 'formal'
         ]
     
     def extract_event(self, text: str, source_type: str = 'post') -> Optional[Dict]:
         """
-        Extract event details from text.
+        Extract event details from text with enhanced filtering.
         
         Args:
-            text: Text to extract from
+            text: Text to extract from (caption + OCR text combined)
             source_type: 'post' or 'story'
             
         Returns:
@@ -65,11 +111,36 @@ class EventExtractor:
         """
         text_lower = text.lower()
         
-        # Check for free food keywords
+        # Step 1: Check for free food keywords
         if not self._contains_free_food(text_lower):
+            logger.debug("Rejected: No free food keywords found")
             return None
         
-        # Extract components
+        # Step 2: CRITICAL - Reject other colleges
+        is_other_college, college_name = self._is_other_college(text_lower)
+        if is_other_college:
+            logger.info(f"Rejected: Other college detected ({college_name})")
+            return None
+        
+        # Step 3: Reject off-campus venues
+        is_off_campus, venue_name = self._is_off_campus(text_lower)
+        if is_off_campus:
+            logger.info(f"Rejected: Off-campus venue detected ({venue_name})")
+            return None
+        
+        # Step 4: Reject paid events
+        is_paid, indicator = self._is_paid_event(text_lower)
+        if is_paid:
+            logger.info(f"Rejected: Paid event indicator detected ({indicator})")
+            return None
+        
+        # Step 5: Require UCD campus location
+        has_ucd_location = self._has_ucd_location(text_lower)
+        if not has_ucd_location:
+            logger.info("Rejected: No UCD campus location found")
+            return None
+        
+        # Step 6: Extract event details
         time = self._extract_time(text)
         date = self._extract_date(text_lower)
         location = self._extract_location(text)
@@ -77,8 +148,9 @@ class EventExtractor:
         # Calculate confidence score
         confidence = self._calculate_confidence(time, date, location)
         
-        # Require minimum confidence
-        if confidence < 0.4:
+        # Require minimum confidence (increased threshold)
+        if confidence < 0.5:
+            logger.debug(f"Rejected: Low confidence ({confidence})")
             return None
         
         # Combine date and time
@@ -86,6 +158,8 @@ class EventExtractor:
         
         # Generate title
         title = self._generate_title(text, location)
+        
+        logger.info(f"Accepted: Free food event detected (confidence: {confidence})")
         
         return {
             'title': title,
@@ -107,6 +181,39 @@ class EventExtractor:
     def _contains_free_food(self, text: str) -> bool:
         """Check if text contains free food keywords."""
         return any(keyword in text for keyword in self.free_food_keywords)
+    
+    def _is_other_college(self, text: str) -> Tuple[bool, str]:
+        """Check if text mentions other Irish colleges."""
+        for college in self.other_colleges:
+            if college in text:
+                return True, college
+        return False, ""
+    
+    def _is_off_campus(self, text: str) -> Tuple[bool, str]:
+        """Check if text mentions off-campus venues."""
+        for venue in self.off_campus_venues:
+            if venue in text:
+                return True, venue
+        return False, ""
+    
+    def _is_paid_event(self, text: str) -> Tuple[bool, str]:
+        """Check if text indicates a paid event."""
+        # Special case: "sign up" alone is OK if no cost mentioned
+        if 'sign up' in text and '€' not in text and 'ticket' not in text:
+            return False, ""
+        
+        for indicator in self.paid_event_indicators:
+            if indicator in text:
+                # Special handling for "ball" - only reject if it seems like a formal ball
+                if indicator == 'ball' and ('ticket' in text or '€' in text or 'formal' in text):
+                    return True, indicator
+                elif indicator != 'ball':
+                    return True, indicator
+        return False, ""
+    
+    def _has_ucd_location(self, text: str) -> bool:
+        """Check if text mentions UCD campus location."""
+        return any(building.lower() in text for building in self.ucd_buildings)
     
     def _extract_time(self, text: str) -> Optional[Dict]:
         """Extract time from text."""

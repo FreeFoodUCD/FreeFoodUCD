@@ -2,6 +2,7 @@
 
 import { Header } from '@/components/Header';
 import { EventCard, EventCardSkeleton } from '@/components/EventCard';
+import EventModal from '@/components/EventModal';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api';
@@ -76,6 +77,8 @@ const MOCK_EVENTS: Event[] = [
 
 export default function Home() {
   const [useMockData] = useState(false); // Changed to false to use real API
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Fetch events from API
   const { data, isLoading, error } = useQuery({
@@ -85,9 +88,19 @@ export default function Home() {
   });
 
   // Fallback to mock data if API fails or returns empty
-  const events = useMockData || (!isLoading && !error && data?.items.length === 0)
+  const events = useMockData || (!isLoading && !error && data?.items && data.items.length === 0)
     ? MOCK_EVENTS
     : (data?.items || []);
+
+  const handleEventClick = (event: Event) => {
+    setSelectedEvent(event);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setTimeout(() => setSelectedEvent(null), 300);
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -167,15 +180,20 @@ export default function Home() {
                 <EventCard
                   key={event.id}
                   event={event}
-                  onClick={() => {
-                    console.log('Event clicked:', event.id);
-                  }}
+                  onClick={() => handleEventClick(event)}
                 />
               ))}
             </div>
           )}
         </div>
       </section>
+
+      {/* Event Detail Modal */}
+      <EventModal
+        event={selectedEvent}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
     </div>
   );
 }

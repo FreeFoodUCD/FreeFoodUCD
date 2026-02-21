@@ -1,306 +1,295 @@
-# 🍕 FreeFood UCD
+# FreeFood UCD 🍕
 
-**Never miss free food on campus again.**
+Automatically detect when UCD societies post about free food on Instagram and notify students via WhatsApp or email.
 
-FreeFood UCD automatically monitors UCD society Instagram accounts for free food announcements and sends instant notifications via WhatsApp or email.
+## Features
 
----
+- 🔍 **Instagram Scraping** - Monitors UCD society accounts via Apify
+- 🧠 **Smart Filtering** - 6-layer NLP validation (rejects other colleges, off-campus, paid events)
+- 📸 **OCR Support** - Extracts text from post images
+- 📱 **WhatsApp Notifications** - Primary notification channel via Twilio
+- 📧 **Email Notifications** - Secondary channel via Resend
+- 🎯 **Real-time Detection** - Scrapes every 30 minutes
+- 🗄️ **PostgreSQL Database** - Stores events, posts, and user preferences
 
-## 🎯 What It Does
+## Tech Stack
 
-- **Monitors** Instagram posts and stories from UCD societies
-- **Detects** free food mentions using NLP
-- **Extracts** event details (time, location, society)
-- **Notifies** students instantly via WhatsApp or email
-- **Displays** upcoming events in a clean, mobile-first interface
+**Backend:**
+- FastAPI (Python)
+- PostgreSQL + SQLAlchemy
+- Celery + Redis (task queue)
+- Apify (Instagram scraping)
+- Pytesseract (OCR)
 
----
+**Frontend:**
+- Next.js 14
+- TypeScript
+- Tailwind CSS
 
-## 🏗️ Architecture
+## Quick Start
 
-```
-Frontend (Next.js) → API (FastAPI) → Database (PostgreSQL)
-                                   ↓
-                          Scraper Service (Playwright)
-                                   ↓
-                          Event Processor (NLP)
-                                   ↓
-                          Notification Service (Twilio/SendGrid)
-```
-
-**Key Features:**
-- Microservice architecture for fault tolerance
-- Event-driven processing with message queues
-- Async scraping with anti-detection measures
-- Real-time notifications with delivery tracking
-- Mobile-first, minimal UI design
-
----
-
-## 📚 Documentation
-
-- **[ARCHITECTURE.md](ARCHITECTURE.md)** - System design and technical architecture
-- **[FRONTEND_DESIGN_SPEC.md](FRONTEND_DESIGN_SPEC.md)** - UI/UX design system and components
-- **[IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md)** - Step-by-step development guide
-
----
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- Python 3.11+
-- Node.js 18+
-- PostgreSQL 16+
-- Redis 7+
-- Docker & Docker Compose
-
-### Local Development
+### 1. Prerequisites
 
 ```bash
-# Clone repository
-git clone https://github.com/yourusername/freefood-ucd.git
-cd freefood-ucd
+# Install system dependencies
+brew install postgresql redis tesseract  # macOS
+# or
+sudo apt install postgresql redis tesseract-ocr  # Linux
 
-# Start services with Docker
-docker-compose up -d
+# Install Python 3.11+
+python --version
+```
 
-# Backend
+### 2. Clone & Setup
+
+```bash
+git clone <repo-url>
+cd FreeFoodUCD
+
+# Backend setup
 cd backend
 python -m venv venv
-source venv/bin/activate
+source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
-alembic upgrade head
-uvicorn app.main:app --reload
 
-# Frontend
-cd frontend
+# Frontend setup
+cd ../frontend
 npm install
+```
+
+### 3. Configure Environment
+
+```bash
+# Copy example env file
+cp backend/.env.example backend/.env
+
+# Edit backend/.env with your credentials:
+# - DATABASE_URL
+# - REDIS_URL
+# - APIFY_API_TOKEN (get from https://apify.com)
+# - TWILIO_* (WhatsApp credentials)
+# - RESEND_API_KEY (email service)
+```
+
+### 4. Initialize Database
+
+```bash
+cd backend
+source venv/bin/activate
+
+# Run migrations
+alembic upgrade head
+
+# Seed with UCD societies
+python seed_data.py
+```
+
+### 5. Start Services
+
+```bash
+# Terminal 1: PostgreSQL
+brew services start postgresql  # or sudo service postgresql start
+
+# Terminal 2: Redis
+brew services start redis  # or sudo service redis-server start
+
+# Terminal 3: Backend API
+cd backend && source venv/bin/activate
+uvicorn app.main:app --reload --port 8000
+
+# Terminal 4: Celery Worker
+cd backend && source venv/bin/activate
+celery -A app.workers.celery_app worker --loglevel=info
+
+# Terminal 5: Celery Beat (Scheduler)
+cd backend && source venv/bin/activate
+celery -A app.workers.celery_app beat --loglevel=info
+
+# Terminal 6: Frontend
+cd frontend
 npm run dev
 ```
 
-Visit:
-- Frontend: http://localhost:3000
-- API Docs: http://localhost:8000/docs
+### 6. Access
 
----
+- **Frontend:** http://localhost:3000
+- **Backend API:** http://localhost:8000
+- **API Docs:** http://localhost:8000/docs
 
-## 🛠️ Tech Stack
-
-### Backend
-- **FastAPI** - Modern async Python web framework
-- **PostgreSQL** - Primary database
-- **Redis** - Caching and message queue
-- **Celery** - Background task processing
-- **SQLAlchemy** - ORM with async support
-
-### Scraping
-- **Playwright** - Headless browser automation
-- **Python** - Scraping logic and NLP
-
-### Frontend
-- **Next.js 14** - React framework with App Router
-- **Tailwind CSS** - Utility-first styling
-- **shadcn/ui** - Accessible component library
-- **Zustand** - State management
-- **React Query** - Data fetching
-
-### Notifications
-- **Twilio** - WhatsApp Business API
-- **SendGrid** - Email delivery
-
-### Infrastructure
-- **Docker** - Containerization
-- **Docker Compose** - Local orchestration
-- **Prometheus** - Metrics collection
-- **Grafana** - Monitoring dashboards
-
----
-
-## 📱 Features
-
-### For Students
-- ✅ Real-time free food alerts
-- ✅ Filter by society or date
-- ✅ WhatsApp and email notifications
-- ✅ Mobile-optimized interface
-- ✅ No app installation required
-
-### For Societies
-- ✅ Automatic detection from Instagram
-- ✅ No extra work required
-- ✅ Increased event attendance
-- ✅ Better student engagement
-
----
-
-## 🎨 Design Philosophy
-
-**Inspiration:** Notion, Splitwise, Monzo
-
-**Principles:**
-- Clean and minimal
-- Fast and responsive
-- Mobile-first
-- Utility-focused (not social media styled)
-- Professional appearance
-
-**Visual Style:**
-- Light grey background (#f9fafb)
-- White cards with subtle shadows
-- Green accent for "Free Food" badges
-- Clear typography hierarchy
-- Generous spacing
-
----
-
-## 🔐 Privacy & Security
-
-- **No personal data selling** - Your information stays private
-- **Opt-in notifications** - You control what you receive
-- **Easy unsubscribe** - One-click opt-out
-- **GDPR compliant** - Right to deletion and data export
-- **Secure authentication** - JWT tokens with refresh rotation
-- **Rate limiting** - Protection against abuse
-
----
-
-## 📊 Project Status
-
-### Phase 1: MVP (Current)
-- [x] Architecture design
-- [x] Frontend design system
-- [x] Implementation guide
-- [ ] Backend API
-- [ ] Instagram scraper
-- [ ] NLP extraction
-- [ ] Notification system
-- [ ] Frontend implementation
-
-### Phase 2: UCD Rollout
-- [ ] Beta testing with 50 users
-- [ ] Monitor all UCD societies
-- [ ] Optimize scraping reliability
-- [ ] Public launch
-
-### Phase 3: Expansion
-- [ ] Other Irish universities
-- [ ] UK campuses
-- [ ] Advanced filtering
-- [ ] Calendar integration
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our contributing guidelines.
-
-### Development Workflow
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### Code Style
-
-- **Python:** Follow PEP 8, use Black formatter
-- **TypeScript:** Follow Airbnb style guide, use Prettier
-- **Commits:** Use conventional commits format
-
----
-
-## 🐛 Known Issues & Limitations
-
-### Instagram Scraping
-- **Fragile:** Instagram changes can break scraping
-- **Rate limits:** Must respect Instagram's limits
-- **Detection risk:** Aggressive scraping may trigger blocks
-- **Stories:** 24-hour lifespan, may miss some
-
-### Mitigation Strategies
-- Separate microservice for scraper (isolated failures)
-- Slow, human-like scraping patterns
-- Rotating user agents and delays
-- Circuit breakers and retry logic
-- Comprehensive monitoring and alerts
-
----
-
-## 📈 Metrics & Monitoring
-
-### Key Metrics
-- Scraping success rate (target: >95%)
-- Event detection accuracy (target: >80%)
-- Notification delivery time (target: <2 min)
-- False positive rate (target: <10%)
-- System uptime (target: >99%)
-
-### Monitoring Tools
-- Prometheus for metrics collection
-- Grafana for visualization
-- Sentry for error tracking
-- Custom health checks
-
----
-
-## 🧪 Testing
+## Testing
 
 ```bash
-# Backend tests
-cd backend
-pytest tests/ -v --cov=app
+cd backend && source venv/bin/activate
 
-# Frontend tests
-cd frontend
-npm test
+# Test Apify scraper
+python test_apify.py
 
-# E2E tests
-npm run test:e2e
-
-# Load tests
-locust -f tests/load_test.py
+# Test end-to-end flow
+python test_end_to_end.py
 ```
 
+## Project Structure
+
+```
+FreeFoodUCD/
+├── backend/
+│   ├── app/
+│   │   ├── api/              # FastAPI routes
+│   │   ├── core/             # Config
+│   │   ├── db/               # Database models
+│   │   ├── services/
+│   │   │   ├── nlp/          # Event extraction
+│   │   │   ├── ocr/          # Image text extraction
+│   │   │   ├── scraper/      # Apify Instagram scraper
+│   │   │   └── notifications/ # WhatsApp & Email
+│   │   └── workers/          # Celery tasks
+│   ├── alembic/              # Database migrations
+│   ├── requirements.txt
+│   ├── seed_data.py
+│   ├── test_apify.py
+│   └── test_end_to_end.py
+├── frontend/
+│   ├── app/                  # Next.js pages
+│   ├── components/           # React components
+│   └── lib/                  # Utilities
+├── ARCHITECTURE.md           # System design
+├── APIFY_SETUP_GUIDE.md     # Apify configuration
+└── README.md                 # This file
+```
+
+## How It Works
+
+1. **Scraping** - Celery Beat triggers scraping every 30 minutes
+2. **Apify** - Scrapes last 3 posts from each UCD society
+3. **OCR** - Extracts text from post images (event details often in images)
+4. **NLP Filtering** - 6-layer validation:
+   - ✅ Contains free food keywords (pizza, snacks, refreshments, etc.)
+   - ❌ Rejects other colleges (DCU, Trinity, Maynooth)
+   - ❌ Rejects off-campus venues (pubs, bars, Temple Bar)
+   - ❌ Rejects paid events (tickets, €, ball, gala)
+   - ✅ Requires UCD location (campus buildings)
+   - ✅ Extracts time, date, location
+5. **Database** - Stores events with duplicate detection
+6. **Notifications** - Sends WhatsApp/Email to subscribed users
+
+## Apify Setup
+
+1. Create account at https://apify.com (free tier: $5/month credit)
+2. Get API token from Settings → Integrations
+3. Add to `backend/.env`:
+   ```
+   APIFY_API_TOKEN=apify_api_xxxxxxxxxxxxxxxxxxxxxxxx
+   ```
+
+**Costs:**
+- Free tier: ~20,000 posts/month (perfect for testing)
+- Production: ~$58/month (35,000 posts for 8 societies)
+
+See `APIFY_SETUP_GUIDE.md` for details.
+
+## Monitored Societies
+
+- UCD Law Society
+- UCD Computer Science Society
+- UCD Engineering Society
+- UCD Business Society
+- UCD Medical Society
+- UCD Drama Society
+- UCD Music Society
+- UCD Sports Societies
+
+Add more in `backend/seed_data.py`
+
+## API Endpoints
+
+- `GET /api/v1/events` - List events (with filters)
+- `GET /api/v1/events/{id}` - Get event details
+- `GET /api/v1/societies` - List societies
+- `POST /api/v1/users/signup` - Subscribe to notifications
+- `GET /api/v1/users/{id}/preferences` - Get notification preferences
+
+## Configuration
+
+### Scraping Frequency
+
+Edit `backend/app/workers/celery_app.py`:
+
+```python
+beat_schedule = {
+    'scrape-posts': {
+        'task': 'app.workers.scraping_tasks.scrape_all_posts',
+        'schedule': crontab(minute='*/30'),  # Every 30 minutes
+    },
+}
+```
+
+### Posts Per Society
+
+Edit `backend/app/workers/scraping_tasks.py`:
+
+```python
+posts_data = await scraper.scrape_posts(
+    society.instagram_handle,
+    max_posts=3  # Adjust as needed
+)
+```
+
+## Troubleshooting
+
+### OCR Not Working
+```bash
+# Install tesseract
+brew install tesseract  # macOS
+sudo apt install tesseract-ocr  # Linux
+```
+
+### Celery Not Starting
+```bash
+# Check Redis is running
+redis-cli ping  # Should return PONG
+
+# Check Celery config
+celery -A app.workers.celery_app inspect active
+```
+
+### No Events Detected
+- Check if societies have posted about free food recently
+- View NLP logs: `grep "NLP" celery.log`
+- Test with known free food post
+
+### Apify Errors
+- Check API token in `.env`
+- Verify credits at https://console.apify.com
+- View run logs in Apify Console
+
+## Production Deployment
+
+1. Set `ENVIRONMENT=production` in `.env`
+2. Use production database (not localhost)
+3. Set up SSL certificates
+4. Configure domain and CORS
+5. Use process manager (PM2, systemd)
+6. Set up monitoring (Sentry)
+7. Configure backups
+
+## Contributing
+
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open Pull Request
+
+## License
+
+MIT License - see LICENSE file
+
+## Support
+
+- **Issues:** GitHub Issues
+- **Email:** support@freefooducd.ie
+- **Apify Support:** https://docs.apify.com
+
 ---
 
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 👥 Team
-
-Built with ❤️ by students, for students.
-
-**Maintainer:** [Your Name]
-
----
-
-## 🙏 Acknowledgments
-
-- UCD societies for making campus life better
-- Open source community for amazing tools
-- Beta testers for valuable feedback
-
----
-
-## 📞 Contact
-
-- **Email:** hello@freefooducd.ie
-- **Instagram:** @freefooducd
-- **Issues:** [GitHub Issues](https://github.com/yourusername/freefood-ucd/issues)
-
----
-
-## ⚠️ Disclaimer
-
-This project is not affiliated with or endorsed by University College Dublin or Instagram. It is an independent student project designed to help students discover free food events on campus.
-
-Use of this service is subject to Instagram's Terms of Service. We recommend using a dedicated monitoring account and respecting rate limits to avoid account restrictions.
-
----
-
-**Made with 🍕 in Dublin**
+Made with ❤️ for UCD students
