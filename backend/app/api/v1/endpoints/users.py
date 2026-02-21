@@ -4,7 +4,7 @@ from sqlalchemy import select
 from typing import Optional
 from uuid import UUID
 from pydantic import BaseModel, EmailStr, Field
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import random
 import string
 
@@ -89,7 +89,7 @@ async def signup_user(
     
     # Generate verification code
     verification_code = generate_verification_code()
-    code_expires = datetime.utcnow() + timedelta(minutes=10)
+    code_expires = datetime.now(timezone.utc) + timedelta(minutes=10)
     
     # Create new user
     new_user = User(
@@ -250,7 +250,7 @@ async def verify_user(
         )
     
     # Check if code expired
-    if datetime.utcnow() > user.verification_code_expires:
+    if datetime.now(timezone.utc) > user.verification_code_expires:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Verification code expired. Please request a new one."
