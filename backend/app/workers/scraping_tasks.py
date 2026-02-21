@@ -195,6 +195,10 @@ async def _scrape_society_posts_async(society_id: str):
             # Apify handles authentication automatically
             posts_data = await scraper.scrape_posts(society.instagram_handle, max_posts=3)
             
+            logger.info(f"Apify returned {len(posts_data)} posts for @{society.instagram_handle}")
+            if len(posts_data) == 0:
+                logger.warning(f"No posts returned by Apify for @{society.instagram_handle}")
+            
             posts_found = 0
             new_posts = 0
             
