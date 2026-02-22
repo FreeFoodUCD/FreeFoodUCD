@@ -71,6 +71,89 @@ interface User {
   created_at: string;
 }
 
+interface UpcomingEvent {
+  id: string;
+  title: string;
+  description: string;
+  location: string;
+  start_time: string;
+  end_time: string | null;
+  society_name: string;
+  society_handle: string;
+  confidence_score: number;
+  notified: boolean;
+  notification_sent_at: string | null;
+  reminder_sent: boolean;
+  reminder_sent_at: string | null;
+  hours_until: number;
+  users_to_notify: number;
+  is_active: boolean;
+}
+
+interface Society {
+  id: string;
+  name: string;
+  instagram_handle: string;
+  is_active: boolean;
+  scrape_posts: boolean;
+  scrape_stories: boolean;
+  last_post_check: string | null;
+  last_story_check: string | null;
+  stats: {
+    total_posts: number;
+    total_events: number;
+    recent_scrapes: number;
+    success_rate: number;
+  };
+}
+
+interface NotificationLog {
+  id: string;
+  event_title: string;
+  society_name: string;
+  user_email: string;
+  user_phone: string;
+  notification_type: string;
+  status: string;
+  sent_at: string;
+  error_message: string | null;
+}
+
+interface NotificationStats {
+  period_days: number;
+  total_sent: number;
+  by_channel: {
+    whatsapp: number;
+    email: number;
+  };
+  by_status: {
+    successful: number;
+    failed: number;
+    pending: number;
+  };
+  delivery_rate: number;
+  recent_failures: number;
+}
+
+interface SystemHealth {
+  database: string;
+  celery_worker: string;
+  celery_beat: string;
+  services: {
+    apify: string;
+    twilio: string;
+    resend: string;
+  };
+}
+
+interface ErrorLog {
+  type: string;
+  timestamp: string;
+  source: string;
+  error: string;
+  details: string;
+}
+
 export default function AdminDashboard() {
   const router = useRouter();
   const [adminKey, setAdminKey] = useState('');
@@ -81,6 +164,12 @@ export default function AdminDashboard() {
   const [logs, setLogs] = useState<ScrapingLog[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
   const [users, setUsers] = useState<User[]>([]);
+  const [upcomingEvents, setUpcomingEvents] = useState<UpcomingEvent[]>([]);
+  const [societies, setSocieties] = useState<Society[]>([]);
+  const [notificationLogs, setNotificationLogs] = useState<NotificationLog[]>([]);
+  const [notificationStats, setNotificationStats] = useState<NotificationStats | null>(null);
+  const [systemHealth, setSystemHealth] = useState<SystemHealth | null>(null);
+  const [errorLogs, setErrorLogs] = useState<ErrorLog[]>([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -184,6 +273,175 @@ export default function AdminDashboard() {
     setLoading(false);
   };
 
+  const loadUpcomingEvents = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${BASE_URL}/api/v1/admin/upcoming-events?days=7`, {
+        headers: { 'X-Admin-Key': adminKey }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setUpcomingEvents(data.events);
+      }
+    } catch (error) {
+      console.error('Error loading upcoming events:', error);
+    }
+    setLoading(false);
+  };
+
+  const loadSocieties = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${BASE_URL}/api/v1/admin/societies-detailed`, {
+        headers: { 'X-Admin-Key': adminKey }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setSocieties(data.societies);
+      }
+    } catch (error) {
+      console.error('Error loading societies:', error);
+    }
+    setLoading(false);
+  };
+
+  const sendReminder = async (eventId: string) => {
+    setLoading(true);
+    setMessage('Sending reminder...');
+    try {
+      const response = await fetch(`${BASE_URL}/api/v1/admin/event/${eventId}/send-reminder`, {
+        method: 'POST',
+        headers: { 'X-Admin-Key': adminKey }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setMessage(`✅ ${data.message} (${data.whatsapp_sent} WhatsApp, ${data.email_sent} Email)`);
+        loadUpcomingEvents();
+      } else {
+        setMessage('❌ Failed to send reminder');
+      }
+    } catch (error) {
+      setMessage('❌ Error sending reminder');
+    }
+    setLoading(false);
+  };
+
+  const toggleSociety = async (societyId: string) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${BASE_URL}/api/v1/admin/societies/${societyId}/toggle`, {
+        method: 'POST',
+        headers: { 'X-Admin-Key': adminKey }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setMessage(`✅ ${data.message}`);
+        loadSocieties();
+      } else {
+        setMessage('❌ Failed to toggle society');
+      }
+    } catch (error) {
+      setMessage('❌ Error toggling society');
+    }
+    setLoading(false);
+  };
+
+  const deleteEvent = async (eventId: string, eventTitle: string) => {
+    if (!confirm(`Are you sure you want to delete "${eventTitle}"?`)) return;
+    
+    setLoading(true);
+    try {
+      const response = await fetch(`${BASE_URL}/api/v1/admin/event/${eventId}`, {
+        method: 'DELETE',
+        headers: { 'X-Admin-Key': adminKey }
+      });
+      if (response.ok) {
+        setMessage('✅ Event deleted successfully');
+        loadUpcomingEvents();
+      } else {
+        setMessage('❌ Failed to delete event');
+      }
+    } catch (error) {
+      setMessage('❌ Error deleting event');
+    }
+    setLoading(false);
+  };
+
+  const loadNotifications = async () => {
+    setLoading(true);
+    try {
+      const [logsRes, statsRes] = await Promise.all([
+        fetch(`${BASE_URL}/api/v1/admin/notification-logs?limit=100`, {
+          headers: { 'X-Admin-Key': adminKey }
+        }),
+        fetch(`${BASE_URL}/api/v1/admin/notification-stats?days=7`, {
+          headers: { 'X-Admin-Key': adminKey }
+        })
+      ]);
+      
+      if (logsRes.ok) {
+        const logsData = await logsRes.json();
+        setNotificationLogs(logsData.logs);
+      }
+      if (statsRes.ok) {
+        const statsData = await statsRes.json();
+        setNotificationStats(statsData);
+      }
+    } catch (error) {
+      console.error('Error loading notifications:', error);
+    }
+    setLoading(false);
+  };
+
+  const loadSystemHealth = async () => {
+    setLoading(true);
+    try {
+      const [healthRes, errorsRes] = await Promise.all([
+        fetch(`${BASE_URL}/api/v1/admin/system-health`, {
+          headers: { 'X-Admin-Key': adminKey }
+        }),
+        fetch(`${BASE_URL}/api/v1/admin/error-logs?limit=50`, {
+          headers: { 'X-Admin-Key': adminKey }
+        })
+      ]);
+      
+      if (healthRes.ok) {
+        const healthData = await healthRes.json();
+        setSystemHealth(healthData);
+      }
+      if (errorsRes.ok) {
+        const errorsData = await errorsRes.json();
+        setErrorLogs(errorsData.errors);
+      }
+    } catch (error) {
+      console.error('Error loading system health:', error);
+    }
+    setLoading(false);
+  };
+
+  const retryFailedNotifications = async () => {
+    if (!confirm('Retry all failed notifications from the last 24 hours?')) return;
+    
+    setLoading(true);
+    setMessage('Retrying failed notifications...');
+    try {
+      const response = await fetch(`${BASE_URL}/api/v1/admin/retry-failed-notifications?hours=24`, {
+        method: 'POST',
+        headers: { 'X-Admin-Key': adminKey }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setMessage(`✅ ${data.message}`);
+        loadNotifications();
+      } else {
+        setMessage('❌ Failed to retry notifications');
+      }
+    } catch (error) {
+      setMessage('❌ Error retrying notifications');
+    }
+    setLoading(false);
+  };
+
   const triggerScrape = async (societyHandle?: string) => {
     setLoading(true);
     setMessage('Scraping in progress...');
@@ -218,6 +476,14 @@ export default function AdminDashboard() {
       loadPosts();
     } else if (isAuthenticated && activeTab === 'users') {
       loadUsers();
+    } else if (isAuthenticated && activeTab === 'events') {
+      loadUpcomingEvents();
+    } else if (isAuthenticated && activeTab === 'societies') {
+      loadSocieties();
+    } else if (isAuthenticated && activeTab === 'notifications') {
+      loadNotifications();
+    } else if (isAuthenticated && activeTab === 'health') {
+      loadSystemHealth();
     }
   }, [activeTab, isAuthenticated]);
 
@@ -265,12 +531,12 @@ export default function AdminDashboard() {
 
       {/* Tabs */}
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <div className="flex space-x-4 border-b">
-          {['dashboard', 'logs', 'posts', 'users', 'scrape'].map((tab) => (
+        <div className="flex space-x-4 border-b overflow-x-auto">
+          {['dashboard', 'events', 'societies', 'notifications', 'health', 'logs', 'posts', 'users', 'scrape'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 font-medium ${
+              className={`px-4 py-2 font-medium whitespace-nowrap ${
                 activeTab === tab
                   ? 'border-b-2 border-green-600 text-green-600'
                   : 'text-gray-600 hover:text-gray-900'
@@ -299,6 +565,382 @@ export default function AdminDashboard() {
             <StatCard title="Posts" stats={stats.posts} color="orange" />
             <div className="col-span-full">
               <ScrapingStatus scraping={stats.scraping} onRefresh={() => loadDashboardData(adminKey)} />
+            </div>
+          </div>
+        )}
+
+        {/* Upcoming Events Tab */}
+        {activeTab === 'events' && (
+          <div className="bg-white rounded-lg shadow overflow-hidden">
+            <div className="p-4 border-b flex justify-between items-center">
+              <h2 className="text-lg font-semibold">Upcoming Events (Next 7 Days)</h2>
+              <button
+                onClick={loadUpcomingEvents}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+              >
+                Refresh
+              </button>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {upcomingEvents.length === 0 ? (
+                <div className="p-8 text-center text-gray-500">
+                  No upcoming events in the next 7 days
+                </div>
+              ) : (
+                upcomingEvents.map((event) => (
+                  <div key={event.id} className="p-4 hover:bg-gray-50">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-lg">{event.title}</h3>
+                        <p className="text-sm text-gray-600">
+                          {event.society_name} (@{event.society_handle})
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        {event.hours_until < 24 && (
+                          <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
+                            {event.hours_until < 1 ? 'Starting Soon!' : `${Math.floor(event.hours_until)}h away`}
+                          </span>
+                        )}
+                        {event.reminder_sent ? (
+                          <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                            ✅ Reminder Sent
+                          </span>
+                        ) : (
+                          <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
+                            ⏰ Reminder Pending
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4 mb-3 text-sm">
+                      <div>
+                        <span className="text-gray-600">📅 Start:</span>
+                        <span className="ml-2 font-medium">
+                          {new Date(event.start_time).toLocaleString()}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">📍 Location:</span>
+                        <span className="ml-2 font-medium">{event.location || 'TBA'}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">👥 Users to notify:</span>
+                        <span className="ml-2 font-medium">{event.users_to_notify}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">🎯 Confidence:</span>
+                        <span className="ml-2 font-medium">{(event.confidence_score * 100).toFixed(0)}%</span>
+                      </div>
+                    </div>
+
+                    {event.description && (
+                      <p className="text-sm text-gray-700 mb-3">{event.description}</p>
+                    )}
+
+                    <div className="flex gap-2">
+                      {!event.reminder_sent && (
+                        <button
+                          onClick={() => sendReminder(event.id)}
+                          disabled={loading}
+                          className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 disabled:bg-gray-400"
+                        >
+                          Send Reminder Now
+                        </button>
+                      )}
+                      <button
+                        onClick={() => deleteEvent(event.id, event.title)}
+                        disabled={loading}
+                        className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700 disabled:bg-gray-400"
+                      >
+                        Delete Event
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Societies Management Tab */}
+        {activeTab === 'societies' && (
+          <div className="bg-white rounded-lg shadow overflow-hidden">
+            <div className="p-4 border-b flex justify-between items-center">
+              <h2 className="text-lg font-semibold">Societies Management</h2>
+              <button
+                onClick={loadSocieties}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+              >
+                Refresh
+              </button>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Society</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Handle</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Posts</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Events</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Success Rate</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Last Check</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {societies.map((society) => (
+                    <tr key={society.id} className={!society.is_active ? 'bg-gray-50' : ''}>
+                      <td className="px-4 py-3 text-sm font-medium">{society.name}</td>
+                      <td className="px-4 py-3 text-sm text-gray-600">@{society.instagram_handle}</td>
+                      <td className="px-4 py-3 text-sm">
+                        <span className={`px-2 py-1 rounded-full text-xs ${
+                          society.is_active 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {society.is_active ? 'Active' : 'Inactive'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm">{society.stats.total_posts}</td>
+                      <td className="px-4 py-3 text-sm">{society.stats.total_events}</td>
+                      <td className="px-4 py-3 text-sm">
+                        <span className={`font-medium ${
+                          society.stats.success_rate >= 80 ? 'text-green-600' :
+                          society.stats.success_rate >= 50 ? 'text-yellow-600' :
+                          'text-red-600'
+                        }`}>
+                          {society.stats.success_rate}%
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600">
+                        {society.last_post_check 
+                          ? new Date(society.last_post_check).toLocaleDateString()
+                          : 'Never'}
+                      </td>
+                      <td className="px-4 py-3 text-sm">
+                        <button
+                          onClick={() => toggleSociety(society.id)}
+                          disabled={loading}
+                          className={`px-3 py-1 text-white text-xs rounded hover:opacity-80 disabled:bg-gray-400 ${
+                            society.is_active ? 'bg-red-600' : 'bg-green-600'
+                          }`}
+                        >
+                          {society.is_active ? 'Deactivate' : 'Activate'}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Notifications Tab */}
+        {activeTab === 'notifications' && (
+          <div className="space-y-6">
+            {/* Stats Cards */}
+            {notificationStats && (
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="bg-white rounded-lg shadow p-4">
+                  <h3 className="text-sm text-gray-600 mb-2">Total Sent (7 days)</h3>
+                  <p className="text-2xl font-bold text-gray-900">{notificationStats.total_sent}</p>
+                </div>
+                <div className="bg-white rounded-lg shadow p-4">
+                  <h3 className="text-sm text-gray-600 mb-2">Delivery Rate</h3>
+                  <p className="text-2xl font-bold text-green-600">{notificationStats.delivery_rate}%</p>
+                </div>
+                <div className="bg-white rounded-lg shadow p-4">
+                  <h3 className="text-sm text-gray-600 mb-2">By Channel</h3>
+                  <p className="text-sm">📱 WhatsApp: {notificationStats.by_channel.whatsapp}</p>
+                  <p className="text-sm">📧 Email: {notificationStats.by_channel.email}</p>
+                </div>
+                <div className="bg-white rounded-lg shadow p-4">
+                  <h3 className="text-sm text-gray-600 mb-2">Recent Failures</h3>
+                  <p className="text-2xl font-bold text-red-600">{notificationStats.recent_failures}</p>
+                  {notificationStats.recent_failures > 0 && (
+                    <button
+                      onClick={retryFailedNotifications}
+                      disabled={loading}
+                      className="mt-2 text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400"
+                    >
+                      Retry Failed
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Notification Logs */}
+            <div className="bg-white rounded-lg shadow overflow-hidden">
+              <div className="p-4 border-b flex justify-between items-center">
+                <h2 className="text-lg font-semibold">Notification Logs (Last 100)</h2>
+                <button
+                  onClick={loadNotifications}
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                >
+                  Refresh
+                </button>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Time</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Event</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Society</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Channel</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Error</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {notificationLogs.map((log) => (
+                      <tr key={log.id}>
+                        <td className="px-4 py-3 text-sm">{new Date(log.sent_at).toLocaleString()}</td>
+                        <td className="px-4 py-3 text-sm">{log.event_title}</td>
+                        <td className="px-4 py-3 text-sm">{log.society_name}</td>
+                        <td className="px-4 py-3 text-sm text-xs">
+                          {log.notification_type === 'email' ? log.user_email : log.user_phone}
+                        </td>
+                        <td className="px-4 py-3 text-sm">
+                          {log.notification_type === 'whatsapp' ? '📱 WhatsApp' : '📧 Email'}
+                        </td>
+                        <td className="px-4 py-3 text-sm">
+                          <span className={`px-2 py-1 rounded-full text-xs ${
+                            log.status === 'sent' ? 'bg-green-100 text-green-800' : 
+                            log.status === 'failed' ? 'bg-red-100 text-red-800' :
+                            'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {log.status}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-red-600 text-xs max-w-xs truncate">
+                          {log.error_message || '-'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* System Health Tab */}
+        {activeTab === 'health' && (
+          <div className="space-y-6">
+            {/* Health Status Cards */}
+            {systemHealth && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-white rounded-lg shadow p-4">
+                  <h3 className="text-sm text-gray-600 mb-2">Database</h3>
+                  <p className={`text-lg font-bold ${
+                    systemHealth.database === 'healthy' ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {systemHealth.database === 'healthy' ? '🟢 Healthy' : '🔴 Unhealthy'}
+                  </p>
+                </div>
+                <div className="bg-white rounded-lg shadow p-4">
+                  <h3 className="text-sm text-gray-600 mb-2">Celery Worker</h3>
+                  <p className={`text-lg font-bold ${
+                    systemHealth.celery_worker === 'healthy' ? 'text-green-600' :
+                    systemHealth.celery_worker === 'warning' ? 'text-yellow-600' :
+                    'text-red-600'
+                  }`}>
+                    {systemHealth.celery_worker === 'healthy' ? '🟢 Healthy' :
+                     systemHealth.celery_worker === 'warning' ? '🟡 Warning' :
+                     '🔴 ' + systemHealth.celery_worker}
+                  </p>
+                </div>
+                <div className="bg-white rounded-lg shadow p-4">
+                  <h3 className="text-sm text-gray-600 mb-2">Celery Beat</h3>
+                  <p className={`text-lg font-bold ${
+                    systemHealth.celery_beat === 'healthy' ? 'text-green-600' :
+                    systemHealth.celery_beat === 'warning' ? 'text-yellow-600' :
+                    'text-red-600'
+                  }`}>
+                    {systemHealth.celery_beat === 'healthy' ? '🟢 Healthy' :
+                     systemHealth.celery_beat === 'warning' ? '🟡 Warning' :
+                     '🔴 ' + systemHealth.celery_beat}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Services Status */}
+            {systemHealth && (
+              <div className="bg-white rounded-lg shadow p-6">
+                <h2 className="text-lg font-semibold mb-4">External Services</h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                    <span className="font-medium">Apify (Scraping)</span>
+                    <span className={`px-2 py-1 rounded text-xs ${
+                      systemHealth.services.apify === 'configured' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    }`}>
+                      {systemHealth.services.apify}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                    <span className="font-medium">Twilio (WhatsApp)</span>
+                    <span className={`px-2 py-1 rounded text-xs ${
+                      systemHealth.services.twilio === 'configured' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    }`}>
+                      {systemHealth.services.twilio}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                    <span className="font-medium">Resend (Email)</span>
+                    <span className={`px-2 py-1 rounded text-xs ${
+                      systemHealth.services.resend === 'configured' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    }`}>
+                      {systemHealth.services.resend}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Error Logs */}
+            <div className="bg-white rounded-lg shadow overflow-hidden">
+              <div className="p-4 border-b flex justify-between items-center">
+                <h2 className="text-lg font-semibold">Recent Errors (Last 50)</h2>
+                <button
+                  onClick={loadSystemHealth}
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                >
+                  Refresh
+                </button>
+              </div>
+              <div className="divide-y divide-gray-200">
+                {errorLogs.length === 0 ? (
+                  <div className="p-8 text-center text-gray-500">
+                    No recent errors 🎉
+                  </div>
+                ) : (
+                  errorLogs.map((error, index) => (
+                    <div key={index} className="p-4 hover:bg-gray-50">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <span className={`px-2 py-1 rounded text-xs font-medium ${
+                            error.type === 'scraping' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'
+                          }`}>
+                            {error.type}
+                          </span>
+                          <span className="ml-2 text-sm text-gray-600">{error.source}</span>
+                        </div>
+                        <span className="text-xs text-gray-500">{new Date(error.timestamp).toLocaleString()}</span>
+                      </div>
+                      <p className="text-sm text-red-600 mb-1">{error.error}</p>
+                      <p className="text-xs text-gray-500">{error.details}</p>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           </div>
         )}
