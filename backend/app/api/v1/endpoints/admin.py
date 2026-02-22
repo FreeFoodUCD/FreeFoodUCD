@@ -750,22 +750,13 @@ async def send_event_reminder(
         "source_type": event.source_type or "post"
     }
     
-    # Send notifications
-    whatsapp_service = WhatsAppService()
+    # Send notifications (email only for now)
     email_service = EmailService()
     
     whatsapp_count = 0
     email_count = 0
     
     for user in users:
-        # Send WhatsApp if verified
-        if user.whatsapp_verified and user.phone_number:
-            try:
-                await whatsapp_service.send_event_notification(user.phone_number, event_data)
-                whatsapp_count += 1
-            except Exception as e:
-                logger.error(f"Failed to send WhatsApp to {user.phone_number}: {e}")
-        
         # Send email if verified
         if user.email_verified and user.email:
             try:
@@ -773,6 +764,15 @@ async def send_event_reminder(
                 email_count += 1
             except Exception as e:
                 logger.error(f"Failed to send email to {user.email}: {e}")
+        
+        # Skip WhatsApp for now (credentials not configured)
+        # if user.whatsapp_verified and user.phone_number:
+        #     try:
+        #         whatsapp_service = WhatsAppService()
+        #         await whatsapp_service.send_event_notification(user.phone_number, event_data)
+        #         whatsapp_count += 1
+        #     except Exception as e:
+        #         logger.error(f"Failed to send WhatsApp to {user.phone_number}: {e}")
     
     # Mark reminder as sent
     from datetime import timezone
@@ -1031,25 +1031,24 @@ async def retry_failed_notifications(
     db: AsyncSession = Depends(get_db),
     _: bool = Depends(verify_admin_key)
 ):
-    """Retry failed notifications from the last N hours."""
-    from app.services.notifications.whatsapp import WhatsAppService
+    """Retry failed notifications from the last N hours (email only)."""
     from app.services.notifications.email import EmailService
     from datetime import timezone
     
     since = datetime.now(timezone.utc) - timedelta(hours=hours)
     
-    # Get failed notifications
+    # Get failed notifications (email only)
     result = await db.execute(
         select(NotificationLog)
         .where(NotificationLog.status == 'failed')
+        .where(NotificationLog.notification_type == 'email')
         .where(NotificationLog.sent_at >= since)
     )
     failed_logs = result.scalars().all()
     
     if not failed_logs:
-        return {"message": "No failed notifications to retry", "retried": 0}
+        return {"message": "No failed email notifications to retry", "retried": 0}
     
-    whatsapp_service = WhatsAppService()
     email_service = EmailService()
     
     retried = 0
@@ -1078,20 +1077,18 @@ async def retry_failed_notifications(
         }
         
         try:
-            if log.notification_type == 'whatsapp' and user.phone_number:
-                await whatsapp_service.send_event_notification(user.phone_number, event_data)
-                log.status = 'sent'
-                log.error_message = None
-                success += 1
-            elif log.notification_type == 'email' and user.email:
+            # Only retry email notifications (WhatsApp not configured)
+            if log.notification_type == 'email' and user.email:
                 await email_service.send_event_notification(user.email, event_data)
                 log.status = 'sent'
                 log.error_message = None
                 success += 1
-            retried += 1
+                retried += 1
+            # Skip WhatsApp retries
         except Exception as e:
             log.error_message = str(e)
             logger.error(f"Retry failed for notification {log.id}: {e}")
+            retried += 1
     
     await db.commit()
     
