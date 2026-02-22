@@ -1,7 +1,7 @@
 """add reminder fields to events
 
 Revision ID: add_reminder_fields
-Revises: add_verification_code_fields
+Revises: add_verification_code
 Create Date: 2026-02-22 17:47:00.000000
 
 """
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = 'add_reminder_fields'
-down_revision = 'add_verification_code_fields'
+down_revision = 'add_verification_code'
 branch_labels = None
 depends_on = None
 
