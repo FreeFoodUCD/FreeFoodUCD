@@ -227,11 +227,13 @@ async def seed_societies(
 @router.post("/scrape-now")
 async def trigger_scrape(
     society_handle: Optional[str] = None,
+    force_reprocess: bool = False,
     db: AsyncSession = Depends(get_db),
     _: bool = Depends(verify_admin_key)
 ):
     """
     Trigger immediate scraping with database saving and NLP processing.
+    Set force_reprocess=true to reprocess existing posts with NLP.
     """
     from app.services.scraper.apify_scraper import ApifyInstagramScraper
     from app.services.nlp.extractor import EventExtractor
@@ -262,30 +264,36 @@ async def trigger_scrape(
             post_id = post_data['url'].split('/p/')[-1].rstrip('/')
             
             # Check if post exists
-            existing = await db.execute(
+            existing_result = await db.execute(
                 select(Post).where(
                     Post.society_id == society.id,
                     Post.instagram_post_id == post_id
                 )
             )
-            if existing.scalar_one_or_none():
+            existing_post = existing_result.scalar_one_or_none()
+            
+            if existing_post and not force_reprocess:
                 continue
             
-            # Save post
-            post = Post(
-                society_id=society.id,
-                instagram_post_id=post_id,
-                caption=post_data['caption'],
-                media_urls=[post_data.get('image_url')] if post_data.get('image_url') else [],
-                source_url=post_data['url'],
-                detected_at=post_data['timestamp'],
-                processed=True
-            )
-            db.add(post)
-            await db.flush()
-            new_posts += 1
+            # If force_reprocess and post exists, use existing post
+            if existing_post and force_reprocess:
+                post = existing_post
+            else:
+                # Save new post
+                post = Post(
+                    society_id=society.id,
+                    instagram_post_id=post_id,
+                    caption=post_data['caption'],
+                    media_urls=[post_data.get('image_url')] if post_data.get('image_url') else [],
+                    source_url=post_data['url'],
+                    detected_at=post_data['timestamp'],
+                    processed=True
+                )
+                db.add(post)
+                await db.flush()
+                new_posts += 1
             
-            # NLP processing
+            # NLP processing (runs for new or force-reprocessed posts)
             event_data = extractor.extract_event(post_data['caption'])
             if event_data and event_data.get('confidence', 0) >= 0.3:
                 event = Event(
