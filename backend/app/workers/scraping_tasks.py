@@ -329,7 +329,55 @@ async def _process_scraped_content_async(content_type: str, content_id: str):
         event_data = extractor.extract_event(text, content_type)
         
         if event_data:
-            # Create event
+            # Check for duplicate events (same time + location within 1 hour window)
+            start_time = event_data['start_time']
+            location = event_data.get('location', '').lower().strip()
+            
+            # Query for similar events within ±1 hour
+            time_window_start = start_time - timedelta(hours=1)
+            time_window_end = start_time + timedelta(hours=1)
+            
+            duplicate_query = select(Event).where(
+                Event.start_time >= time_window_start,
+                Event.start_time <= time_window_end,
+                Event.is_active == True
+            )
+            result = await session.execute(duplicate_query)
+            existing_events = result.scalars().all()
+            
+            # Check if any existing event has similar location
+            is_duplicate = False
+            for existing in existing_events:
+                existing_location = (existing.location or '').lower().strip()
+                # Consider duplicate if locations match or one is empty
+                if location and existing_location:
+                    # Simple string matching (could be improved with fuzzy matching)
+                    if location in existing_location or existing_location in location:
+                        is_duplicate = True
+                        logger.info(f"Duplicate event detected: {existing.title} at {existing.start_time}")
+                        break
+                elif not location and not existing_location:
+                    # Both have no location, check if titles are similar
+                    existing_title = existing.title.lower()
+                    new_title = event_data['title'].lower()
+                    if existing_title in new_title or new_title in existing_title:
+                        is_duplicate = True
+                        logger.info(f"Duplicate event detected (by title): {existing.title}")
+                        break
+            
+            if is_duplicate:
+                # Mark content as processed but don't create duplicate event
+                content.processed = True
+                content.is_free_food = True
+                await session.commit()
+                logger.info(f"Skipped duplicate event: {event_data['title']} at {start_time}")
+                return {
+                    "event_created": False,
+                    "reason": "duplicate",
+                    "title": event_data['title']
+                }
+            
+            # Create event (no duplicate found)
             event = Event(
                 society_id=content.society_id,
                 title=event_data['title'],
