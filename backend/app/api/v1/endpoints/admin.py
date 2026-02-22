@@ -546,9 +546,9 @@ async def get_posts(
         )
         society = society_result.scalar_one_or_none()
         
-        # Check if post has associated event
+        # Check if post has associated event (get first one if multiple exist)
         event_result = await db.execute(
-            select(Event).where(Event.source_id == post.id, Event.source_type == 'post')
+            select(Event).where(Event.source_id == post.id, Event.source_type == 'post').limit(1)
         )
         event = event_result.scalar_one_or_none()
         
