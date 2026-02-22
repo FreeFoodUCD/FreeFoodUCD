@@ -1,18 +1,29 @@
 'use client';
 
 import { Header } from '@/components/Header';
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { Mail, ArrowRight, Check, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
+import { useSearchParams } from 'next/navigation';
 
-export default function SignupPage() {
-  const [step, setStep] = useState<'form' | 'verify' | 'success'>('form');
-  const [email, setEmail] = useState('');
+function SignupContent() {
+  const searchParams = useSearchParams();
+  const emailFromUrl = searchParams.get('email');
+  
+  const [step, setStep] = useState<'form' | 'verify' | 'success'>(emailFromUrl ? 'verify' : 'form');
+  const [email, setEmail] = useState(emailFromUrl || '');
   const [verificationCode, setVerificationCode] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (emailFromUrl) {
+      setEmail(emailFromUrl);
+      setStep('verify');
+    }
+  }, [emailFromUrl]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,9 +36,9 @@ export default function SignupPage() {
       setStep('verify');
     } catch (err: any) {
       if (err.message === 'already_signed_up' || err.message.includes('already exists')) {
-        setError('You\'re already signed up! Check your email for notifications.');
+        setError('already signed up fatty');
       } else {
-        setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+        setError(err instanceof Error ? err.message : 'something went wrong, try again');
       }
     } finally {
       setIsSubmitting(false);
@@ -60,37 +71,39 @@ export default function SignupPage() {
           {step === 'form' && (
             <div className="text-center">
               <div className="mb-8">
-                <span className="inline-block px-4 py-2 rounded-full bg-blue-50 text-primary text-sm font-semibold mb-6">
+                <span className="inline-block px-5 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold mb-6 border-2 border-primary/20">
                   never miss free food again
                 </span>
               </div>
 
-              <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-4">
-                get started 🍕
+              <div className="text-6xl mb-6">🍕</div>
+
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-text mb-4">
+                get started
               </h1>
-              <p className="text-xl text-gray-600 mb-12">
+              <p className="text-lg md:text-xl text-text-light mb-12">
                 enter your email to receive instant notifications
               </p>
 
               <form onSubmit={handleSubmit} className="max-w-md mx-auto">
                 {error && (
-                  <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 flex items-start gap-3">
-                    <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                    <p className="text-sm text-red-800 font-medium">{error}</p>
+                  <div className="mb-6 p-4 rounded-2xl bg-danger/10 border-2 border-danger/20 flex items-start gap-3">
+                    <AlertCircle className="w-5 h-5 text-danger-dark flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-danger-dark font-bold text-left">{error}</p>
                   </div>
                 )}
 
                 <div className="mb-6">
                   <div className="relative">
                     <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                      <Mail className="w-5 h-5 text-gray-400" />
+                      <Mail className="w-5 h-5 text-text-lighter" />
                     </div>
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="your.email@ucd.ie"
-                      className="w-full pl-12 pr-4 py-4 rounded-xl border-2 border-gray-200 focus:border-primary focus:outline-none text-lg transition-colors"
+                      className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-gray-200 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 text-lg transition-all bg-white"
                       required
                     />
                   </div>
@@ -99,7 +112,7 @@ export default function SignupPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full px-8 py-4 rounded-xl bg-primary text-white text-lg font-semibold hover:bg-primary-dark transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full px-8 py-4 rounded-2xl bg-accent text-white text-lg font-bold hover:bg-accent-dark transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? (
                     <>
@@ -113,10 +126,6 @@ export default function SignupPage() {
                     </>
                   )}
                 </button>
-
-                <p className="text-sm text-gray-500 mt-4">
-                  by signing up, you agree to receive email notifications
-                </p>
               </form>
             </div>
           )}
@@ -124,24 +133,24 @@ export default function SignupPage() {
           {/* Step 2: Verification */}
           {step === 'verify' && (
             <div className="text-center">
-              <div className="w-20 h-20 rounded-full bg-blue-50 flex items-center justify-center mx-auto mb-6">
+              <div className="w-20 h-20 rounded-3xl bg-primary/10 flex items-center justify-center mx-auto mb-6 border-2 border-primary/20">
                 <Mail className="w-10 h-10 text-primary" />
               </div>
               
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              <h1 className="text-4xl md:text-5xl font-bold text-text mb-4">
                 check your email 📬
               </h1>
               
-              <p className="text-lg text-gray-600 mb-8">
+              <p className="text-lg text-text-light mb-8">
                 we sent a 6-digit code to<br />
-                <span className="font-semibold text-gray-900">{email}</span>
+                <span className="font-bold text-text">{email}</span>
               </p>
 
               <form onSubmit={handleVerify} className="max-w-md mx-auto">
                 {error && (
-                  <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 flex items-start gap-3">
-                    <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                    <p className="text-sm text-red-800 font-medium">{error}</p>
+                  <div className="mb-6 p-4 rounded-2xl bg-danger/10 border-2 border-danger/20 flex items-start gap-3">
+                    <AlertCircle className="w-5 h-5 text-danger-dark flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-danger-dark font-bold text-left">{error}</p>
                   </div>
                 )}
 
@@ -152,10 +161,10 @@ export default function SignupPage() {
                     onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                     placeholder="000000"
                     maxLength={6}
-                    className="w-full px-6 py-5 rounded-xl border-2 border-gray-200 focus:border-primary focus:outline-none text-center text-3xl font-bold tracking-[0.5em] transition-colors"
+                    className="w-full px-6 py-5 rounded-2xl border-2 border-gray-200 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 text-center text-3xl font-bold tracking-[0.5em] transition-all bg-white"
                     required
                   />
-                  <p className="text-sm text-gray-500 mt-2">
+                  <p className="text-sm text-text-lighter mt-2 font-medium">
                     code expires in 10 minutes
                   </p>
                 </div>
@@ -163,7 +172,7 @@ export default function SignupPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting || verificationCode.length !== 6}
-                  className="w-full px-8 py-4 rounded-xl bg-primary text-white text-lg font-semibold hover:bg-primary-dark transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full px-8 py-4 rounded-2xl bg-accent text-white text-lg font-bold hover:bg-accent-dark transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? (
                     <>
@@ -181,7 +190,7 @@ export default function SignupPage() {
                 <button
                   type="button"
                   onClick={() => setStep('form')}
-                  className="mt-4 text-gray-600 hover:text-gray-900 font-medium transition-colors"
+                  className="mt-4 text-text-light hover:text-text font-bold transition-colors"
                 >
                   ← use different email
                 </button>
@@ -192,39 +201,39 @@ export default function SignupPage() {
           {/* Step 3: Success */}
           {step === 'success' && (
             <div className="text-center">
-              <div className="w-24 h-24 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-6">
-                <Check className="w-12 h-12 text-green-600" />
+              <div className="w-24 h-24 rounded-3xl bg-accent/10 flex items-center justify-center mx-auto mb-6 border-2 border-accent/20">
+                <Check className="w-12 h-12 text-accent-dark" />
               </div>
               
-              <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-4">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-text mb-4">
                 you're in! 🎉
               </h1>
               
-              <p className="text-xl text-gray-600 mb-12">
+              <p className="text-lg md:text-xl text-text-light mb-12">
                 you'll now get instant email alerts about free food events
               </p>
 
-              <div className="bg-gray-50 rounded-2xl p-8 mb-8 max-w-md mx-auto">
-                <h3 className="text-xl font-bold text-gray-900 mb-6">what's next?</h3>
+              <div className="bg-gray-50 rounded-3xl p-8 mb-8 max-w-md mx-auto border-2 border-gray-100">
+                <h3 className="text-xl font-bold text-text mb-6">what's next?</h3>
                 <ul className="text-left space-y-4">
                   <li className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-white text-sm font-bold flex items-center justify-center mt-0.5">1</span>
-                    <span className="text-gray-700">we monitor UCD society Instagram accounts</span>
+                    <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-white text-sm font-bold flex items-center justify-center mt-0.5">1</span>
+                    <span className="text-text-light font-medium">we monitor UCD society Instagram accounts</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-white text-sm font-bold flex items-center justify-center mt-0.5">2</span>
-                    <span className="text-gray-700">when free food is posted, you get an instant email</span>
+                    <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-white text-sm font-bold flex items-center justify-center mt-0.5">2</span>
+                    <span className="text-text-light font-medium">when free food is posted, you get an instant email</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-white text-sm font-bold flex items-center justify-center mt-0.5">3</span>
-                    <span className="text-gray-700">never miss free food again!</span>
+                    <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-white text-sm font-bold flex items-center justify-center mt-0.5">3</span>
+                    <span className="text-text-light font-medium">never miss free food again!</span>
                   </li>
                 </ul>
               </div>
 
               <Link
                 href="/"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-primary hover:bg-blue-50 transition-colors font-semibold"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-primary hover:bg-primary/10 transition-all font-bold border-2 border-primary/20"
               >
                 ← back to home
               </Link>
@@ -233,6 +242,24 @@ export default function SignupPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white">
+        <Header />
+        <main className="pt-24 pb-16 px-4">
+          <div className="max-w-2xl mx-auto text-center">
+            <div className="inline-block w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            <p className="text-text-light mt-4 font-semibold">loading...</p>
+          </div>
+        </main>
+      </div>
+    }>
+      <SignupContent />
+    </Suspense>
   );
 }
 

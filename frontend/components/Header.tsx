@@ -8,13 +8,13 @@ export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-primary shadow-md">
-      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative w-10 h-10 transition-transform group-hover:scale-110">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b-2 border-gray-100">
+      <div className="max-w-7xl mx-auto px-4 h-16 md:h-20 flex items-center justify-center md:justify-start">
+        {/* Logo - Centered on mobile, left side on desktop */}
+        <Link href="/" className="flex items-center gap-2 md:gap-3 group md:mr-8">
+          <div className="relative w-10 h-10 md:w-12 md:h-12 transition-transform group-hover:scale-110">
             <Image
-              src="/FreeFoodUCDLogo.jpeg"
+              src="/FreeFoodUCDLogo_nobg.png"
               alt="FreeFood UCD Logo"
               fill
               className="object-contain"
@@ -22,29 +22,29 @@ export function Header() {
             />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-white">
-              FreeFood <span className="text-white/90">UCD</span>
+            <h1 className="text-lg md:text-xl font-bold text-text">
+              FreeFood <span className="text-primary">UCD</span>
             </h1>
           </div>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden md:flex items-center gap-2">
           <Link
             href="/"
-            className="text-sm font-medium text-white/90 hover:text-white transition-colors"
+            className="px-4 py-2 text-sm font-semibold text-text-light hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
           >
             Events
           </Link>
           <Link
             href="/societies"
-            className="text-sm font-medium text-white/90 hover:text-white transition-colors"
+            className="px-4 py-2 text-sm font-semibold text-text-light hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
           >
             Societies
           </Link>
           <Link
             href="/about"
-            className="text-sm font-medium text-white/90 hover:text-white transition-colors"
+            className="px-4 py-2 text-sm font-semibold text-text-light hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
           >
             About
           </Link>
@@ -54,7 +54,7 @@ export function Header() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 text-white hover:text-white/80"
+            className="md:hidden p-2 text-text hover:bg-gray-50 rounded-xl transition-all"
             aria-label="Toggle menu"
           >
             <svg
@@ -85,25 +85,25 @@ export function Header() {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden border-t border-white/20 bg-primary-dark">
-          <nav className="px-4 py-4 space-y-3">
+        <div className="md:hidden border-t border-gray-100 bg-white">
+          <nav className="px-4 py-4 space-y-2">
             <Link
               href="/"
-              className="block px-3 py-2 text-base font-medium text-white hover:bg-white/10 rounded-lg"
+              className="block px-4 py-3 text-base font-semibold text-text hover:bg-primary/5 hover:text-primary rounded-xl transition-all"
               onClick={() => setIsMenuOpen(false)}
             >
               Events
             </Link>
             <Link
               href="/societies"
-              className="block px-3 py-2 text-base font-medium text-white hover:bg-white/10 rounded-lg"
+              className="block px-4 py-3 text-base font-semibold text-text hover:bg-primary/5 hover:text-primary rounded-xl transition-all"
               onClick={() => setIsMenuOpen(false)}
             >
               Societies
             </Link>
             <Link
               href="/about"
-              className="block px-3 py-2 text-base font-medium text-white hover:bg-white/10 rounded-lg"
+              className="block px-4 py-3 text-base font-semibold text-text hover:bg-primary/5 hover:text-primary rounded-xl transition-all"
               onClick={() => setIsMenuOpen(false)}
             >
               About

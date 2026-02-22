@@ -35,26 +35,27 @@ export default function SocietiesPage() {
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            <div className="text-6xl mb-6">👥</div>
+            <h1 className="text-4xl md:text-5xl font-bold text-text mb-4">
               monitored societies
             </h1>
-            <p className="text-lg text-gray-600">
+            <p className="text-lg md:text-xl text-text-light font-medium">
               we track these {societies.length} UCD societies for free food announcements
             </p>
           </div>
 
           {/* Loading State */}
           {loading && (
-            <div className="text-center py-12">
-              <div className="inline-block w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-              <p className="text-gray-600 mt-4">loading societies...</p>
+            <div className="text-center py-16 bg-gray-50 rounded-3xl border-2 border-gray-100">
+              <div className="inline-block w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+              <p className="text-text-light mt-4 font-semibold">loading societies...</p>
             </div>
           )}
 
           {/* Error State */}
           {error && (
-            <div className="text-center py-12">
-              <p className="text-red-600">{error}</p>
+            <div className="text-center py-16 bg-gray-50 rounded-3xl border-2 border-gray-100">
+              <p className="text-danger-dark font-bold">{error}</p>
             </div>
           )}
 
@@ -68,21 +69,23 @@ export default function SocietiesPage() {
                     href={`https://instagram.com/${society.instagram_handle}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-between p-4 rounded-lg hover:bg-gray-50 transition-colors group"
+                    className="flex items-center justify-between p-5 bg-gray-50 rounded-2xl hover:shadow-lg transition-all group border-2 border-gray-100 hover:border-primary/30"
                   >
-                    <div className="flex items-center gap-3">
-                      <Instagram className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" />
+                    <div className="flex items-center gap-4">
+                      <div className="p-2 bg-primary/10 rounded-xl group-hover:bg-primary/20 transition-all">
+                        <Instagram className="w-5 h-5 text-primary" />
+                      </div>
                       <div>
-                        <h3 className="font-semibold text-gray-900 group-hover:text-primary transition-colors">
+                        <h3 className="font-bold text-text group-hover:text-primary transition-colors">
                           {society.name}
                         </h3>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-text-lighter font-medium">
                           @{society.instagram_handle}
                         </p>
                       </div>
                     </div>
                     {society.is_active && (
-                      <span className="text-xs font-medium text-green-600 bg-green-50 px-3 py-1 rounded-full">
+                      <span className="text-xs font-bold text-success-dark bg-success/10 px-3 py-1.5 rounded-full border-2 border-success/20">
                         active
                       </span>
                     )}
@@ -91,26 +94,26 @@ export default function SocietiesPage() {
               </div>
 
               {/* Stats */}
-              <div className="bg-gray-50 rounded-xl p-8 text-center">
-                <div className="text-4xl font-bold text-primary mb-2">
+              <div className="bg-gray-50 rounded-3xl p-8 md:p-10 text-center border-2 border-gray-200">
+                <div className="text-5xl md:text-6xl font-bold text-primary mb-3">
                   {societies.length}
                 </div>
-                <div className="text-gray-600">societies monitored 24/7</div>
+                <div className="text-lg text-text-light font-semibold">societies monitored 24/7</div>
               </div>
             </>
           )}
 
           {/* Missing Society CTA */}
-          <div className="mt-12 text-center bg-primary/5 rounded-xl p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-3">
+          <div className="mt-12 text-center bg-gray-50 rounded-3xl p-8 md:p-10 border-2 border-gray-100">
+            <h2 className="text-2xl md:text-3xl font-bold text-text mb-3">
               missing a society?
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-text-light mb-6 font-medium">
               let us know and we'll add them
             </p>
             <a
               href="mailto:hello@freefooducd.ie"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary text-white font-semibold hover:bg-primary-dark transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-accent text-white font-bold hover:bg-accent-dark transition-all shadow-md hover:shadow-lg"
             >
               suggest a society
             </a>

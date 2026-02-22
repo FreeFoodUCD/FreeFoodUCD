@@ -39,7 +39,7 @@ export function FilterBar({
               className={cn(
                 'px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all',
                 timeFilter === filter.value
-                  ? 'bg-gray-900 text-white shadow-sm'
+                  ? 'bg-primary text-white shadow-sm'
                   : 'bg-white text-gray-700 border border-gray-200 hover:border-gray-300'
               )}
             >
@@ -115,7 +115,7 @@ export function FilterBar({
             </p>
             <button
               onClick={() => setShowSocietyFilter(false)}
-              className="mt-4 w-full px-4 py-3 rounded-lg bg-gray-900 text-white font-semibold"
+              className="mt-4 w-full px-4 py-3 rounded-lg bg-primary text-white font-semibold hover:bg-primary-dark transition-all"
             >
               Close
             </button>

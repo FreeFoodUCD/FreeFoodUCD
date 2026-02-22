@@ -219,5 +219,59 @@ Happy eating! 🍕"""
                 "success": False,
                 "error": str(e)
             }
+    
+    async def send_event_reminder(
+        self,
+        phone_number: str,
+        event_data: Dict
+    ) -> Dict:
+        """
+        Send event reminder via WhatsApp (1 hour before event)
+        
+        Args:
+            phone_number: Recipient's phone number
+            event_data: Event information dict
+            
+        Returns:
+            Dict with success status
+        """
+        try:
+            to_number = self._format_phone_number(phone_number)
+            
+            society = event_data.get("society_name", "Unknown Society")
+            title = event_data.get("title", "Free Food Event")
+            location = event_data.get("location", "Location TBA")
+            time = event_data.get("start_time", "Time TBA")
+            
+            message_body = f"""⏰ REMINDER: Starting in 1 Hour!
+
+🍕 {title}
+
+Society: {society}
+📍 Location: {location}
+🕒 Time: {time}
+
+Don't miss out! Head over now! 🏃‍♂️💨"""
+            
+            message = self.client.messages.create(
+                from_=self.from_number,
+                body=message_body,
+                to=to_number
+            )
+            
+            logger.info(f"Reminder sent. SID: {message.sid}")
+            
+            return {
+                "success": True,
+                "message_sid": message.sid,
+                "status": message.status
+            }
+            
+        except Exception as e:
+            logger.error(f"Error sending reminder: {str(e)}")
+            return {
+                "success": False,
+                "error": str(e)
+            }
 
 # Made with Bob

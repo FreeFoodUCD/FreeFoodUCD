@@ -180,6 +180,111 @@ async def _send_welcome_message_async(user_id: str):
 
 
 # Import datetime
-from datetime import datetime
+from datetime import datetime, timedelta
+
+
+@celery_app.task
+def send_upcoming_event_notifications():
+    """
+    Check for events starting in 1 hour and send reminder notifications.
+    Runs every 10 minutes to catch events.
+    """
+    return asyncio.run(_send_upcoming_event_notifications_async())
+
+
+async def _send_upcoming_event_notifications_async():
+    """Async implementation of send_upcoming_event_notifications."""
+    async with async_session_maker() as session:
+        # Get current time and 1 hour from now window
+        now = datetime.now()
+        one_hour_from_now = now + timedelta(hours=1)
+        # Check events starting between 50-70 minutes from now (10 min window)
+        window_start = now + timedelta(minutes=50)
+        window_end = now + timedelta(minutes=70)
+        
+        # Find events that:
+        # 1. Start in approximately 1 hour
+        # 2. Haven't been reminded yet
+        # 3. Are active
+        query = select(Event).where(
+            Event.start_time >= window_start,
+            Event.start_time <= window_end,
+            Event.is_active == True,
+            Event.reminder_sent == False
+        )
+        result = await session.execute(query)
+        upcoming_events = result.scalars().all()
+        
+        if not upcoming_events:
+            logger.info("No upcoming events requiring reminders")
+            return {"events_reminded": 0}
+        
+        logger.info(f"Sending reminders for {len(upcoming_events)} upcoming events")
+        
+        total_notified = 0
+        for event in upcoming_events:
+            # Get eligible users for this event
+            users = await _get_eligible_users(session, event)
+            
+            if not users:
+                continue
+            
+            # Format event data for notifications
+            event_data = {
+                'society_name': event.society.name if event.society else 'Unknown Society',
+                'title': event.title,
+                'location': event.location or 'Location TBA',
+                'start_time': event.start_time.strftime('%I:%M %p') if event.start_time else 'Time TBA',
+                'date': event.start_time.strftime('%A, %B %d') if event.start_time else 'Date TBA',
+            }
+            
+            # Send WhatsApp reminders
+            whatsapp_notifier = WhatsAppService()
+            whatsapp_users = [u for u in users if u.notification_preferences.get('whatsapp', False)]
+            
+            whatsapp_results = []
+            for user in whatsapp_users:
+                if user.phone_number:
+                    result = await whatsapp_notifier.send_event_reminder(user.phone_number, event_data)
+                    whatsapp_results.append({
+                        'user_id': str(user.id),
+                        'status': 'success' if result.get('success') else 'failed',
+                        'error': result.get('error')
+                    })
+            
+            if whatsapp_results:
+                await _log_notifications(session, str(event.id), whatsapp_results, 'whatsapp_reminder')
+            
+            # Send email reminders
+            email_notifier = EmailNotifier()
+            email_users = [u for u in users if u.notification_preferences.get('email', False)]
+            
+            email_results = []
+            for user in email_users:
+                if user.email:
+                    result = await email_notifier.send_event_reminder(user.email, event_data)
+                    email_results.append({
+                        'user_id': str(user.id),
+                        'status': 'success' if result.get('success') else 'failed',
+                        'error': result.get('error')
+                    })
+            
+            if email_results:
+                await _log_notifications(session, str(event.id), email_results, 'email_reminder')
+            
+            # Mark event as reminded
+            event.reminder_sent = True
+            event.reminder_sent_at = datetime.now()
+            total_notified += len(users)
+        
+        await session.commit()
+        
+        logger.info(f"Sent reminders for {len(upcoming_events)} events to {total_notified} users")
+        
+        return {
+            "events_reminded": len(upcoming_events),
+            "users_notified": total_notified
+        }
+
 
 # Made with Bob

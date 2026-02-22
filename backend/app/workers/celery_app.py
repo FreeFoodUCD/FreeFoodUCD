@@ -26,18 +26,18 @@ celery_app.conf.update(
 
 # Celery Beat schedule for periodic tasks
 celery_app.conf.beat_schedule = {
-    # Scrape stories every 5 minutes
-    'scrape-stories-every-5-minutes': {
-        'task': 'app.workers.scraping_tasks.scrape_all_stories',
-        'schedule': 300.0,  # 5 minutes in seconds
+    # Scrape posts once daily at 9 AM (when societies typically post)
+    'scrape-posts-daily': {
+        'task': 'app.workers.scraping_tasks.scrape_all_posts',
+        'schedule': crontab(hour=9, minute=0),
         'options': {'queue': 'scraping'}
     },
     
-    # Scrape posts every 15 minutes
-    'scrape-posts-every-15-minutes': {
-        'task': 'app.workers.scraping_tasks.scrape_all_posts',
-        'schedule': 900.0,  # 15 minutes in seconds
-        'options': {'queue': 'scraping'}
+    # Check for upcoming events and send notifications every 10 minutes
+    'send-upcoming-event-notifications': {
+        'task': 'app.workers.notification_tasks.send_upcoming_event_notifications',
+        'schedule': 600.0,  # 10 minutes in seconds
+        'options': {'queue': 'notifications'}
     },
     
     # Cleanup expired stories daily at 2 AM
@@ -54,10 +54,10 @@ celery_app.conf.beat_schedule = {
         'options': {'queue': 'maintenance'}
     },
     
-    # Health check every minute
+    # Health check every 5 minutes
     'health-check': {
         'task': 'app.workers.maintenance_tasks.health_check',
-        'schedule': 60.0,  # 1 minute
+        'schedule': 300.0,  # 5 minutes
         'options': {'queue': 'maintenance'}
     },
 }

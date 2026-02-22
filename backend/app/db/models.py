@@ -86,6 +86,8 @@ class Event(Base):
     extracted_data = Column(JSONB)
     notified = Column(Boolean, default=False, index=True)
     notification_sent_at = Column(DateTime(timezone=True))
+    reminder_sent = Column(Boolean, default=False, index=True)
+    reminder_sent_at = Column(DateTime(timezone=True))
     is_active = Column(Boolean, default=True, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

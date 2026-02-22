@@ -61,105 +61,117 @@ export function EventCard({ event, onClick }: EventCardProps) {
 
   const { isLive, isEndingSoon, isPast, minutesLeft, relativeTime } = timeState;
 
+  // Get food emoji based on event title
+  const getFoodEmoji = () => {
+    const title = event.title.toLowerCase();
+    if (title.includes('pizza')) return '🍕';
+    if (title.includes('sandwich') || title.includes('sub')) return '🥪';
+    if (title.includes('donut') || title.includes('doughnut')) return '🍩';
+    if (title.includes('burger')) return '🍔';
+    if (title.includes('taco')) return '🌮';
+    if (title.includes('coffee') || title.includes('tea')) return '☕';
+    if (title.includes('cake') || title.includes('dessert')) return '🍰';
+    if (title.includes('cookie')) return '🍪';
+    return '🍕'; // default
+  };
+
   return (
     <div
       onClick={onClick}
       className={cn(
-        'bg-white rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-200 cursor-pointer overflow-hidden',
-        'border-2 border-transparent',
-        isLive && 'border-l-4 border-l-danger',
-        isEndingSoon && 'border-l-4 border-l-warning',
+        'bg-white rounded-3xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden',
+        'border-2 border-gray-100 hover:border-primary/20',
+        isLive && 'ring-2 ring-primary ring-offset-2 ring-offset-white',
+        isEndingSoon && 'ring-2 ring-secondary ring-offset-2 ring-offset-white',
         isPast && 'opacity-60'
       )}
     >
-      <div className="p-4">
-        {/* Header with badges */}
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex-1">
+      <div className="p-5 md:p-6">
+        {/* Header with food emoji and badges */}
+        <div className="flex items-start gap-3 mb-4">
+          <div className="text-4xl md:text-5xl flex-shrink-0">
+            {getFoodEmoji()}
+          </div>
+          <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2 flex-wrap">
-              {/* Free Food Badge */}
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary">
-                Free Food
-              </span>
-
               {/* Live Badge */}
               {isLive && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-danger text-white animate-pulse-ring">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
-                  LIVE
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-primary text-white animate-pulse-ring">
+                  <span className="w-2 h-2 rounded-full bg-white"></span>
+                  LIVE NOW
                 </span>
               )}
 
               {/* Ending Soon Badge */}
               {isEndingSoon && (
-                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-warning text-gray-900">
-                  ⚠️ {minutesLeft}m left
+                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-secondary text-text">
+                  ⏰ {minutesLeft}m left
                 </span>
               )}
 
               {/* Time ago */}
-              {mounted && (
-                <span className="text-xs text-gray-500">
+              {mounted && !isLive && (
+                <span className="text-xs font-medium text-text-lighter">
                   {relativeTime}
                 </span>
               )}
             </div>
 
             {/* Event Title */}
-            <h3 className="text-lg font-bold text-gray-900 leading-tight line-clamp-2">
+            <h3 className="text-lg md:text-xl font-bold text-text leading-tight line-clamp-2 mb-2">
               {event.title}
             </h3>
           </div>
         </div>
 
         {/* Society */}
-        <div className="flex items-center gap-2.5 mb-3">
+        <div className="flex items-center gap-3 mb-4 p-3 bg-gray-50 rounded-2xl border border-gray-100">
           <div
-            className="w-9 h-9 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-sm"
+            className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm"
             style={{ backgroundColor: societyColor }}
           >
             {event.society.name.charAt(0)}
           </div>
-          <span className="text-sm font-semibold text-gray-700">
+          <span className="text-sm font-bold text-text">
             {event.society.name}
           </span>
         </div>
 
         {/* Details */}
-        <div className="space-y-2 mb-3">
+        <div className="space-y-3 mb-4">
           {/* Location */}
-          <div className="flex items-start gap-2.5 text-sm text-gray-600">
-            <MapPin className="w-4 h-4 mt-0.5 text-gray-400 flex-shrink-0" />
-            <span className="line-clamp-1">{event.location}</span>
+          <div className="flex items-start gap-3 text-sm text-text-light">
+            <MapPin className="w-5 h-5 mt-0.5 text-primary flex-shrink-0" />
+            <span className="line-clamp-1 font-medium">{event.location}</span>
           </div>
 
           {/* Time */}
-          <div className="flex items-center gap-2.5 text-sm text-gray-600">
-            <Clock className="w-4 h-4 text-gray-400 flex-shrink-0" />
-            <span>
-              {isLive ? 'Happening Now!' : formatEventTime(event.start_time)}
+          <div className="flex items-center gap-3 text-sm text-text-light">
+            <Clock className="w-5 h-5 text-primary flex-shrink-0" />
+            <span className="font-medium">
+              {isLive ? '🔥 Happening Now!' : formatEventTime(event.start_time)}
             </span>
           </div>
         </div>
 
         {/* Description (if available) */}
         {event.description && (
-          <p className="text-sm text-gray-600 line-clamp-2 mb-3">
+          <p className="text-sm text-text-light line-clamp-2 mb-4 leading-relaxed">
             {event.description}
           </p>
         )}
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-          <span className="text-xs text-gray-500">
-            From Instagram {event.source_type === 'story' ? 'Story' : 'Post'}
+        <div className="flex items-center justify-between pt-4 border-t-2 border-gray-100">
+          <span className="text-xs font-semibold text-text-lighter">
+            📸 {event.source_type === 'story' ? 'Story' : 'Post'}
           </span>
           <button
             onClick={(e) => {
               e.stopPropagation();
               // Share functionality
             }}
-            className="p-1.5 text-gray-400 hover:text-primary transition-colors rounded-lg hover:bg-gray-50"
+            className="p-2 text-text-lighter hover:text-primary transition-colors rounded-xl hover:bg-gray-50"
             aria-label="Share event"
           >
             <Share2 className="w-4 h-4" />
@@ -173,20 +185,21 @@ export function EventCard({ event, onClick }: EventCardProps) {
 // Loading skeleton
 export function EventCardSkeleton() {
   return (
-    <div className="bg-white rounded-2xl shadow-card p-4 animate-pulse">
-      <div className="flex items-start justify-between mb-3">
+    <div className="bg-white rounded-3xl shadow-soft p-5 md:p-6 animate-pulse">
+      <div className="flex items-start gap-3 mb-4">
+        <div className="w-12 h-12 md:w-14 md:h-14 bg-gray-200 rounded-2xl"></div>
         <div className="flex-1">
-          <div className="h-5 bg-gray-200 rounded w-24 mb-2"></div>
-          <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+          <div className="h-5 bg-gray-200 rounded-xl w-24 mb-2"></div>
+          <div className="h-6 bg-gray-200 rounded-xl w-3/4"></div>
         </div>
       </div>
-      <div className="flex items-center gap-2.5 mb-3">
-        <div className="w-9 h-9 rounded-full bg-gray-200"></div>
-        <div className="h-4 bg-gray-200 rounded w-32"></div>
+      <div className="flex items-center gap-3 mb-4 p-3 bg-gray-100 rounded-2xl">
+        <div className="w-10 h-10 rounded-full bg-gray-200"></div>
+        <div className="h-4 bg-gray-200 rounded-xl w-32"></div>
       </div>
-      <div className="space-y-2 mb-3">
-        <div className="h-4 bg-gray-200 rounded w-full"></div>
-        <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+      <div className="space-y-3 mb-4">
+        <div className="h-4 bg-gray-200 rounded-xl w-full"></div>
+        <div className="h-4 bg-gray-200 rounded-xl w-2/3"></div>
       </div>
     </div>
   );

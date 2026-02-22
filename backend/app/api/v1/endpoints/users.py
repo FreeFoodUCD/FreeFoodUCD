@@ -81,15 +81,40 @@ async def signup_user(
     query = select(User).where(User.email == user_data.email)
     result = await db.execute(query)
     existing_user = result.scalar_one_or_none()
-    if existing_user:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="already_signed_up"
-        )
     
     # Generate verification code
     verification_code = generate_verification_code()
     code_expires = datetime.now(timezone.utc) + timedelta(minutes=10)
+    
+    if existing_user:
+        # If user exists but is not verified, resend verification code
+        if not existing_user.email_verified:
+            existing_user.verification_code = verification_code
+            existing_user.verification_code_expires = code_expires
+            await db.commit()
+            await db.refresh(existing_user)
+            
+            # Resend verification code
+            try:
+                await brevo.send_verification_email(user_data.email, verification_code)
+            except Exception as e:
+                print(f"Error sending verification code: {e}")
+            
+            return UserResponse(
+                id=existing_user.id,
+                email=existing_user.email,
+                phone_number=existing_user.phone_number,
+                whatsapp_verified=existing_user.whatsapp_verified,
+                email_verified=existing_user.email_verified,
+                notification_preferences=existing_user.notification_preferences,
+                is_active=existing_user.is_active
+            )
+        else:
+            # User is already verified
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="already_signed_up"
+            )
     
     # Create new user
     new_user = User(

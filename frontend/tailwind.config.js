@@ -8,33 +8,31 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Brand colors from FreeFood UCD logo
-        brand: {
-          cyan: '#03daff',
-          red: '#fa3000',
-          yellow: '#ffbc03',
-          brown: '#d96504',
-        },
-        // Semantic colors
+        // Logo-inspired artistic minimal palette
         primary: {
-          DEFAULT: '#03daff',
-          light: '#5ee4ff',
-          dark: '#02b8d9',
+          DEFAULT: '#F78620', // Warm orange/brown from logo - friendly, approachable
+          light: '#FFA04D',
+          dark: '#E06D0A',
         },
-        danger: {
-          DEFAULT: '#fa3000',
-          light: '#ff6b47',
-          dark: '#d12800',
-        },
-        warning: {
-          DEFAULT: '#ffbc03',
-          light: '#ffd24d',
-          dark: '#d99d02',
+        secondary: {
+          DEFAULT: '#FFC613', // Yellow from logo - energetic, optimistic
+          light: '#FFD54D',
+          dark: '#E6B000',
         },
         accent: {
-          DEFAULT: '#d96504',
-          light: '#ff8833',
-          dark: '#b35403',
+          DEFAULT: '#6FC266', // Green from logo - fresh, positive
+          light: '#8FD88A',
+          dark: '#5AAA52',
+        },
+        text: {
+          DEFAULT: '#1A1A1A', // Deep black
+          light: '#4B5563',
+          lighter: '#9CA3AF',
+        },
+        danger: {
+          DEFAULT: '#DC2626',
+          light: '#FCA5A5',
+          dark: '#991B1B',
         },
       },
       fontFamily: {
@@ -44,10 +42,12 @@ module.exports = {
         'xl': '1rem',
         '2xl': '1.5rem',
         '3xl': '2rem',
+        '4xl': '2.5rem',
       },
       boxShadow: {
-        'card': '0 2px 8px rgba(0, 0, 0, 0.08)',
-        'card-hover': '0 4px 16px rgba(0, 0, 0, 0.12)',
+        'soft': '0 2px 12px rgba(47, 128, 237, 0.08)',
+        'soft-hover': '0 4px 20px rgba(47, 128, 237, 0.12)',
+        'warm': '0 2px 12px rgba(255, 183, 3, 0.15)',
       },
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',

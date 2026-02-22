@@ -85,71 +85,71 @@ export default function EventModal({ event, isOpen, onClose }: EventModalProps) 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center md:p-4 bg-black/50 backdrop-blur-sm">
+      <div className="relative w-full md:max-w-2xl bg-white rounded-t-3xl md:rounded-3xl shadow-2xl max-h-[95vh] md:max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-2xl">
+        <div className="sticky top-0 bg-primary text-white p-6 md:p-8 rounded-t-3xl">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-full transition-colors"
+            className="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-2xl transition-all"
             aria-label="Close modal"
           >
             <X className="w-6 h-6" />
           </button>
           
           <div className="pr-12">
-            <div className="inline-block px-3 py-1 bg-white/20 rounded-full text-sm font-medium mb-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/20 rounded-full text-sm font-bold mb-4">
               {event.source_type === 'story' ? '📸 Story' : '📱 Post'}
             </div>
-            <h2 className="text-2xl font-bold mb-2">{event.title}</h2>
-            <div className="flex items-center gap-2 text-blue-100">
-              <Users className="w-4 h-4" />
-              <span className="font-medium">{event.society.name}</span>
+            <h2 className="text-2xl md:text-3xl font-bold mb-3 leading-tight">{event.title}</h2>
+            <div className="flex items-center gap-2 text-white/90">
+              <Users className="w-5 h-5" />
+              <span className="font-semibold">{event.society.name}</span>
             </div>
           </div>
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-6">
+        <div className="p-6 md:p-8 space-y-5">
           {/* Time & Date */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-start gap-3 p-4 bg-orange-50 rounded-xl border border-orange-200">
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <Clock className="w-5 h-5 text-orange-600" />
+            <div className="flex items-start gap-3 p-4 bg-secondary/10 rounded-2xl border-2 border-secondary/20">
+              <div className="p-2 bg-secondary/20 rounded-xl">
+                <Clock className="w-5 h-5 text-secondary-dark" />
               </div>
               <div>
-                <p className="text-sm text-gray-600 mb-1">Time</p>
-                <p className="font-semibold text-gray-900">{formatTime(event.start_time)}</p>
-                <p className="text-sm text-orange-600 font-medium mt-1">
+                <p className="text-sm text-text-light font-semibold mb-1">Time</p>
+                <p className="font-bold text-text text-lg">{formatTime(event.start_time)}</p>
+                <p className="text-sm text-secondary-dark font-bold mt-1">
                   {getRelativeTime(event.start_time)}
                 </p>
               </div>
             </div>
 
-            <div className="flex items-start gap-3 p-4 bg-purple-50 rounded-xl border border-purple-200">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Calendar className="w-5 h-5 text-purple-600" />
+            <div className="flex items-start gap-3 p-4 bg-primary/10 rounded-2xl border-2 border-primary/20">
+              <div className="p-2 bg-primary/20 rounded-xl">
+                <Calendar className="w-5 h-5 text-primary-dark" />
               </div>
               <div>
-                <p className="text-sm text-gray-600 mb-1">Date</p>
-                <p className="font-semibold text-gray-900">{formatDate(event.start_time)}</p>
+                <p className="text-sm text-text-light font-semibold mb-1">Date</p>
+                <p className="font-bold text-text">{formatDate(event.start_time)}</p>
               </div>
             </div>
           </div>
 
           {/* Location */}
-          <div className="flex items-start gap-3 p-4 bg-green-50 rounded-xl border border-green-200">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <MapPin className="w-5 h-5 text-green-600" />
+          <div className="flex items-start gap-3 p-4 bg-success/10 rounded-2xl border-2 border-success/20">
+            <div className="p-2 bg-success/20 rounded-xl">
+              <MapPin className="w-5 h-5 text-success-dark" />
             </div>
             <div className="flex-1">
-              <p className="text-sm text-gray-600 mb-1">Location</p>
-              <p className="font-semibold text-gray-900">{event.location}</p>
+              <p className="text-sm text-text-light font-semibold mb-1">Location</p>
+              <p className="font-bold text-text mb-2">{event.location}</p>
               <a
                 href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location + ' UCD')}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-sm text-green-600 hover:text-green-700 font-medium mt-2"
+                className="inline-flex items-center gap-1 text-sm text-success-dark hover:text-success font-bold"
               >
                 Open in Google Maps
                 <ExternalLink className="w-4 h-4" />
@@ -159,21 +159,21 @@ export default function EventModal({ event, isOpen, onClose }: EventModalProps) 
 
           {/* Description */}
           {event.description && (
-            <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
-              <p className="text-sm text-gray-600 mb-2">Description</p>
-              <p className="text-gray-900 leading-relaxed">{event.description}</p>
+            <div className="p-4 bg-cream rounded-2xl border-2 border-primary/10">
+              <p className="text-sm text-text-light font-semibold mb-2">Description</p>
+              <p className="text-text leading-relaxed">{event.description}</p>
             </div>
           )}
 
           {/* Source Link */}
           {event.source_url && (
-            <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
-              <p className="text-sm text-gray-600 mb-2">Source</p>
+            <div className="p-4 bg-primary/5 rounded-2xl border-2 border-primary/10">
+              <p className="text-sm text-text-light font-semibold mb-2">Source</p>
               <a
                 href={event.source_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
+                className="inline-flex items-center gap-2 text-primary hover:text-primary-dark font-bold"
               >
                 View original post on Instagram
                 <ExternalLink className="w-4 h-4" />
@@ -182,17 +182,17 @@ export default function EventModal({ event, isOpen, onClose }: EventModalProps) 
           )}
 
           {/* Action Buttons */}
-          <div className="flex gap-3 pt-4">
+          <div className="flex flex-col sm:flex-row gap-3 pt-4">
             <button
               onClick={handleShare}
-              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-xl"
+              className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-primary text-white rounded-2xl font-bold hover:bg-primary-dark transition-all shadow-soft hover:shadow-soft-hover"
             >
               <Share2 className="w-5 h-5" />
               Share Event
             </button>
             <button
               onClick={onClose}
-              className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-colors"
+              className="px-6 py-4 bg-cream text-text rounded-2xl font-bold hover:bg-primary/10 transition-all border-2 border-primary/20"
             >
               Close
             </button>

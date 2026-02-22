@@ -257,6 +257,104 @@ class EmailService:
                 "success": False,
                 "error": str(e)
             }
+    
+    async def send_event_reminder(
+        self,
+        email: str,
+        event_data: Dict
+    ) -> Dict:
+        """
+        Send event reminder (1 hour before event starts)
+        
+        Args:
+            email: Recipient's email address
+            event_data: Event information dict
+            
+        Returns:
+            Dict with success status
+        """
+        try:
+            subject = f"⏰ Reminder: Free Food in 1 Hour - {event_data.get('society_name', 'UCD Society')}"
+            html_content = self._format_reminder_html(event_data)
+            
+            params = {
+                "from": self.from_email,
+                "to": [email],
+                "subject": subject,
+                "html": html_content
+            }
+            
+            result = resend.Emails.send(params)
+            
+            logger.info(f"Reminder email sent to {email}. ID: {result.get('id')}")
+            
+            return {
+                "success": True,
+                "message_id": result.get('id'),
+                "status": "sent"
+            }
+            
+        except Exception as e:
+            logger.error(f"Error sending reminder email to {email}: {str(e)}")
+            return {
+                "success": False,
+                "error": str(e)
+            }
+    
+    def _format_reminder_html(self, event_data: Dict) -> str:
+        """Format event reminder into HTML email"""
+        society = event_data.get("society_name", "Unknown Society")
+        title = event_data.get("title", "Free Food Event")
+        location = event_data.get("location", "Location TBA")
+        time = event_data.get("start_time", "Time TBA")
+        
+        html = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Event Reminder</title>
+        </head>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+            
+            <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 30px; border-radius: 12px; text-align: center; margin-bottom: 30px;">
+                <h1 style="margin: 0; font-size: 28px;">⏰ Starting in 1 Hour!</h1>
+            </div>
+            
+            <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; margin-bottom: 20px; border-radius: 8px;">
+                <p style="margin: 0; font-size: 18px; font-weight: 600; color: #92400e;">Don't forget! Free food event starting soon:</p>
+            </div>
+            
+            <div style="background: #f9fafb; border-radius: 12px; padding: 25px; margin-bottom: 20px;">
+                <h2 style="margin-top: 0; color: #111827; font-size: 22px;">{title}</h2>
+                
+                <div style="margin: 20px 0;">
+                    <p style="margin: 10px 0; font-size: 16px;">
+                        <strong>🏛 Society:</strong> {society}
+                    </p>
+                    <p style="margin: 10px 0; font-size: 16px;">
+                        <strong>📍 Location:</strong> {location}
+                    </p>
+                    <p style="margin: 10px 0; font-size: 16px;">
+                        <strong>🕒 Time:</strong> {time}
+                    </p>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <p style="font-size: 18px; color: #d97706; font-weight: 600;">Head over now! 🏃‍♂️💨</p>
+            </div>
+            
+            <div style="text-align: center; padding: 20px; color: #9ca3af; font-size: 12px; border-top: 1px solid #e5e7eb; margin-top: 30px;">
+                <p>FreeFood UCD - Never miss free food again!</p>
+            </div>
+            
+        </body>
+        </html>
+        """
+        
+        return html
 
 
 # Alias for backward compatibility

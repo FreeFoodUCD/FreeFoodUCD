@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, Header
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, delete
+from sqlalchemy import select, delete, desc
 from typing import List, Optional
 from app.db.base import get_db
-from app.db.models import User, Society, Event
+from app.db.models import User, Society, Event, Post, ScrapingLog
 from app.core.config import settings
+from datetime import datetime, timedelta
 
 router = APIRouter()
 
@@ -463,6 +464,188 @@ async def list_societies(
             }
             for society in societies
         ]
+    }
+
+
+@router.get("/scraping-logs")
+async def get_scraping_logs(
+    limit: int = 50,
+    society_id: Optional[str] = None,
+    status: Optional[str] = None,
+    db: AsyncSession = Depends(get_db),
+    _: bool = Depends(verify_admin_key)
+):
+    """Get recent scraping logs with optional filters."""
+    query = select(ScrapingLog).order_by(desc(ScrapingLog.created_at))
+    
+    if society_id:
+        query = query.where(ScrapingLog.society_id == society_id)
+    if status:
+        query = query.where(ScrapingLog.status == status)
+    
+    query = query.limit(limit)
+    
+    result = await db.execute(query)
+    logs = result.scalars().all()
+    
+    # Get society names
+    logs_with_society = []
+    for log in logs:
+        society_result = await db.execute(
+            select(Society).where(Society.id == log.society_id)
+        )
+        society = society_result.scalar_one_or_none()
+        
+        logs_with_society.append({
+            "id": str(log.id),
+            "society_name": society.name if society else "Unknown",
+            "society_handle": society.instagram_handle if society else "unknown",
+            "scrape_type": log.scrape_type,
+            "status": log.status,
+            "items_found": log.items_found,
+            "error_message": log.error_message,
+            "duration_ms": log.duration_ms,
+            "created_at": log.created_at.isoformat()
+        })
+    
+    return {
+        "total": len(logs_with_society),
+        "logs": logs_with_society
+    }
+
+
+@router.get("/posts")
+async def get_posts(
+    limit: int = 50,
+    society_id: Optional[str] = None,
+    is_free_food: Optional[bool] = None,
+    processed: Optional[bool] = None,
+    db: AsyncSession = Depends(get_db),
+    _: bool = Depends(verify_admin_key)
+):
+    """Get recent posts with optional filters."""
+    query = select(Post).order_by(desc(Post.detected_at))
+    
+    if society_id:
+        query = query.where(Post.society_id == society_id)
+    if is_free_food is not None:
+        query = query.where(Post.is_free_food == is_free_food)
+    if processed is not None:
+        query = query.where(Post.processed == processed)
+    
+    query = query.limit(limit)
+    
+    result = await db.execute(query)
+    posts = result.scalars().all()
+    
+    # Get society names and event info
+    posts_with_details = []
+    for post in posts:
+        society_result = await db.execute(
+            select(Society).where(Society.id == post.society_id)
+        )
+        society = society_result.scalar_one_or_none()
+        
+        # Check if post has associated event
+        event_result = await db.execute(
+            select(Event).where(Event.source_id == post.id, Event.source_type == 'post')
+        )
+        event = event_result.scalar_one_or_none()
+        
+        posts_with_details.append({
+            "id": str(post.id),
+            "society_name": society.name if society else "Unknown",
+            "society_handle": society.instagram_handle if society else "unknown",
+            "instagram_post_id": post.instagram_post_id,
+            "caption": post.caption[:200] + "..." if post.caption and len(post.caption) > 200 else post.caption,
+            "caption_full": post.caption,
+            "source_url": post.source_url,
+            "media_urls": post.media_urls,
+            "detected_at": post.detected_at.isoformat() if post.detected_at else None,
+            "is_free_food": post.is_free_food,
+            "processed": post.processed,
+            "has_event": event is not None,
+            "event_id": str(event.id) if event else None,
+            "event_title": event.title if event else None
+        })
+    
+    return {
+        "total": len(posts_with_details),
+        "posts": posts_with_details
+    }
+
+
+@router.get("/dashboard-stats")
+async def get_dashboard_stats(
+    db: AsyncSession = Depends(get_db),
+    _: bool = Depends(verify_admin_key)
+):
+    """Get comprehensive dashboard statistics."""
+    # Get basic counts
+    users_result = await db.execute(select(User))
+    users = users_result.scalars().all()
+    
+    societies_result = await db.execute(select(Society))
+    societies = societies_result.scalars().all()
+    
+    events_result = await db.execute(select(Event).where(Event.is_active == True))
+    events = events_result.scalars().all()
+    
+    posts_result = await db.execute(select(Post))
+    posts = posts_result.scalars().all()
+    
+    # Get recent scraping activity (last 24 hours)
+    yesterday = datetime.now() - timedelta(days=1)
+    recent_logs_result = await db.execute(
+        select(ScrapingLog).where(ScrapingLog.created_at >= yesterday)
+    )
+    recent_logs = recent_logs_result.scalars().all()
+    
+    # Calculate success rate
+    if recent_logs:
+        successful = sum(1 for log in recent_logs if log.status == 'success')
+        success_rate = (successful / len(recent_logs)) * 100
+    else:
+        success_rate = 0
+    
+    # Get upcoming events (next 7 days)
+    now = datetime.now()
+    next_week = now + timedelta(days=7)
+    upcoming_events_result = await db.execute(
+        select(Event).where(
+            Event.start_time >= now,
+            Event.start_time <= next_week,
+            Event.is_active == True
+        )
+    )
+    upcoming_events = upcoming_events_result.scalars().all()
+    
+    return {
+        "users": {
+            "total": len(users),
+            "whatsapp_verified": sum(1 for u in users if u.whatsapp_verified),
+            "email_verified": sum(1 for u in users if u.email_verified),
+            "active": sum(1 for u in users if u.is_active),
+        },
+        "societies": {
+            "total": len(societies),
+            "active": sum(1 for s in societies if s.is_active),
+            "scraping_posts": sum(1 for s in societies if s.scrape_posts),
+        },
+        "events": {
+            "total": len(events),
+            "upcoming": len(upcoming_events),
+        },
+        "posts": {
+            "total": len(posts),
+            "free_food": sum(1 for p in posts if p.is_free_food),
+            "processed": sum(1 for p in posts if p.processed),
+        },
+        "scraping": {
+            "last_24h_attempts": len(recent_logs),
+            "success_rate": round(success_rate, 1),
+            "last_scrape": recent_logs[0].created_at.isoformat() if recent_logs else None,
+        }
     }
 
 
