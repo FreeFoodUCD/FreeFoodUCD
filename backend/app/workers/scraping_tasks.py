@@ -12,19 +12,10 @@ import hashlib
 
 logger = logging.getLogger(__name__)
 
-# Global scraper instance
-_scraper_instance = None
-
-
 def get_scraper():
-    """Get or create the global Apify scraper instance."""
-    global _scraper_instance
-    if _scraper_instance is None:
-        from app.core.config import settings
-        _scraper_instance = ApifyInstagramScraper(
-            api_token=settings.APIFY_API_TOKEN
-        )
-    return _scraper_instance
+    """Create a fresh Apify scraper instance (no caching to avoid stale state)."""
+    from app.core.config import settings
+    return ApifyInstagramScraper(api_token=settings.APIFY_API_TOKEN)
 
 
 @celery_app.task(bind=True, max_retries=3)
