@@ -13,12 +13,20 @@ app = FastAPI(
 )
 
 # Configure CORS
+# Add Vercel domains explicitly as fallback
+allowed_origins = settings.allowed_origins_list + [
+    "https://freefooducd.vercel.app",
+    "https://freefooducd-4tq3d2y6y-freefooducds-projects.vercel.app",
+    "https://*.vercel.app"  # Allow all Vercel preview deployments
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allowed_origins_list,
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 # Include API router
