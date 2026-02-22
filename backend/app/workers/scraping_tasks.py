@@ -169,14 +169,20 @@ def scrape_society_posts(self, society_id: str):
 
 async def _scrape_society_posts_async(society_id: str):
     """Async implementation of scrape_society_posts."""
+    print(f"[DEBUG] _scrape_society_posts_async called with society_id: {society_id}")
+    logger.info(f"[DEBUG] _scrape_society_posts_async called with society_id: {society_id}")
     start_time = datetime.now()
     
     async with async_session_maker() as session:
         society = await session.get(Society, society_id)
         if not society:
+            print(f"[DEBUG] Society not found: {society_id}")
             return {"error": "Society not found"}
         
+        print(f"[DEBUG] Found society: {society.name} (@{society.instagram_handle})")
+        
         try:
+            print(f"[DEBUG] About to scrape posts for @{society.instagram_handle}")
             logger.info(f"Scraping posts for @{society.instagram_handle}")
             
             # Get Apify scraper instance
