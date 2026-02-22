@@ -231,14 +231,16 @@ async def trigger_scrape(
     _: bool = Depends(verify_admin_key)
 ):
     """
-    Trigger immediate scraping (runs synchronously for Railway).
-    Uses same logic as scrape-test but saves to database.
+    Trigger immediate scraping with database saving and NLP processing.
     """
     from app.services.scraper.apify_scraper import ApifyInstagramScraper
+    from app.services.nlp.extractor import EventExtractor
+    from app.db.models import Post, Event
     from app.core.config import settings
+    from datetime import datetime
     
     if society_handle:
-        # Scrape specific society using working scrape-test logic
+        # Scrape specific society
         result = await db.execute(
             select(Society).where(Society.instagram_handle == society_handle)
         )
@@ -247,17 +249,71 @@ async def trigger_scrape(
         if not society:
             raise HTTPException(status_code=404, detail=f"Society @{society_handle} not found")
         
-        # Use same scraper logic as scrape-test (which works!)
+        # Scrape posts using working logic
         scraper = ApifyInstagramScraper(api_token=settings.APIFY_API_TOKEN)
-        posts = await scraper.scrape_posts(society_handle, max_posts=3)
+        posts_data = await scraper.scrape_posts(society_handle, max_posts=3)
+        
+        new_posts = 0
+        new_events = 0
+        extractor = EventExtractor()
+        
+        for post_data in posts_data:
+            # Extract post ID
+            post_id = post_data['url'].split('/p/')[-1].rstrip('/')
+            
+            # Check if post exists
+            existing = await db.execute(
+                select(Post).where(
+                    Post.society_id == society.id,
+                    Post.instagram_post_id == post_id
+                )
+            )
+            if existing.scalar_one_or_none():
+                continue
+            
+            # Save post
+            post = Post(
+                society_id=society.id,
+                instagram_post_id=post_id,
+                caption=post_data['caption'],
+                media_urls=[post_data.get('image_url')] if post_data.get('image_url') else [],
+                source_url=post_data['url'],
+                detected_at=post_data['timestamp'],
+                processed=True
+            )
+            db.add(post)
+            await db.flush()
+            new_posts += 1
+            
+            # NLP processing
+            event_data = extractor.extract_event(post_data['caption'])
+            if event_data and event_data.get('confidence', 0) >= 0.3:
+                event = Event(
+                    society_id=society.id,
+                    title=event_data.get('title', f"Free Food from {society.name}"),
+                    description=post_data['caption'][:500],
+                    location=event_data.get('location'),
+                    start_time=event_data.get('start_time'),
+                    source_type='post',
+                    source_id=post.id,
+                    confidence_score=event_data.get('confidence'),
+                    raw_text=post_data['caption'],
+                    is_active=True
+                )
+                db.add(event)
+                new_events += 1
+        
+        await db.commit()
         
         return {
             "message": f"Scraping completed for @{society_handle}",
             "society": society.name,
             "result": {
                 "society": society_handle,
-                "posts_found": len(posts),
-                "posts": posts[:3]  # Return first 3 for inspection
+                "posts_found": len(posts_data),
+                "new_posts": new_posts,
+                "new_events": new_events,
+                "status": "success"
             },
             "status": "completed"
         }
