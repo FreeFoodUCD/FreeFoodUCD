@@ -273,6 +273,32 @@ export default function AdminDashboard() {
     setLoading(false);
   };
 
+  const deleteUser = async (userId: string, userIdentifier: string) => {
+    if (!confirm(`Are you sure you want to delete user: ${userIdentifier}?`)) {
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      const response = await fetch(`${BASE_URL}/api/v1/admin/users/${userId}`, {
+        method: 'DELETE',
+        headers: { 'X-Admin-Key': adminKey }
+      });
+      
+      if (response.ok) {
+        alert(`User ${userIdentifier} deleted successfully`);
+        await loadUsers(); // Reload users list
+      } else {
+        const error = await response.json();
+        alert(`Error deleting user: ${error.detail || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      alert('Error deleting user');
+    }
+    setLoading(false);
+  };
+
   const loadUpcomingEvents = async () => {
     setLoading(true);
     try {
@@ -1059,6 +1085,7 @@ export default function AdminDashboard() {
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email Verified</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Joined</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -1080,6 +1107,14 @@ export default function AdminDashboard() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-sm">{new Date(user.created_at).toLocaleDateString()}</td>
+                      <td className="px-4 py-3 text-sm">
+                        <button
+                          onClick={() => deleteUser(user.id, user.email || user.phone_number || 'user')}
+                          className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-xs"
+                        >
+                          Delete
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
