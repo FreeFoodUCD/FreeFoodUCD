@@ -1,888 +1,517 @@
 # FreeFood UCD - System Architecture
 
-## 🏗️ High-Level Architecture
+## 🎯 Overview
 
-```mermaid
-graph TB
-    subgraph "Client Layer"
-        A[Next.js Frontend]
-        A1[Mobile Browser]
-        A2[Desktop Browser]
-    end
-    
-    subgraph "API Gateway"
-        B[FastAPI Backend]
-        B1[REST Endpoints]
-        B2[WebSocket Server]
-    end
-    
-    subgraph "Scraping Microservice"
-        C[Instagram Scraper Service]
-        C1[Post Monitor]
-        C2[Story Monitor]
-        C3[Session Manager]
-    end
-    
-    subgraph "Processing Pipeline"
-        D[Event Processor]
-        D1[NLP Extractor]
-        D2[Deduplication Engine]
-        D3[Event Validator]
-    end
-    
-    subgraph "Notification Service"
-        E[Notification Manager]
-        E1[WhatsApp Handler]
-        E2[Email Handler]
-        E3[Queue Manager]
-    end
-    
-    subgraph "Data Layer"
-        F[(PostgreSQL)]
-        G[(Redis Cache)]
-        H[S3/Object Storage]
-    end
-    
-    subgraph "Background Workers"
-        I[Celery Workers]
-        I1[Scraping Jobs]
-        I2[Notification Jobs]
-        I3[Cleanup Jobs]
-    end
-    
-    subgraph "Message Queue"
-        J[RabbitMQ/Redis]
-    end
-    
-    A --> B
-    B --> F
-    B --> G
-    C --> J
-    J --> D
-    D --> F
-    D --> E
-    E --> I2
-    I1 --> C
-    I --> G
-    C --> H
-    D --> H
+FreeFood UCD is a notification system that monitors UCD society Instagram accounts for free food events and alerts students via email.
+
+**Core Flow:** Instagram → Scraper → Event Detection → Email Notification
+
+---
+
+## 🏗️ System Architecture
+
+```
+┌─────────────┐
+│   Users     │
+│  (Browser)  │
+└──────┬──────┘
+       │
+       ↓
+┌─────────────────────────────────────────┐
+│         Frontend (Next.js/Vercel)       │
+│  - Landing page (shows next 24h events) │
+│  - Signup flow with email verification  │
+│  - Admin dashboard                      │
+└──────────────┬──────────────────────────┘
+               │
+               ↓
+┌─────────────────────────────────────────┐
+│       Backend API (FastAPI/Railway)     │
+│  - REST endpoints                       │
+│  - User management                      │
+│  - Event CRUD                           │
+│  - Admin operations                     │
+└──────┬──────────────────────────────────┘
+       │
+       ├─────────────────┬─────────────────┬──────────────────┐
+       ↓                 ↓                 ↓                  ↓
+┌─────────────┐   ┌─────────────┐   ┌──────────────┐   ┌──────────┐
+│ PostgreSQL  │   │   Redis     │   │ Celery Beat  │   │  Brevo   │
+│  Database   │   │   Cache     │   │  Scheduler   │   │  Email   │
+└─────────────┘   └─────────────┘   └──────┬───────┘   └──────────┘
+                                            │
+                                            ↓
+                                    ┌───────────────┐
+                                    │ Celery Worker │
+                                    │  - Scraping   │
+                                    │  - Reminders  │
+                                    └───────┬───────┘
+                                            │
+                                            ↓
+                                    ┌───────────────┐
+                                    │ Apify Service │
+                                    │   Instagram   │
+                                    │    Scraper    │
+                                    └───────────────┘
 ```
 
 ---
 
-## 🎯 Core Design Principles
+## 📦 Core Components
 
-### 1. **Microservice Isolation**
-- Story scraper runs independently
-- Can fail/restart without affecting main system
-- Separate health monitoring and alerting
-- Independent scaling
+### 1. **Frontend (Next.js + TypeScript)**
+**Location:** `frontend/`  
+**Deployed:** Vercel  
+**Purpose:** User interface
 
-### 2. **Event-Driven Architecture**
-- Loose coupling between services
-- Asynchronous processing
-- Easy to add new consumers
-- Fault-tolerant by design
+**Pages:**
+- `/` - Landing page (shows events in next 24 hours)
+- `/signup` - Email signup with verification
+- `/admin` - Admin dashboard (9 tabs)
+- `/societies` - Society list
+- `/about` - About page
 
-### 3. **Fail-Safe Defaults**
-- Graceful degradation
-- Circuit breakers for external services
-- Retry mechanisms with exponential backoff
-- Dead letter queues for failed messages
-
-### 4. **Data Integrity**
-- Idempotent operations
-- Content-based deduplication
-- Audit trails for all actions
-- Soft deletes for compliance
+**Key Features:**
+- React Query for data fetching
+- Tailwind CSS for styling
+- Real-time event countdown timers
+- Responsive design
 
 ---
 
-## 📦 Service Breakdown
+### 2. **Backend API (FastAPI + Python)**
+**Location:** `backend/`  
+**Deployed:** Railway  
+**Purpose:** Business logic and data management
 
-### **1. FastAPI Backend** (Port 8000)
-
-**Responsibilities:**
-- REST API endpoints
-- User authentication
-- Event CRUD operations
-- Society management
-- User preferences
-- WebSocket connections for real-time updates
+**Structure:**
+```
+backend/
+├── app/
+│   ├── api/v1/endpoints/     # REST endpoints
+│   │   ├── events.py         # Event CRUD
+│   │   ├── users.py          # User management
+│   │   ├── societies.py      # Society management
+│   │   └── admin.py          # Admin operations
+│   ├── core/
+│   │   └── config.py         # Settings
+│   ├── db/
+│   │   ├── models.py         # SQLAlchemy models
+│   │   └── base.py           # Database session
+│   ├── services/
+│   │   ├── notifications/
+│   │   │   └── brevo.py      # Email service (Brevo)
+│   │   ├── scraper/
+│   │   │   └── apify_scraper.py  # Instagram scraper
+│   │   ├── nlp/
+│   │   │   └── extractor.py  # Event extraction
+│   │   └── ocr/
+│   │       └── image_text_extractor.py  # OCR
+│   └── workers/
+│       ├── celery_app.py     # Celery config
+│       ├── scraping_tasks.py # Scraping jobs
+│       └── notification_tasks.py  # Email jobs
+```
 
 **Key Endpoints:**
 ```
-GET    /api/v1/events              # List events with filters
-GET    /api/v1/events/{id}         # Get event details
-GET    /api/v1/societies           # List societies
-POST   /api/v1/users/signup        # User registration
-PUT    /api/v1/users/preferences   # Update preferences
-GET    /api/v1/health              # Health check
+GET  /api/v1/events?date=24h          # Get events (next 24h)
+POST /api/v1/users/signup             # User signup
+POST /api/v1/users/verify             # Verify email code
+GET  /api/v1/admin/upcoming-events    # Admin: upcoming events
+POST /api/v1/admin/scrape             # Admin: manual scrape
 ```
-
-**Tech Stack:**
-- FastAPI 0.109+
-- SQLAlchemy 2.0 (async)
-- Pydantic v2
-- Python 3.11+
 
 ---
 
-### **2. Instagram Scraper Service** (Port 8001)
+### 3. **Database (PostgreSQL)**
+**Deployed:** Railway  
+**Purpose:** Persistent data storage
 
-**Responsibilities:**
-- Instagram authentication
-- Post scraping
-- Story scraping
-- Rate limiting
-- Session management
-- Screenshot capture
+**Core Tables:**
+```sql
+societies           # UCD societies to monitor
+├── id, name, instagram_handle
+├── is_active, scrape_posts, scrape_stories
+└── last_scraped_at
 
-**Architecture:**
+posts               # Raw Instagram posts
+├── id, society_id, instagram_post_id
+├── caption, media_urls
+└── is_free_food, processed
+
+events              # Processed free food events
+├── id, society_id, title, description
+├── location, start_time, end_time
+├── source_type (post/story)
+├── notified, reminder_sent
+└── confidence_score
+
+users               # Registered users
+├── id, email, email_verified
+├── is_active, notification_preferences
+└── verification_code, code_expires_at
+
+notification_logs   # Audit trail
+├── id, event_id, user_id
+├── notification_type, status
+└── sent_at, error_message
+
+scraping_logs       # Monitoring
+├── id, society_id, status
+├── items_found, duration_ms
+└── error_message
 ```
-scraper-service/
-├── src/
-│   ├── instagram/
-│   │   ├── browser.py          # Playwright browser management
-│   │   ├── login.py            # Authentication handler
-│   │   ├── post_scraper.py     # Feed post scraping
-│   │   └── story_scraper.py    # Story scraping
-│   ├── queue/
-│   │   ├── consumer.py         # Consume scraping jobs
-│   │   └── publisher.py        # Publish results
-│   ├── storage/
-│   │   └── s3_client.py        # Screenshot storage
-│   └── main.py                 # Service entry point
-```
 
-**Communication:**
-- Consumes: `scraping.jobs` queue
-- Publishes: `scraping.results` queue
-- Stores: Screenshots in S3/MinIO
+---
 
-**Anti-Detection Measures:**
+### 4. **Background Jobs (Celery + Redis)**
+**Purpose:** Scheduled tasks and async processing
+
+**Celery Beat Schedule:**
 ```python
-# Rotating user agents
-# Random delays (1-3s between actions)
-# Human-like scrolling patterns
-# Session persistence
-# Proxy rotation (optional)
-# Browser fingerprint randomization
+# Daily scraping at 9 AM UTC
+'daily-scrape': {
+    'task': 'scrape_all_societies',
+    'schedule': crontab(hour=9, minute=0)
+}
+
+# Check for reminders every 30 minutes
+'check-reminders': {
+    'task': 'send_upcoming_event_notifications',
+    'schedule': crontab(minute='*/30')
+}
+
+# Cleanup old data daily at 2 AM
+'cleanup': {
+    'task': 'cleanup_old_data',
+    'schedule': crontab(hour=2, minute=0)
+}
 ```
+
+**Tasks:**
+1. **Scraping** - Fetch Instagram posts via Apify
+2. **Event Detection** - Extract event details using NLP
+3. **Notifications** - Send emails via Brevo
+4. **Reminders** - Send 1-hour before event starts
+5. **Cleanup** - Remove old posts/logs
 
 ---
 
-### **3. Event Processor Service**
+### 5. **External Services**
 
-**Responsibilities:**
-- Consume raw scraping results
-- NLP extraction (time, date, location)
-- Event validation
-- Deduplication
-- Confidence scoring
-- Trigger notifications
+#### **Apify (Instagram Scraping)**
+- **Purpose:** Scrape Instagram posts and stories
+- **API:** Apify Instagram Scraper actor
+- **Config:** `APIFY_API_TOKEN`
+- **Rate:** Once daily per society
 
-**Processing Pipeline:**
-```
-Raw Content → Keyword Filter → NLP Extraction → Validation → Deduplication → Save Event → Notify
-```
-
-**NLP Components:**
-```python
-# Time extraction
-- Regex patterns for times (6pm, 18:00, etc.)
-- Relative time parsing (in 2 hours, etc.)
-
-# Date extraction
-- Today/tomorrow detection
-- Weekday parsing
-- Date format parsing (dd/mm, mm/dd)
-
-# Location extraction
-- UCD building database matching
-- Room number extraction
-- NER for unknown locations
-```
-
----
-
-### **4. Notification Service**
-
-**Responsibilities:**
-- Queue management
-- WhatsApp message sending (Twilio)
-- Email sending (SendGrid/Resend)
-- Delivery tracking
-- Retry logic
-- User preference filtering
-
-**Message Flow:**
-```
-Event Created → Filter Users → Queue Messages → Send (WhatsApp/Email) → Log Result
-```
-
-**Rate Limiting:**
-- WhatsApp: 1 msg/sec per user
-- Email: 100 msg/sec (SendGrid limit)
-- Batch processing for efficiency
-
----
-
-## 🗄️ Database Schema
-
-### **Core Tables**
-
-#### `societies`
-```sql
-id              UUID PRIMARY KEY
-name            VARCHAR(255)
-instagram_handle VARCHAR(100) UNIQUE
-is_active       BOOLEAN DEFAULT true
-scrape_posts    BOOLEAN DEFAULT true
-scrape_stories  BOOLEAN DEFAULT true
-last_post_check TIMESTAMP
-last_story_check TIMESTAMP
-created_at      TIMESTAMP
-updated_at      TIMESTAMP
-```
-
-#### `posts` (Raw Data)
-```sql
-id                UUID PRIMARY KEY
-society_id        UUID REFERENCES societies
-instagram_post_id VARCHAR(255) UNIQUE
-caption           TEXT
-source_url        TEXT
-media_urls        JSONB
-detected_at       TIMESTAMP
-is_free_food      BOOLEAN
-processed         BOOLEAN
-created_at        TIMESTAMP
-```
-
-#### `stories` (Raw Data - Partitioned)
-```sql
-id              UUID PRIMARY KEY
-society_id      UUID REFERENCES societies
-story_text      TEXT
-story_timestamp TIMESTAMP
-detected_at     TIMESTAMP
-expires_at      TIMESTAMP
-is_free_food    BOOLEAN
-content_hash    VARCHAR(64) UNIQUE
-screenshot_url  TEXT
-processed       BOOLEAN
-created_at      TIMESTAMP
-```
-
-**Partitioning Strategy:**
-```sql
--- Daily partitions, auto-drop after 7 days
-CREATE TABLE stories_2024_01_15 PARTITION OF stories
-    FOR VALUES FROM ('2024-01-15') TO ('2024-01-16');
-```
-
-#### `events` (Processed Data)
-```sql
-id                UUID PRIMARY KEY
-society_id        UUID REFERENCES societies
-title             VARCHAR(500)
-description       TEXT
-location          VARCHAR(255)
-location_building VARCHAR(100)
-location_room     VARCHAR(50)
-start_time        TIMESTAMP
-end_time          TIMESTAMP
-source_type       VARCHAR(20) -- 'post' or 'story'
-source_id         UUID
-confidence_score  FLOAT
-raw_text          TEXT
-extracted_data    JSONB
-notified          BOOLEAN
-notification_sent_at TIMESTAMP
-is_active         BOOLEAN
-created_at        TIMESTAMP
-updated_at        TIMESTAMP
-```
-
-#### `users`
-```sql
-id                      UUID PRIMARY KEY
-email                   VARCHAR(255) UNIQUE
-phone_number            VARCHAR(20) UNIQUE
-whatsapp_verified       BOOLEAN
-email_verified          BOOLEAN
-notification_preferences JSONB
-is_active               BOOLEAN
-created_at              TIMESTAMP
-updated_at              TIMESTAMP
-```
-
-#### `user_society_preferences`
-```sql
-user_id     UUID REFERENCES users
-society_id  UUID REFERENCES societies
-notify      BOOLEAN
-created_at  TIMESTAMP
-PRIMARY KEY (user_id, society_id)
-```
-
-#### `notification_logs` (Audit Trail)
-```sql
-id                UUID PRIMARY KEY
-event_id          UUID REFERENCES events
-user_id           UUID REFERENCES users
-notification_type VARCHAR(20)
-status            VARCHAR(20)
-sent_at           TIMESTAMP
-error_message     TEXT
-```
-
-#### `scraping_logs` (Monitoring)
-```sql
-id            UUID PRIMARY KEY
-society_id    UUID REFERENCES societies
-scrape_type   VARCHAR(20)
-status        VARCHAR(20)
-items_found   INTEGER
-error_message TEXT
-duration_ms   INTEGER
-created_at    TIMESTAMP
-```
+#### **Brevo (Email Service)**
+- **Purpose:** Send transactional emails
+- **API:** Brevo SMTP API
+- **Config:** `BREVO_API_KEY`, `BREVO_FROM_EMAIL`
+- **Emails:**
+  - Verification codes
+  - Welcome messages
+  - Event notifications
+  - Event reminders (1 hour before)
 
 ---
 
 ## 🔄 Data Flow
 
 ### **1. Scraping Flow**
-
 ```
-Celery Beat (Scheduler)
+Celery Beat (9 AM UTC)
     ↓
-Scraping Task Triggered
+Trigger scraping task
     ↓
-Publish to scraping.jobs queue
+For each active society:
     ↓
-Scraper Service Consumes Job
+    Call Apify API
     ↓
-Login to Instagram (if needed)
+    Get Instagram posts
     ↓
-Navigate to Society Profile
+    Save to posts table
     ↓
-Scrape Posts/Stories
+    Check for free food keywords
     ↓
-Extract Text & Metadata
+    If match: Extract event details (NLP)
     ↓
-Take Screenshots (stories)
+    Validate and score confidence
     ↓
-Publish to scraping.results queue
+    Save to events table
     ↓
-Event Processor Consumes Result
-    ↓
-Save Raw Data (posts/stories table)
-    ↓
-Check for Free Food Keywords
-    ↓
-If Match: Extract Event Details
-    ↓
-Validate & Score Confidence
-    ↓
-Check for Duplicates (content hash)
-    ↓
-Save Event (events table)
-    ↓
-Trigger Notification
+    Send notifications to users
 ```
 
 ### **2. Notification Flow**
-
 ```
-Event Created
+New event created
     ↓
-Query Users (preferences + society filters)
+Get all active users
     ↓
-For Each User:
+Filter by email_verified = true
     ↓
-    Check notification preferences
+For each user:
     ↓
-    Create notification job
+    Format email with event details
     ↓
-    Add to notification queue
+    Send via Brevo API
     ↓
-Notification Worker Consumes Job
+    Log result to notification_logs
     ↓
-Send WhatsApp (Twilio) or Email (SendGrid)
-    ↓
-Log Result (notification_logs)
-    ↓
-Update Event (notified = true)
+Mark event as notified
 ```
 
-### **3. User Signup Flow**
-
+### **3. Reminder Flow**
 ```
-User Submits Phone/Email
+Every 30 minutes:
     ↓
-Validate Input
+Query events starting in ~1 hour
     ↓
-Check if User Exists
+Filter: reminder_sent = false
     ↓
-Send Verification Code (WhatsApp/Email)
+For each event:
     ↓
-User Enters Code
+    Get eligible users
     ↓
-Verify Code
+    Send reminder emails
     ↓
-Create User Record
+    Mark reminder_sent = true
+```
+
+### **4. User Signup Flow**
+```
+User enters email
     ↓
-Show Society Preferences
+Generate 6-digit code
     ↓
-Save Preferences
+Send verification email (Brevo)
     ↓
-Send Welcome Message
+User enters code
+    ↓
+Verify code (10 min expiry)
+    ↓
+Mark email_verified = true
+    ↓
+Send welcome email
 ```
 
 ---
 
-## 🔐 Security & Privacy
+## 🔐 Security
 
 ### **Authentication**
-- JWT tokens for API access
-- Refresh token rotation
-- Rate limiting per IP/user
-- CORS configuration
-
-### **Instagram Account Security**
-- Dedicated monitoring account
-- 2FA enabled
-- Session persistence
-- Automatic re-login on failure
-- Activity logging
+- Admin endpoints: API key in header (`X-Admin-Key`)
+- User data: Email verification required
+- Rate limiting: 100 requests/minute per IP
 
 ### **Data Privacy**
-- User data encrypted at rest
-- GDPR compliance
-- Easy account deletion
-- Opt-out mechanisms
-- No data selling
+- No passwords stored (email-only signup)
+- Verification codes expire in 10 minutes
+- Users can unsubscribe anytime
+- GDPR compliant
 
 ### **API Security**
 ```python
-# Rate limiting
-@limiter.limit("100/minute")
-async def get_events():
-    pass
-
-# Input validation
+# Input validation with Pydantic
 class EventQuery(BaseModel):
-    date: Optional[date]
+    date_filter: Optional[str]
     society_id: Optional[UUID]
     limit: int = Field(default=20, le=100)
+
+# CORS configuration
+allow_origins=[
+    "https://freefooducd.vercel.app",
+    "http://localhost:3000"
+]
 ```
 
 ---
 
-## 📊 Caching Strategy
-
-### **Redis Cache Layers**
-
-#### **1. Session Cache**
-```python
-# Instagram session cookies
-Key: f"ig:session:{account_id}"
-TTL: 24 hours
-```
-
-#### **2. Rate Limiting**
-```python
-# Track scraping rate
-Key: f"rate:scrape:{society_id}"
-TTL: 60 seconds
-```
-
-#### **3. Deduplication**
-```python
-# Story content hashes
-Key: f"story:hash:{content_hash}"
-TTL: 48 hours
-```
-
-#### **4. API Response Cache**
-```python
-# Event list cache
-Key: f"events:list:{filters_hash}"
-TTL: 60 seconds
-```
-
-#### **5. User Preferences**
-```python
-# Frequently accessed preferences
-Key: f"user:prefs:{user_id}"
-TTL: 5 minutes
-```
-
----
-
-## 🔄 Background Jobs
-
-### **Celery Beat Schedule**
-
-```python
-celery_app.conf.beat_schedule = {
-    # Story scraping (high frequency)
-    'scrape-stories': {
-        'task': 'scrape_all_stories',
-        'schedule': 300.0,  # Every 5 minutes
-    },
-    
-    # Post scraping (lower frequency)
-    'scrape-posts': {
-        'task': 'scrape_all_posts',
-        'schedule': 900.0,  # Every 15 minutes
-    },
-    
-    # Cleanup expired stories
-    'cleanup-stories': {
-        'task': 'cleanup_expired_stories',
-        'schedule': crontab(hour=2, minute=0),  # 2 AM daily
-    },
-    
-    # Archive old events
-    'archive-events': {
-        'task': 'archive_old_events',
-        'schedule': crontab(hour=3, minute=0),  # 3 AM daily
-    },
-    
-    # Health check
-    'health-check': {
-        'task': 'check_scraper_health',
-        'schedule': 60.0,  # Every minute
-    },
-}
-```
-
----
-
-## 🚨 Error Handling & Monitoring
-
-### **Circuit Breaker Pattern**
-
-```python
-from circuitbreaker import circuit
-
-@circuit(failure_threshold=5, recovery_timeout=60)
-async def scrape_instagram(society_id: str):
-    # If 5 failures occur, circuit opens for 60 seconds
-    pass
-```
-
-### **Retry Strategy**
-
-```python
-@celery_app.task(
-    bind=True,
-    max_retries=3,
-    default_retry_delay=60
-)
-async def scrape_society(self, society_id: str):
-    try:
-        await scraper.scrape(society_id)
-    except Exception as e:
-        # Exponential backoff: 60s, 120s, 240s
-        self.retry(
-            exc=e,
-            countdown=60 * (2 ** self.request.retries)
-        )
-```
+## 📊 Monitoring & Logging
 
 ### **Health Checks**
-
 ```python
-# /health endpoint
+GET /api/v1/health
 {
     "status": "healthy",
-    "services": {
-        "database": "up",
-        "redis": "up",
-        "scraper": "up",
-        "celery": "up"
-    },
-    "last_scrape": "2024-01-15T14:30:00Z",
-    "events_today": 12
+    "database": "connected",
+    "redis": "connected",
+    "celery_worker": "running",
+    "celery_beat": "running"
 }
 ```
 
-### **Monitoring Stack**
+### **Admin Dashboard**
+- **Dashboard:** System overview, recent activity
+- **Events:** View/manage upcoming events
+- **Societies:** Monitor scraping performance
+- **Notifications:** Delivery stats, retry failed
+- **Health:** System status, error logs
+- **Logs:** Scraping history
+- **Posts:** Raw Instagram data
+- **Users:** User management
+- **Scrape:** Manual scraping trigger
 
-```yaml
-# Prometheus metrics
-- scraping_success_rate
-- scraping_duration_seconds
-- events_detected_total
-- notifications_sent_total
-- api_request_duration_seconds
+### **Logging**
+```python
+# Structured logging
+logger.info(f"Scraped {count} posts from {society.name}")
+logger.error(f"Failed to scrape {society.name}: {error}")
 
-# Grafana dashboards
-- System overview
-- Scraping performance
-- Event detection accuracy
-- Notification delivery
-- Error rates
-
-# Sentry error tracking
-- Exception monitoring
-- Performance monitoring
-- Release tracking
+# Stored in:
+- scraping_logs table
+- notification_logs table
+- Application logs (Railway)
 ```
 
 ---
 
-## 🔧 Configuration Management
+## 🚀 Deployment
+
+### **Production Stack**
+```
+Frontend:  Vercel (Next.js)
+Backend:   Railway (FastAPI + Celery)
+Database:  Railway (PostgreSQL)
+Cache:     Railway (Redis)
+Email:     Brevo
+Scraping:  Apify
+```
 
 ### **Environment Variables**
-
 ```bash
 # Database
-DATABASE_URL=postgresql://user:pass@localhost:5432/freefood
-REDIS_URL=redis://localhost:6379/0
+DATABASE_URL=postgresql://...
+REDIS_URL=redis://...
 
-# Instagram
-INSTAGRAM_USERNAME=freefood_monitor
-INSTAGRAM_PASSWORD=secure_password
+# Apify
+APIFY_API_TOKEN=xxx
 
-# Twilio (WhatsApp)
-TWILIO_ACCOUNT_SID=ACxxxxx
-TWILIO_AUTH_TOKEN=xxxxx
-TWILIO_WHATSAPP_NUMBER=+14155238886
-
-# SendGrid (Email)
-SENDGRID_API_KEY=SG.xxxxx
-SENDGRID_FROM_EMAIL=alerts@freefooducd.ie
-
-# AWS S3 (Screenshots)
-AWS_ACCESS_KEY_ID=xxxxx
-AWS_SECRET_ACCESS_KEY=xxxxx
-AWS_S3_BUCKET=freefood-screenshots
+# Brevo (Email)
+BREVO_API_KEY=xxx
+BREVO_FROM_EMAIL=alerts@freefooducd.ie
+BREVO_FROM_NAME=FreeFood UCD
 
 # Application
-SECRET_KEY=xxxxx
+SECRET_KEY=xxx
+ADMIN_API_KEY=xxx
 ENVIRONMENT=production
-LOG_LEVEL=INFO
 ```
+
+### **Deployment Process**
+1. Push to GitHub main branch
+2. Railway auto-deploys backend
+3. Vercel auto-deploys frontend
+4. Database migrations run automatically
+5. Celery workers restart
 
 ---
 
-## 🐳 Docker Architecture
+## 🎯 Design Principles
 
-### **Services**
+### **1. Simplicity**
+- Single email service (Brevo)
+- Single scraping service (Apify)
+- Clear separation of concerns
+- Minimal dependencies
 
-```yaml
-services:
-  # Database
-  postgres:
-    image: postgres:16-alpine
-    
-  # Cache
-  redis:
-    image: redis:7-alpine
-    
-  # Message Queue
-  rabbitmq:
-    image: rabbitmq:3-management-alpine
-    
-  # API Backend
-  backend:
-    build: ./backend
-    depends_on: [postgres, redis]
-    
-  # Scraper Service (isolated)
-  scraper:
-    build: ./scraper-service
-    depends_on: [rabbitmq, redis]
-    restart: on-failure
-    
-  # Celery Workers
-  celery-worker:
-    build: ./backend
-    command: celery -A app.workers worker
-    
-  # Celery Beat (scheduler)
-  celery-beat:
-    build: ./backend
-    command: celery -A app.workers beat
-    
-  # Frontend
-  frontend:
-    build: ./frontend
-    depends_on: [backend]
-    
-  # Monitoring
-  prometheus:
-    image: prom/prometheus
-    
-  grafana:
-    image: grafana/grafana
-```
+### **2. Reliability**
+- Retry logic for failed tasks
+- Error logging and monitoring
+- Graceful degradation
+- Health checks
 
----
+### **3. Maintainability**
+- Type hints throughout
+- Clear naming conventions
+- Comprehensive logging
+- Documentation
 
-## 📈 Scalability Plan
-
-### **Phase 1: UCD Only (MVP)**
-- Single scraper instance
-- 20-30 societies
-- ~1000 users
-- Single server deployment
-
-### **Phase 2: Irish Universities**
-- Multiple scraper instances (per university)
-- 100+ societies
-- ~10,000 users
-- Load balancer + multiple backend instances
-
-### **Phase 3: UK Expansion**
-- Distributed scraper fleet
-- 500+ societies
-- ~100,000 users
-- Kubernetes deployment
-- Multi-region setup
-
-### **Scaling Strategies**
-
-```python
-# Horizontal scaling
-- Add more Celery workers
-- Add more scraper instances
-- Database read replicas
-- Redis cluster
-
-# Vertical scaling
-- Increase worker memory
-- Faster database instance
-- SSD storage
-
-# Optimization
+### **4. Scalability**
+- Async operations (FastAPI)
+- Background job queue (Celery)
 - Database indexing
-- Query optimization
-- Caching layer
-- CDN for frontend
-```
+- Caching layer (Redis)
 
 ---
 
-## 🧪 Testing Strategy
+## 📈 Future Enhancements
+
+### **Phase 1 (Current)**
+- ✅ Email notifications
+- ✅ Daily scraping
+- ✅ Event reminders
+- ✅ Admin dashboard
+
+### **Phase 2 (Planned)**
+- WhatsApp notifications (Twilio)
+- Real-time scraping (webhooks)
+- Mobile app (React Native)
+- Event categories/tags
+
+### **Phase 3 (Future)**
+- Multi-university support
+- AI-powered event extraction
+- User event submissions
+- Social features (comments, ratings)
+
+---
+
+## 🧪 Testing
 
 ### **Unit Tests**
 ```python
 # NLP extraction
 test_extract_time()
-test_extract_date()
 test_extract_location()
 
-# Deduplication
-test_content_hash()
+# Event validation
+test_event_confidence_score()
 test_duplicate_detection()
-
-# Validation
-test_event_validation()
-test_confidence_scoring()
 ```
 
 ### **Integration Tests**
 ```python
 # API endpoints
 test_get_events()
-test_create_user()
-test_update_preferences()
+test_user_signup()
+test_admin_scrape()
 
-# Database operations
-test_save_event()
-test_query_events()
+# Background jobs
+test_scraping_task()
+test_notification_task()
 ```
 
 ### **E2E Tests**
 ```python
-# Full flow
-test_scrape_to_notification()
-test_user_signup_flow()
+# Full user flow
+test_signup_to_notification()
 test_event_display()
-```
-
-### **Load Tests**
-```python
-# Locust scenarios
-- 1000 concurrent users
-- 100 events/minute
-- API response time < 200ms
-```
-
----
-
-## 🚀 Deployment Strategy
-
-### **Development**
-```bash
-docker-compose up
-# All services run locally
-```
-
-### **Staging**
-```bash
-# Deploy to staging server
-# Test with real Instagram account
-# Verify notifications
-```
-
-### **Production**
-```bash
-# Blue-green deployment
-# Zero-downtime updates
-# Automated rollback on failure
-```
-
-### **CI/CD Pipeline**
-```yaml
-# GitHub Actions
-1. Run tests
-2. Build Docker images
-3. Push to registry
-4. Deploy to staging
-5. Run E2E tests
-6. Deploy to production (manual approval)
 ```
 
 ---
 
 ## 📝 API Documentation
 
-### **OpenAPI/Swagger**
-- Auto-generated from FastAPI
-- Available at `/docs`
-- Interactive API testing
+**Interactive Docs:** `https://api.freefooducd.ie/docs`
 
-### **Example Endpoints**
-
+**Key Endpoints:**
 ```python
-# Get events
-GET /api/v1/events?date=today&society_id=xxx
-Response: {
-    "events": [...],
-    "total": 12,
-    "page": 1
-}
-
-# Create user
+# Public
+GET  /api/v1/events?date=24h
 POST /api/v1/users/signup
-Body: {
-    "phone_number": "+353871234567",
-    "email": "user@ucd.ie"
-}
-Response: {
-    "user_id": "xxx",
-    "verification_sent": true
-}
+POST /api/v1/users/verify
+
+# Admin (requires X-Admin-Key header)
+GET  /api/v1/admin/upcoming-events
+POST /api/v1/admin/scrape
+GET  /api/v1/admin/notification-logs
+GET  /api/v1/admin/system-health
 ```
 
 ---
 
-This architecture provides a robust, scalable, and maintainable foundation for FreeFood UCD with clear separation of concerns and fault tolerance built in.
+This architecture provides a simple, reliable, and maintainable system for notifying UCD students about free food events.
