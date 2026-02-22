@@ -2,7 +2,7 @@ from app.workers.celery_app import celery_app
 from app.db.base import async_session_maker
 from app.db.models import Event, User, UserSocietyPreference, NotificationLog
 from app.services.notifications.whatsapp import WhatsAppService
-from app.services.notifications.email import EmailNotifier
+from app.services.notifications.brevo import BrevoEmailService
 from sqlalchemy import select, and_
 import logging
 import asyncio
@@ -52,7 +52,7 @@ async def _notify_event_async(event_id: str):
             await _log_notifications(session, event_id, whatsapp_results, 'whatsapp')
         
         # Send email notifications
-        email_notifier = EmailNotifier()
+        email_notifier = BrevoEmailService()
         email_users = [u for u in users if u.notification_preferences.get('email', False)]
         
         if email_users:
@@ -139,8 +139,8 @@ async def _send_verification_code_async(user_id: str, code: str, method: str):
             result = await notifier.send_verification_code(user.phone_number, code)
             return result
         elif method == 'email' and user.email:
-            notifier = EmailNotifier()
-            result = await notifier.send_verification_email(user.email, code)
+            notifier = BrevoEmailService()
+            result = await notifier.send_verification_code(user.email, code)
             return result
         else:
             return {"error": "Invalid method or missing contact info"}
@@ -173,8 +173,8 @@ async def _send_welcome_message_async(user_id: str):
         
         # Send email welcome if verified
         if user.email and user.email_verified:
-            notifier = EmailNotifier()
-            results['email'] = await notifier.send_welcome_email(user.email)
+            notifier = BrevoEmailService()
+            results['email'] = await notifier.send_welcome_message(user.email)
         
         return results
 
@@ -256,7 +256,7 @@ async def _send_upcoming_event_notifications_async():
                 await _log_notifications(session, str(event.id), whatsapp_results, 'whatsapp_reminder')
             
             # Send email reminders
-            email_notifier = EmailNotifier()
+            email_notifier = BrevoEmailService()
             email_users = [u for u in users if u.notification_preferences.get('email', False)]
             
             email_results = []
