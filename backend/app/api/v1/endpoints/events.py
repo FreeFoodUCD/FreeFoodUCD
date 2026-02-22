@@ -54,7 +54,7 @@ class EventListResponse(BaseModel):
 
 @router.get("/events", response_model=EventListResponse)
 async def get_events(
-    date_filter: Optional[str] = Query(None, alias="date", description="Filter by date: 'today', 'tomorrow', 'week', or YYYY-MM-DD"),
+    date_filter: Optional[str] = Query(None, alias="date", description="Filter by date: 'today', 'tomorrow', '24h', 'week', or YYYY-MM-DD"),
     society_id: Optional[UUID] = Query(None, description="Filter by society ID"),
     page: int = Query(1, ge=1, description="Page number"),
     page_size: int = Query(20, ge=1, le=100, description="Items per page"),
@@ -63,7 +63,7 @@ async def get_events(
     """
     Get list of free food events with filters.
     
-    - **date_filter**: Filter by date ('today', 'tomorrow', 'week', or specific date)
+    - **date_filter**: Filter by date ('today', 'tomorrow', '24h', 'week', or specific date)
     - **society_id**: Filter by specific society
     - **page**: Page number for pagination
     - **page_size**: Number of items per page
@@ -93,6 +93,14 @@ async def get_events(
                     Event.start_time < end_of_day
                 )
             )
+        elif date_filter.lower() == "24h":
+            end_of_24h = now + timedelta(hours=24)
+            query = query.where(
+                and_(
+                    Event.start_time >= now,
+                    Event.start_time <= end_of_24h
+                )
+            )
         elif date_filter.lower() == "week":
             end_of_week = now + timedelta(days=7)
             query = query.where(
@@ -114,7 +122,7 @@ async def get_events(
                     )
                 )
             except ValueError:
-                raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD or 'today', 'tomorrow', 'week'")
+                raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD or 'today', 'tomorrow', '24h', 'week'")
     
     # Apply society filter
     if society_id:

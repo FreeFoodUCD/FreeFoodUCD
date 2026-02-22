@@ -720,8 +720,7 @@ async def send_event_reminder(
     _: bool = Depends(verify_admin_key)
 ):
     """Manually trigger reminder notification for an event."""
-    from app.services.notifications.whatsapp import WhatsAppService
-    from app.services.notifications.email import EmailService
+    from app.services.notifications.brevo import BrevoEmailService
     
     event = await db.get(Event, event_id)
     if not event:
@@ -751,7 +750,7 @@ async def send_event_reminder(
     }
     
     # Send notifications (email only for now)
-    email_service = EmailService()
+    email_service = BrevoEmailService()
     
     whatsapp_count = 0
     email_count = 0
