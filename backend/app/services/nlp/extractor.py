@@ -1,4 +1,5 @@
 import re
+import unicodedata
 from datetime import datetime, timedelta
 from typing import Optional, Dict, List, Tuple
 import pytz
@@ -8,16 +9,45 @@ logger = logging.getLogger(__name__)
 
 
 class EventExtractor:
-    """Extract event details from text using NLP and pattern matching."""
+    """
+    Strict TRUE/FALSE classifier for free food events at UCD.
+    
+    Returns TRUE only if:
+    - Free food is explicitly mentioned
+    - Event is at UCD Belfield campus (or assumed on-campus)
+    - NOT at another college
+    - NOT off-campus venue
+    - NOT a paid event (except €2 membership)
+    - NOT a nightlife event (ball, pub crawl, etc.)
+    """
     
     def __init__(self):
         self.timezone = pytz.timezone('Europe/Dublin')
         self.ucd_buildings = self.load_ucd_buildings()
         self.other_colleges = self.load_other_colleges()
         self.off_campus_venues = self.load_off_campus_venues()
-        self.paid_event_indicators = self.load_paid_indicators()
+        self.nightlife_keywords = self.load_nightlife_keywords()
         
-        # Time patterns
+        # Explicit food keywords only (removed vague terms like "free", "join us", "study session")
+        self.explicit_food_keywords = [
+            # Explicit free food phrases
+            'free food', 'free pizza', 'free lunch', 'free dinner', 
+            'free breakfast', 'free snacks',
+            
+            # Food types
+            'pizza', 'refreshments', 'snacks', 'food', 'drinks', 
+            'lunch', 'dinner', 'breakfast', 'catering', 'buffet',
+            'nibbles', 'tea', 'coffee', 'cookies', 'dessert',
+            
+            # Cultural/special events
+            'potluck', 'iftar', 'break the fast', 'banquet',
+            
+            # Provision phrases
+            'food provided', 'refreshments provided', 
+            'complimentary food', 'italian food'
+        ]
+        
+        # Time patterns (for extraction after classification)
         self.time_patterns = [
             r'(\d{1,2}):(\d{2})\s*(am|pm|AM|PM)',  # 6:30 PM
             r'(\d{1,2})\s*(am|pm|AM|PM)',  # 6 PM
@@ -25,17 +55,7 @@ class EventExtractor:
             r'(\d{1,2})\.(\d{2})',  # 18.30
         ]
         
-        # Free food keywords (very permissive - UCD societies usually offer free food)
-        self.free_food_keywords = [
-            'free food', 'free pizza', 'free', 'pizza', 'refreshments',
-            'snacks', 'food', 'drinks', 'lunch', 'dinner', 'breakfast',
-            'catering', 'buffet', 'nibbles', 'tea', 'coffee', 'cookies',
-            'dessert', 'potluck', 'iftar', 'break the fast', 'provided',
-            'complimentary', 'food and drinks', 'italian food', 'snack',
-            'study session', 'banquet', 'flavour', 'join us'
-        ]
-        
-        # Date keywords
+        # Date keywords (for extraction after classification)
         self.date_keywords = {
             'today': 0,
             'tonight': 0,
@@ -50,16 +70,16 @@ class EventExtractor:
         }
     
     def load_ucd_buildings(self) -> List[str]:
-        """Load list of UCD buildings."""
+        """Load list of UCD buildings and campus keywords."""
         return [
-            'Newman Building', 'Newman', 'O\'Brien Centre', 'O\'Brien',
-            'James Joyce Library', 'Library', 'Student Centre',
-            'Science Centre', 'Science', 'Engineering Building',
-            'Quinn School', 'Sutherland School', 'Moore Centre',
-            'Roebuck Castle', 'Belfield', 'Arts Building',
-            'Agriculture Building', 'Veterinary', 'Smurfit',
-            'Lochlann Quinn', 'Health Sciences', 'Conway Institute',
-            'Astra Hall', 'UCD', 'campus'
+            'newman building', 'newman', 'obrien centre', 'obrien',
+            'james joyce library', 'library', 'student centre',
+            'science centre', 'science', 'engineering building',
+            'quinn school', 'sutherland school', 'moore centre',
+            'roebuck castle', 'belfield', 'arts building',
+            'agriculture building', 'veterinary', 'smurfit',
+            'lochlann quinn', 'health sciences', 'conway institute',
+            'astra hall', 'ucd', 'campus'
         ]
     
     def load_other_colleges(self) -> List[str]:
@@ -74,16 +94,16 @@ class EventExtractor:
         return [
             # Pubs/Bars
             'pub', 'bar', 'brewery', 'tavern',
-            'kennedy\'s', 'doyle\'s', 'sinnott\'s',
-            'johnnie fox\'s', 'blue light', 'taylors',
+            'kennedys', 'doyles', 'sinnotts',
+            'johnnie foxs', 'blue light', 'taylors',
             'three rock', 'pub crawl',
             
             # Restaurants/Cafes
             'restaurant', 'cafe', 'bistro', 'grill', 'diner',
-            'nando\'s', 'supermac\'s', 'eddie rocket\'s',
+            'nandos', 'supermacs', 'eddie rockets',
             
             # Dublin Areas (off-campus)
-            'soho', 'temple bar', 'grafton street', 'o\'connell street',
+            'soho', 'temple bar', 'grafton street', 'oconnell street',
             'rathmines', 'ranelagh', 'dundrum', 'city centre',
             'dublin 2', 'dublin 4', 'dublin mountains',
             
@@ -91,70 +111,204 @@ class EventExtractor:
             'night out', 'mixer at', 'meet at', 'heading to'
         ]
     
-    def load_paid_indicators(self) -> List[str]:
-        """Load list of paid event indicators."""
+    def load_nightlife_keywords(self) -> List[str]:
+        """Load list of nightlife event keywords to reject."""
         return [
-            'ticket', 'tickets', 'entry fee', 'admission',
-            '€', 'euro', 'cost', 'price', 'pay',
-            'book now', 'register', 'ball', 'gala', 'formal'
+            'ball', 'gala', 'formal', 'pub crawl', 'night out',
+            'nightclub', 'club night', 'bar crawl',
+            'pre drinks', 'afters', 'sesh', 'going out'
         ]
+    
+    def _preprocess_text(self, text: str) -> str:
+        """
+        Clean and normalize text before classification.
+        
+        - Remove URLs
+        - Remove @mentions
+        - Remove emojis
+        - Normalize unicode (é → e)
+        - Clean whitespace
+        - Lowercase
+        """
+        # Remove URLs
+        text = re.sub(r'http\S+|www\.\S+', '', text)
+        
+        # Remove @mentions
+        text = re.sub(r'@\w+', '', text)
+        
+        # Normalize unicode (é → e, ñ → n)
+        text = unicodedata.normalize('NFKD', text)
+        
+        # Remove non-ASCII characters (emojis, special chars)
+        text = text.encode('ascii', 'ignore').decode('ascii')
+        
+        # Clean whitespace
+        text = ' '.join(text.split())
+        
+        # Lowercase
+        return text.lower()
+    
+    def classify_event(self, text: str) -> bool:
+        """
+        Strict TRUE/FALSE classifier for free food events.
+        
+        Returns TRUE only if ALL conditions met:
+        1. Explicit food keyword present
+        2. NOT other college
+        3. NOT off-campus venue (explicit rejection)
+        4. NOT paid event (except €2 membership)
+        5. NOT nightlife event
+        6. UCD location is OPTIONAL (assume on-campus if not mentioned)
+        
+        Args:
+            text: Combined Instagram caption + OCR text
+            
+        Returns:
+            True if free food event at UCD, False otherwise
+        """
+        # Preprocess text
+        clean_text = self._preprocess_text(text)
+        
+        logger.debug(f"Classifying text: {clean_text[:100]}...")
+        
+        # Rule 1: MUST have explicit food keyword
+        if not self._has_explicit_food(clean_text):
+            logger.debug("REJECT: No explicit food keyword")
+            return False
+        
+        # Rule 2: MUST NOT be other college
+        if self._is_other_college(clean_text):
+            logger.debug("REJECT: Other college mentioned")
+            return False
+        
+        # Rule 3: MUST NOT be off-campus (EXPLICIT rejection)
+        if self._is_off_campus(clean_text):
+            logger.debug("REJECT: Off-campus venue mentioned")
+            return False
+        
+        # Rule 4: MUST NOT be paid (except €2 membership)
+        if self._is_paid_event(clean_text):
+            logger.debug("REJECT: Paid event indicator")
+            return False
+        
+        # Rule 5: MUST NOT be nightlife event
+        if self._is_nightlife_event(clean_text):
+            logger.debug("REJECT: Nightlife event")
+            return False
+        
+        # UCD location is OPTIONAL
+        # If mentioned → great
+        # If not mentioned → assume on-campus (UCD society default)
+        # If off-campus → already rejected in Rule 3
+        
+        has_ucd_location = self._has_ucd_location(clean_text)
+        if has_ucd_location:
+            logger.info("ACCEPT: Free food event at UCD (explicit location)")
+        else:
+            logger.info("ACCEPT: Free food event at UCD (assumed on-campus)")
+        
+        return True
+    
+    def _has_explicit_food(self, text: str) -> bool:
+        """
+        Check for explicit food keywords.
+        
+        REJECT "free entry" without food mention.
+        """
+        # "free entry" alone is NOT enough
+        if 'free entry' in text:
+            has_food = any(
+                food in text for food in ['food', 'pizza', 'snacks', 'refreshments', 'lunch', 'dinner']
+            )
+            if not has_food:
+                logger.debug("REJECT: 'free entry' without food mention")
+                return False
+        
+        # Check for explicit food keywords
+        return any(keyword in text for keyword in self.explicit_food_keywords)
+    
+    def _is_other_college(self, text: str) -> bool:
+        """Check if text mentions other Irish colleges."""
+        for college in self.other_colleges:
+            if college in text:
+                logger.debug(f"Found other college: {college}")
+                return True
+        return False
+    
+    def _is_off_campus(self, text: str) -> bool:
+        """Check if text mentions off-campus venues."""
+        for venue in self.off_campus_venues:
+            if venue in text:
+                logger.debug(f"Found off-campus venue: {venue}")
+                return True
+        return False
+    
+    def _is_paid_event(self, text: str) -> bool:
+        """
+        Check if text indicates a paid event.
+        
+        Allow €2 membership only.
+        Reject ANY other price mention.
+        """
+        # Allow €2 or e2 membership only
+        if 'e2' in text or '€2' in text or 'euro 2' in text:
+            if any(word in text for word in ['membership', 'ucard', 'sign up', 'member']):
+                # Check if there are OTHER prices mentioned
+                euro_matches = re.findall(r'€\d+|e\d+|euro \d+', text)
+                if len(euro_matches) == 1:
+                    logger.debug("Found €2 membership - allowed")
+                    return False  # Only €2 mentioned, it's membership
+        
+        # Reject ANY other price mention
+        if re.search(r'€\d+|e\d+|euro \d+', text):
+            logger.debug("Found price indicator")
+            return True
+        
+        # Reject ticket/entry fee keywords
+        paid_keywords = ['ticket', 'tickets', 'entry fee', 'admission', 'cost', 'price', 'pay']
+        for keyword in paid_keywords:
+            if keyword in text:
+                logger.debug(f"Found paid keyword: {keyword}")
+                return True
+        
+        return False
+    
+    def _is_nightlife_event(self, text: str) -> bool:
+        """Check if text indicates a nightlife event (ball, pub crawl, etc.)."""
+        for keyword in self.nightlife_keywords:
+            if keyword in text:
+                logger.debug(f"Found nightlife keyword: {keyword}")
+                return True
+        return False
+    
+    def _has_ucd_location(self, text: str) -> bool:
+        """Check if text mentions UCD campus location."""
+        return any(building in text for building in self.ucd_buildings)
+    
+    # ========== Event Detail Extraction (called AFTER classification) ==========
     
     def extract_event(self, text: str, source_type: str = 'post') -> Optional[Dict]:
         """
-        Extract event details from text with enhanced filtering.
+        Extract event details from text.
+        
+        This method should be called AFTER classify_event() returns True.
+        It extracts time, date, location, and generates event details.
         
         Args:
             text: Text to extract from (caption + OCR text combined)
             source_type: 'post' or 'story'
             
         Returns:
-            Dictionary with event details or None if not a free food event
+            Dictionary with event details or None if classification fails
         """
-        text_lower = text.lower()
-        
-        # Step 1: Check for free food keywords
-        if not self._contains_free_food(text_lower):
-            logger.debug("Rejected: No free food keywords found")
+        # First, classify the event
+        if not self.classify_event(text):
             return None
         
-        # Step 2: CRITICAL - Reject other colleges
-        is_other_college, college_name = self._is_other_college(text_lower)
-        if is_other_college:
-            logger.info(f"Rejected: Other college detected ({college_name})")
-            return None
-        
-        # Step 3: Reject off-campus venues
-        is_off_campus, venue_name = self._is_off_campus(text_lower)
-        if is_off_campus:
-            logger.info(f"Rejected: Off-campus venue detected ({venue_name})")
-            return None
-        
-        # Step 4: Reject paid events
-        is_paid, indicator = self._is_paid_event(text_lower)
-        if is_paid:
-            logger.info(f"Rejected: Paid event indicator detected ({indicator})")
-            return None
-        
-        # Step 5: Check for UCD campus location (more flexible)
-        has_ucd_location = self._has_ucd_location(text_lower)
-        
-        # Step 6: Extract event details
+        # Extract event details
         time = self._extract_time(text)
-        date = self._extract_date(text_lower)
+        date = self._extract_date(text.lower())
         location = self._extract_location(text)
-        
-        # Calculate confidence score
-        confidence = self._calculate_confidence(time, date, location, has_ucd_location)
-        
-        # Lower threshold - UCD societies post on campus by default
-        # If no explicit location but has time/date, still accept (assume on campus)
-        if confidence < 0.3:
-            logger.debug(f"Rejected: Low confidence ({confidence})")
-            return None
-        
-        # Warn if no UCD location but still accept if other signals strong
-        if not has_ucd_location:
-            logger.warning("No explicit UCD location, but accepting based on other signals")
         
         # Combine date and time
         start_time = self._combine_datetime(date, time)
@@ -162,7 +316,8 @@ class EventExtractor:
         # Generate title
         title = self._generate_title(text, location)
         
-        logger.info(f"Accepted: Free food event detected (confidence: {confidence})")
+        # Calculate confidence (simplified - just for compatibility)
+        confidence = 1.0 if (time and location) else 0.8
         
         return {
             'title': title,
@@ -171,7 +326,7 @@ class EventExtractor:
             'location_building': location.get('building') if location else None,
             'location_room': location.get('room') if location else None,
             'start_time': start_time,
-            'end_time': None,  # Could be enhanced
+            'end_time': None,
             'confidence_score': confidence,
             'raw_text': text,
             'extracted_data': {
@@ -180,54 +335,6 @@ class EventExtractor:
                 'location_found': location is not None,
             }
         }
-    
-    def _contains_free_food(self, text: str) -> bool:
-        """Check if text contains free food keywords."""
-        return any(keyword in text for keyword in self.free_food_keywords)
-    
-    def _is_other_college(self, text: str) -> Tuple[bool, str]:
-        """Check if text mentions other Irish colleges."""
-        for college in self.other_colleges:
-            if college in text:
-                return True, college
-        return False, ""
-    
-    def _is_off_campus(self, text: str) -> Tuple[bool, str]:
-        """Check if text mentions off-campus venues."""
-        for venue in self.off_campus_venues:
-            if venue in text:
-                return True, venue
-        return False, ""
-    
-    def _is_paid_event(self, text: str) -> Tuple[bool, str]:
-        """Check if text indicates a paid event."""
-        # UCD society membership is €2 - this is NOT a paid event indicator
-        # Only reject if tickets/entry fees are mentioned, not membership
-        
-        # Ignore €2 membership fee mentions
-        if '€2' in text and ('ucard' in text or 'membership' in text or 'sign up' in text):
-            return False, ""
-        
-        # Ignore "sign up" alone
-        if 'sign up' in text and '€' not in text and 'ticket' not in text:
-            return False, ""
-        
-        # Check for actual paid event indicators
-        for indicator in self.paid_event_indicators:
-            if indicator in text:
-                # Special handling for "ball" - only reject if formal ball
-                if indicator == 'ball' and ('ticket' in text or '€' in text or 'formal' in text):
-                    return True, indicator
-                # Ignore € if it's just €2 for membership
-                elif indicator == '€' and '€2' in text:
-                    continue
-                elif indicator != 'ball' and indicator != '€':
-                    return True, indicator
-        return False, ""
-    
-    def _has_ucd_location(self, text: str) -> bool:
-        """Check if text mentions UCD campus location."""
-        return any(building.lower() in text for building in self.ucd_buildings)
     
     def _extract_time(self, text: str) -> Optional[Dict]:
         """Extract time from text."""
@@ -311,9 +418,11 @@ class EventExtractor:
     
     def _extract_location(self, text: str) -> Optional[Dict]:
         """Extract location from text."""
+        text_lower = text.lower()
+        
         # Check against known UCD buildings
         for building in self.ucd_buildings:
-            if building.lower() in text.lower():
+            if building in text_lower:
                 # Try to extract room number
                 room_patterns = [
                     rf'{building}\s+([A-Z]?\d+)',  # Newman A105
@@ -325,15 +434,15 @@ class EventExtractor:
                     match = re.search(pattern, text, re.IGNORECASE)
                     if match:
                         return {
-                            'building': building,
+                            'building': building.title(),
                             'room': match.group(1),
-                            'full_location': f"{building} {match.group(1)}"
+                            'full_location': f"{building.title()} {match.group(1)}"
                         }
                 
                 return {
-                    'building': building,
+                    'building': building.title(),
                     'room': None,
-                    'full_location': building
+                    'full_location': building.title()
                 }
         
         # Try to find any location-like text
@@ -352,36 +461,6 @@ class EventExtractor:
                 }
         
         return None
-    
-    def _calculate_confidence(self, time: Optional[Dict], date: Optional[datetime], location: Optional[Dict], has_ucd_location: bool = False) -> float:
-        """Calculate confidence score for extracted event."""
-        score = 0.0
-        
-        # Base score for being detected as free food from UCD society
-        score += 0.4  # Increased base score
-        
-        # Time found
-        if time:
-            score += 0.3
-        
-        # Date found (explicit date keyword)
-        if date:
-            score += 0.2
-        
-        # Location found
-        if location:
-            score += 0.2
-            # Bonus for known UCD building
-            if location.get('building'):
-                score += 0.1
-            # Bonus for room number
-            if location.get('room'):
-                score += 0.1
-        elif has_ucd_location:
-            # Has UCD mention but no specific location extracted
-            score += 0.1
-        
-        return min(score, 1.0)
     
     def _combine_datetime(self, date: Optional[datetime], time: Optional[Dict]) -> datetime:
         """Combine date and time into single datetime."""
