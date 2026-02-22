@@ -22,6 +22,9 @@ celery_app.conf.update(
     task_soft_time_limit=25 * 60,  # 25 minutes
     worker_prefetch_multiplier=1,
     worker_max_tasks_per_child=1000,
+    # Use Redis for beat schedule instead of file (fixes permission issues)
+    beat_scheduler='celery.beat:PersistentScheduler',
+    beat_schedule_filename='/tmp/celerybeat-schedule',
 )
 
 # Celery Beat schedule for periodic tasks
