@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
+// Ensure we have the base URL without /api/v1
+const BASE_URL = API_URL.replace(/\/api\/v1\/?$/, '');
+
 interface DashboardStats {
   users: {
     total: number;
@@ -94,7 +97,7 @@ export default function AdminDashboard() {
   const handleLogin = async () => {
     try {
       // Test the admin key
-      const response = await fetch(`${API_URL}/api/v1/admin/stats`, {
+      const response = await fetch(`${BASE_URL}/api/v1/admin/stats`, {
         headers: { 'X-Admin-Key': adminKey }
       });
       
@@ -120,7 +123,7 @@ export default function AdminDashboard() {
   const loadDashboardData = async (key: string) => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/api/v1/admin/dashboard-stats`, {
+      const response = await fetch(`${BASE_URL}/api/v1/admin/dashboard-stats`, {
         headers: { 'X-Admin-Key': key }
       });
       if (response.ok) {
@@ -136,7 +139,7 @@ export default function AdminDashboard() {
   const loadScrapingLogs = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/api/v1/admin/scraping-logs?limit=50`, {
+      const response = await fetch(`${BASE_URL}/api/v1/admin/scraping-logs?limit=50`, {
         headers: { 'X-Admin-Key': adminKey }
       });
       if (response.ok) {
@@ -152,7 +155,7 @@ export default function AdminDashboard() {
   const loadPosts = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/api/v1/admin/posts?limit=50`, {
+      const response = await fetch(`${BASE_URL}/api/v1/admin/posts?limit=50`, {
         headers: { 'X-Admin-Key': adminKey }
       });
       if (response.ok) {
@@ -168,7 +171,7 @@ export default function AdminDashboard() {
   const loadUsers = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/api/v1/admin/users`, {
+      const response = await fetch(`${BASE_URL}/api/v1/admin/users`, {
         headers: { 'X-Admin-Key': adminKey }
       });
       if (response.ok) {
@@ -185,9 +188,9 @@ export default function AdminDashboard() {
     setLoading(true);
     setMessage('Scraping in progress...');
     try {
-      const url = societyHandle 
-        ? `${API_URL}/api/v1/admin/scrape-now?society_handle=${societyHandle}`
-        : `${API_URL}/api/v1/admin/scrape-now`;
+      const url = societyHandle
+        ? `${BASE_URL}/api/v1/admin/scrape-now?society_handle=${societyHandle}`
+        : `${BASE_URL}/api/v1/admin/scrape-now`;
       
       const response = await fetch(url, {
         method: 'POST',
