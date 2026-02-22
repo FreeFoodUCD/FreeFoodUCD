@@ -299,8 +299,8 @@ async def trigger_scrape(
             event_data = extractor.extract_event(post_data['caption'])
             print(f"[DEBUG] NLP result: {event_data}")
             
-            if event_data and event_data.get('confidence', 0) >= 0.3:
-                print(f"[DEBUG] Creating event with confidence {event_data.get('confidence')}")
+            if event_data and event_data.get('confidence_score', 0) >= 0.3:
+                print(f"[DEBUG] Creating event with confidence {event_data.get('confidence_score')}")
                 event = Event(
                     society_id=society.id,
                     title=event_data.get('title', f"Free Food from {society.name}"),
@@ -309,7 +309,7 @@ async def trigger_scrape(
                     start_time=event_data.get('start_time'),
                     source_type='post',
                     source_id=post.id,
-                    confidence_score=event_data.get('confidence'),
+                    confidence_score=event_data.get('confidence_score'),
                     raw_text=post_data['caption'],
                     is_active=True
                 )
