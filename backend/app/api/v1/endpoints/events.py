@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
+from sqlalchemy.orm import selectinload
 from typing import List, Optional
 from datetime import date, datetime, timedelta
 from uuid import UUID
@@ -134,6 +135,9 @@ async def get_events(
     # Apply pagination
     offset = (page - 1) * page_size
     query = query.limit(page_size).offset(offset)
+    
+    # Eagerly load society relationship to avoid lazy loading issues
+    query = query.options(selectinload(Event.society))
     
     # Execute query
     result = await db.execute(query)
