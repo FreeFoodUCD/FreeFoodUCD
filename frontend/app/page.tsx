@@ -46,10 +46,10 @@ export default function Home() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
-  // Fetch events from API
+  // Fetch events from API (next 24 hours)
   const { data, isLoading, error } = useQuery({
-    queryKey: ['events'],
-    queryFn: () => api.getEvents({}),
+    queryKey: ['events', '24h'],
+    queryFn: () => api.getEvents({ date_filter: '24h' }),
     enabled: !useMockData,
   });
 
@@ -169,7 +169,7 @@ export default function Home() {
               what's happening now 👀
             </h2>
             <p className="text-lg text-text-light font-medium">
-              recent free food events from UCD societies
+              free food events in the next 24 hours
             </p>
           </div>
 
