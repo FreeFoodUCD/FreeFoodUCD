@@ -295,8 +295,23 @@ async def trigger_scrape(
             
             # NLP processing (runs for new or force-reprocessed posts)
             print(f"[DEBUG] Running NLP on post: {post_data['url']}")
-            print(f"[DEBUG] Caption preview: {post_data['caption'][:100]}...")
-            event_data = extractor.extract_event(post_data['caption'])
+            
+            # Combine caption with OCR text from images
+            combined_text = post_data['caption']
+            if post_data.get('image_url'):
+                try:
+                    from app.services.ocr.image_text_extractor import ImageTextExtractor
+                    ocr = ImageTextExtractor()
+                    ocr_text = ocr.extract_text_from_urls([post_data['image_url']])
+                    if ocr_text:
+                        combined_text = f"{combined_text}\n\n[Image Text]\n{ocr_text}"
+                        print(f"[DEBUG] Added OCR text ({len(ocr_text)} chars)")
+                except Exception as ocr_error:
+                    print(f"[DEBUG] OCR failed: {ocr_error}")
+            
+            print(f"[DEBUG] Caption preview: {combined_text[:100]}...")
+            print(f"[DEBUG] Full text length: {len(combined_text)} chars")
+            event_data = extractor.extract_event(combined_text)
             print(f"[DEBUG] NLP result: {event_data}")
             
             if event_data and event_data.get('confidence_score', 0) >= 0.3:

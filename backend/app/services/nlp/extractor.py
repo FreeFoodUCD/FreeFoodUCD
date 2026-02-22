@@ -31,19 +31,20 @@ class EventExtractor:
         # Explicit food keywords only (removed vague terms like "free", "join us", "study session")
         self.explicit_food_keywords = [
             # Explicit free food phrases
-            'free food', 'free pizza', 'free lunch', 'free dinner', 
-            'free breakfast', 'free snacks',
+            'free food', 'free pizza', 'free lunch', 'free dinner',
+            'free breakfast', 'free snacks', 'free snack',
             
-            # Food types
-            'pizza', 'refreshments', 'snacks', 'food', 'drinks', 
+            # Food types (include both singular and plural)
+            'pizza', 'refreshments', 'snacks', 'snack', 'food', 'drinks', 'drink',
             'lunch', 'dinner', 'breakfast', 'catering', 'buffet',
-            'nibbles', 'tea', 'coffee', 'cookies', 'dessert',
+            'nibbles', 'tea', 'coffee', 'cookies', 'cookie', 'dessert',
+            'protein bar', 'protein bars', 'kombucha',
             
             # Cultural/special events
             'potluck', 'iftar', 'break the fast', 'banquet',
             
             # Provision phrases
-            'food provided', 'refreshments provided', 
+            'food provided', 'refreshments provided',
             'complimentary food', 'italian food'
         ]
         
