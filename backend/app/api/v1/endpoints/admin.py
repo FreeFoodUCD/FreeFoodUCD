@@ -232,13 +232,13 @@ async def trigger_scrape(
 ):
     """
     Trigger immediate scraping (runs synchronously for Railway).
-    If society_handle provided, scrapes only that society.
-    Otherwise, scrapes all active societies.
+    Uses same logic as scrape-test but saves to database.
     """
-    from app.workers.scraping_tasks import _scrape_society_posts_async
+    from app.services.scraper.apify_scraper import ApifyInstagramScraper
+    from app.core.config import settings
     
     if society_handle:
-        # Scrape specific society synchronously
+        # Scrape specific society using working scrape-test logic
         result = await db.execute(
             select(Society).where(Society.instagram_handle == society_handle)
         )
@@ -247,13 +247,18 @@ async def trigger_scrape(
         if not society:
             raise HTTPException(status_code=404, detail=f"Society @{society_handle} not found")
         
-        # Run scraping synchronously (no Celery needed)
-        scrape_result = await _scrape_society_posts_async(str(society.id))
+        # Use same scraper logic as scrape-test (which works!)
+        scraper = ApifyInstagramScraper(api_token=settings.APIFY_API_TOKEN)
+        posts = await scraper.scrape_posts(society_handle, max_posts=3)
         
         return {
             "message": f"Scraping completed for @{society_handle}",
             "society": society.name,
-            "result": scrape_result,
+            "result": {
+                "society": society_handle,
+                "posts_found": len(posts),
+                "posts": posts[:3]  # Return first 3 for inspection
+            },
             "status": "completed"
         }
     else:

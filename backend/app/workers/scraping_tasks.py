@@ -186,11 +186,15 @@ async def _scrape_society_posts_async(society_id: str):
             logger.info(f"Scraping posts for @{society.instagram_handle}")
             
             # Get Apify scraper instance
+            print(f"[DEBUG] Getting scraper instance...")
             scraper = get_scraper()
+            print(f"[DEBUG] Scraper instance created: {type(scraper)}")
             
             # Scrape last 3 posts (societies post 2-3 times/week)
             # Apify handles authentication automatically
+            print(f"[DEBUG] Calling scraper.scrape_posts for @{society.instagram_handle}")
             posts_data = await scraper.scrape_posts(society.instagram_handle, max_posts=3)
+            print(f"[DEBUG] scraper.scrape_posts returned {len(posts_data)} posts")
             
             logger.info(f"Apify returned {len(posts_data)} posts for @{society.instagram_handle}")
             if len(posts_data) == 0:
