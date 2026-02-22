@@ -294,8 +294,13 @@ async def trigger_scrape(
                 new_posts += 1
             
             # NLP processing (runs for new or force-reprocessed posts)
+            print(f"[DEBUG] Running NLP on post: {post_data['url']}")
+            print(f"[DEBUG] Caption preview: {post_data['caption'][:100]}...")
             event_data = extractor.extract_event(post_data['caption'])
+            print(f"[DEBUG] NLP result: {event_data}")
+            
             if event_data and event_data.get('confidence', 0) >= 0.3:
+                print(f"[DEBUG] Creating event with confidence {event_data.get('confidence')}")
                 event = Event(
                     society_id=society.id,
                     title=event_data.get('title', f"Free Food from {society.name}"),
@@ -310,6 +315,8 @@ async def trigger_scrape(
                 )
                 db.add(event)
                 new_events += 1
+            else:
+                print(f"[DEBUG] Event rejected - confidence too low or None")
         
         await db.commit()
         
