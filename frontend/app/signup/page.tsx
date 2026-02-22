@@ -187,13 +187,12 @@ function SignupContent() {
                   )}
                 </button>
 
-                <button
-                  type="button"
-                  onClick={() => setStep('form')}
-                  className="mt-4 text-text-light hover:text-text font-bold transition-colors"
+                <Link
+                  href="/"
+                  className="mt-4 inline-block text-text-light hover:text-text font-bold transition-colors"
                 >
                   ← use different email
-                </button>
+                </Link>
               </form>
             </div>
           )}
