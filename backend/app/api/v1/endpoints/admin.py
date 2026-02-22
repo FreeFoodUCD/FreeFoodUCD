@@ -267,23 +267,21 @@ async def trigger_scrape(
             # Extract post ID
             post_id = post_data['url'].split('/p/')[-1].rstrip('/')
             
-            # Check if post exists
+            # Check if post exists (by instagram_post_id only, since it's unique)
             existing_result = await db.execute(
-                select(Post).where(
-                    Post.society_id == society.id,
-                    Post.instagram_post_id == post_id
-                )
+                select(Post).where(Post.instagram_post_id == post_id)
             )
             existing_post = existing_result.scalar_one_or_none()
             
             if existing_post and not force_reprocess:
+                # Post already exists, skip it
                 continue
             
             # If force_reprocess and post exists, use existing post
             if existing_post and force_reprocess:
                 post = existing_post
-            else:
-                # Save new post
+            elif not existing_post:
+                # Save new post only if it doesn't exist
                 post = Post(
                     society_id=society.id,
                     instagram_post_id=post_id,
@@ -296,6 +294,9 @@ async def trigger_scrape(
                 db.add(post)
                 await db.flush()
                 new_posts += 1
+            else:
+                # Post exists but not force_reprocess, skip
+                continue
             
             # NLP processing (runs for new or force-reprocessed posts)
             print(f"[DEBUG] Running NLP on post: {post_data['url']}")
@@ -658,7 +659,8 @@ async def get_upcoming_events(
     _: bool = Depends(verify_admin_key)
 ):
     """Get upcoming events within specified days with reminder status."""
-    now = datetime.now()
+    from datetime import timezone
+    now = datetime.now(timezone.utc)
     future = now + timedelta(days=days)
     
     query = select(Event).where(
@@ -773,8 +775,9 @@ async def send_event_reminder(
                 logger.error(f"Failed to send email to {user.email}: {e}")
     
     # Mark reminder as sent
+    from datetime import timezone
     event.reminder_sent = True
-    event.reminder_sent_at = datetime.now()
+    event.reminder_sent_at = datetime.now(timezone.utc)
     await db.commit()
     
     return {
@@ -976,7 +979,8 @@ async def get_notification_stats(
     _: bool = Depends(verify_admin_key)
 ):
     """Get notification statistics for the specified period."""
-    since = datetime.now() - timedelta(days=days)
+    from datetime import timezone
+    since = datetime.now(timezone.utc) - timedelta(days=days)
     
     # Get all logs in period
     result = await db.execute(
@@ -1030,8 +1034,9 @@ async def retry_failed_notifications(
     """Retry failed notifications from the last N hours."""
     from app.services.notifications.whatsapp import WhatsAppService
     from app.services.notifications.email import EmailService
+    from datetime import timezone
     
-    since = datetime.now() - timedelta(hours=hours)
+    since = datetime.now(timezone.utc) - timedelta(hours=hours)
     
     # Get failed notifications
     result = await db.execute(
@@ -1121,16 +1126,18 @@ async def get_system_health(
     
     # Check recent scraping activity (indicates workers are running)
     try:
+        from datetime import timezone
+        now = datetime.now(timezone.utc)
         recent_logs_result = await db.execute(
             select(ScrapingLog)
-            .where(ScrapingLog.created_at >= datetime.now() - timedelta(hours=24))
+            .where(ScrapingLog.created_at >= now - timedelta(hours=24))
             .order_by(desc(ScrapingLog.created_at))
             .limit(1)
         )
         recent_log = recent_logs_result.scalar_one_or_none()
         
         if recent_log:
-            hours_since = (datetime.now() - recent_log.created_at).total_seconds() / 3600
+            hours_since = (now - recent_log.created_at).total_seconds() / 3600
             if hours_since < 2:
                 health_status["celery_worker"] = "healthy"
             elif hours_since < 24:
@@ -1145,10 +1152,12 @@ async def get_system_health(
     
     # Check if beat schedule is working (check for events with reminders)
     try:
+        from datetime import timezone
+        now = datetime.now(timezone.utc)
         upcoming_events_result = await db.execute(
             select(Event)
-            .where(Event.start_time >= datetime.now())
-            .where(Event.start_time <= datetime.now() + timedelta(days=1))
+            .where(Event.start_time >= now)
+            .where(Event.start_time <= now + timedelta(days=1))
             .where(Event.is_active == True)
         )
         upcoming_events = upcoming_events_result.scalars().all()
@@ -1240,6 +1249,7 @@ async def send_test_notification(
     """Send a test notification to a specific user."""
     from app.services.notifications.whatsapp import WhatsAppService
     from app.services.notifications.email import EmailService
+    from datetime import timezone
     
     user = await db.get(User, user_id)
     if not user:
@@ -1250,7 +1260,7 @@ async def send_test_notification(
         "title": "Test Free Food Event",
         "location": "Test Location",
         "start_time": "12:00 PM",
-        "date": datetime.now().strftime("%A, %B %d, %Y"),
+        "date": datetime.now(timezone.utc).strftime("%A, %B %d, %Y"),
         "source_type": "test"
     }
     
