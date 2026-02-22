@@ -17,8 +17,16 @@ class EmailService:
     
     def __init__(self):
         """Initialize Resend client"""
-        resend.api_key = settings.RESEND_API_KEY
-        self.from_email = f"{settings.RESEND_FROM_NAME} <{settings.RESEND_FROM_EMAIL}>"
+        # Use Brevo settings as fallback if Resend not configured
+        if settings.RESEND_API_KEY:
+            resend.api_key = settings.RESEND_API_KEY
+            from_name = getattr(settings, 'RESEND_FROM_NAME', settings.BREVO_FROM_NAME)
+            from_email = settings.RESEND_FROM_EMAIL or settings.BREVO_FROM_EMAIL
+            self.from_email = f"{from_name} <{from_email}>"
+        else:
+            # Fallback to Brevo settings
+            resend.api_key = settings.BREVO_API_KEY
+            self.from_email = f"{settings.BREVO_FROM_NAME} <{settings.BREVO_FROM_EMAIL}>"
     
     async def send_event_notification(
         self,
