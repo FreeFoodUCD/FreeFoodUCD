@@ -138,7 +138,7 @@ function SignupContent() {
               </div>
               
               <h1 className="text-4xl md:text-5xl font-bold text-text mb-4">
-                check your email 📬
+                check your email
               </h1>
               
               <p className="text-lg text-text-light mb-8">
@@ -205,7 +205,7 @@ function SignupContent() {
               </div>
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-text mb-4">
-                you're in! 🎉
+                you're in!
               </h1>
               
               <p className="text-lg md:text-xl text-text-light mb-12">

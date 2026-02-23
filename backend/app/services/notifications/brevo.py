@@ -142,8 +142,8 @@ class BrevoEmailService:
                 "htmlContent": f"""
                 <!DOCTYPE html>
                 <html>
-                <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
-                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; padding: 40px; text-align: center; color: white; margin-bottom: 30px;">
+                <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #1A1A1A;">
+                    <div style="background: linear-gradient(135deg, #F78620 0%, #6FC266 100%); border-radius: 16px; padding: 40px; text-align: center; color: white; margin-bottom: 30px;">
                         <div style="font-size: 64px; margin-bottom: 20px;">🍕</div>
                         <div style="font-size: 28px; font-weight: bold; margin-bottom: 10px;">Welcome to FreeFood UCD</div>
                     </div>
@@ -155,8 +155,8 @@ class BrevoEmailService:
                             You're all set. We'll ping you when there's free food on campus.
                         </p>
                         
-                        <div style="background: #f3f4f6; border-left: 4px solid #667eea; border-radius: 8px; padding: 20px; margin: 30px 0;">
-                            <p style="font-size: 14px; font-weight: 600; margin-bottom: 10px; color: #667eea;">Fun fact:</p>
+                        <div style="background: #f3f4f6; border-left: 4px solid #F78620; border-radius: 8px; padding: 20px; margin: 30px 0;">
+                            <p style="font-size: 14px; font-weight: 600; margin-bottom: 10px; color: #F78620;">Fun fact:</p>
                             <p style="font-size: 14px; line-height: 1.6; margin: 0; color: #4b5563;">
                                 There was once a "Fat Men's Club" in 18th century New York. Entry? 200lbs minimum. With our alerts, you'll qualify by finals.
                             </p>
