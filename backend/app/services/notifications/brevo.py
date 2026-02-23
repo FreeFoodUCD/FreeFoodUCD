@@ -138,7 +138,7 @@ class BrevoEmailService:
                     "email": self.from_email
                 },
                 "to": [{"email": email, "name": name}],
-                "subject": "You're in. Now, let's get you fed. 🍕",
+                "subject": "You're in. 🍕",
                 "htmlContent": f"""
                 <!DOCTYPE html>
                 <html>
@@ -152,26 +152,18 @@ class BrevoEmailService:
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Hi {name},</p>
                         
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-                            You've officially joined the elite ranks of UCD students who refuse to pay €9 for a lukewarm panini when there's free pizza three buildings away.
-                        </p>
-                        
-                        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-                            <strong>Yes, it is that serious.</strong>
-                        </p>
-                        
-                        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
-                            Our bots are currently crawling every UCD society page and Instagram story. The second a "Free Pizza," "Donuts in Newman," or "Leftover Catering" post drops, you'll be the first to know.
+                            You're all set. We'll ping you when there's free food on campus.
                         </p>
                         
                         <div style="background: #f3f4f6; border-left: 4px solid #667eea; border-radius: 8px; padding: 20px; margin: 30px 0;">
-                            <p style="font-size: 14px; font-weight: 600; margin-bottom: 10px; color: #667eea;">While you wait for the first alert, here is a "Heavy" Fact:</p>
+                            <p style="font-size: 14px; font-weight: 600; margin-bottom: 10px; color: #667eea;">Fun fact:</p>
                             <p style="font-size: 14px; line-height: 1.6; margin: 0; color: #4b5563;">
-                                Did you know that in the 18th century, being "rotund" was such a flex of wealth that there was a "Fat Men's Club" in New York? To get in, you had to weigh at least 200lbs and pass a weigh-in at the door. We aren't saying you should start a UCD chapter... but with the amount of free food we're about to find you, you might qualify by finals week.
+                                There was once a "Fat Men's Club" in 18th century New York. Entry? 200lbs minimum. With our alerts, you'll qualify by finals.
                             </p>
                         </div>
                         
-                        <p style="font-size: 14px; color: #6b7280; margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
-                            FreeFood UCD - Because student budgets are tight, but our alerts are tighter.
+                        <p style="font-size: 14px; color: #6b7280; margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb; text-align: center;">
+                            — FreeFood UCD
                         </p>
                     </div>
                 </body>
