@@ -17,10 +17,11 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://freefooducd.vercel.app",
-        "https://freefooducd-4tq3d2y6y-freefooducds-projects.vercel.app",
+        "https://freefooducd-production.up.railway.app",
         "http://localhost:3000",
-        "http://localhost:8000"
+        "http://localhost:8000",
     ],
+    allow_origin_regex=r"https://freefooducd.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

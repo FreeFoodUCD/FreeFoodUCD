@@ -166,7 +166,7 @@ export default function Home() {
           {/* Section Header */}
           <div className="text-center mb-12 md:mb-10">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-text mb-4 md:mb-3">
-              what's happening now 👀
+              what's happening now
             </h2>
             <p className="text-lg text-text-light font-medium">
               free food events in the next 24 hours

@@ -44,17 +44,17 @@ class EventResponse(BaseModel):
 
 
 class EventListResponse(BaseModel):
-    """Paginated event list response."""
-    events: List[EventResponse]
+    """Paginated event list response (matches frontend PaginatedResponse<Event>)."""
+    items: List[EventResponse]
     total: int
     page: int
-    page_size: int
-    has_more: bool
+    size: int
+    pages: int
 
 
 @router.get("/events", response_model=EventListResponse)
 async def get_events(
-    date_filter: Optional[str] = Query(None, alias="date", description="Filter by date: 'today', 'tomorrow', '24h', 'week', or YYYY-MM-DD"),
+    date_filter: Optional[str] = Query(None, description="Filter by date: 'today', 'tomorrow', '24h', 'week', or YYYY-MM-DD"),
     society_id: Optional[UUID] = Query(None, description="Filter by society ID"),
     page: int = Query(1, ge=1, description="Page number"),
     page_size: int = Query(20, ge=1, le=100, description="Items per page"),
@@ -151,9 +151,11 @@ async def get_events(
     result = await db.execute(query)
     events = result.scalars().all()
     
+    pages = max(1, -(-total // page_size))  # ceiling division
+
     # Build response
     return EventListResponse(
-        events=[
+        items=[
             EventResponse(
                 id=event.id,
                 title=event.title,
@@ -176,8 +178,8 @@ async def get_events(
         ],
         total=total,
         page=page,
-        page_size=page_size,
-        has_more=(offset + len(events)) < total
+        size=page_size,
+        pages=pages,
     )
 
 
