@@ -54,8 +54,8 @@ class EventExtractor:
         self.time_patterns = [
             r'(\d{1,2}):(\d{2})\s*(am|pm|AM|PM)',  # 6:30 PM
             r'(\d{1,2})\s*(am|pm|AM|PM)',  # 6 PM
-            r'at\s+(\d{1,2})',  # at 6
-            r'(\d{1,2})\.(\d{2})',  # 18.30
+            r'at\s+(\d{1,2})\s*(am|pm|AM|PM)',  # at 6 PM (require AM/PM)
+            r'(\d{1,2})\.(\d{2})\s*(am|pm|AM|PM)?',  # 18.30 or 6.30 PM
         ]
         
         # Date keywords (for extraction after classification)
@@ -349,8 +349,9 @@ class EventExtractor:
     
     def _extract_time(self, text: str) -> Optional[Dict]:
         """Extract time from text, prioritizing start times in ranges."""
-        # First, check for time ranges (e.g., "from 2-3:30 PM", "2:00-3:30 PM")
+        # First, check for time ranges (e.g., "6pm to 7pm", "from 2-3:30 PM", "2:00-3:30 PM")
         range_patterns = [
+            r'(?:at\s+)?(\d{1,2})\s*(am|pm|AM|PM)\s+(?:to|-|–)\s+\d{1,2}\s*(?:am|pm|AM|PM)',  # 6pm to 7pm, at 6pm to 7pm
             r'from\s+(\d{1,2})\s*(?::(\d{2}))?\s*(?:-|–|to)\s*\d{1,2}(?::\d{2})?\s*(am|pm|AM|PM)',  # from 2-3:30 PM
             r'(\d{1,2})\s*(?::(\d{2}))?\s*(?:-|–)\s*\d{1,2}(?::\d{2})?\s*(am|pm|AM|PM)',  # 2-3:30 PM
             r'from\s+(\d{1,2})\s*(am|pm|AM|PM)\s*(?:-|–|to)',  # from 2 PM to
@@ -362,14 +363,16 @@ class EventExtractor:
                 groups = match.groups()
                 try:
                     hour = int(groups[0])
-                    # Check if groups[1] is a number (minute) or AM/PM
-                    if groups[1] and groups[1].lower() not in ['am', 'pm']:
-                        minute = int(groups[1])
-                        period = groups[2].upper() if len(groups) > 2 and groups[2] else None
-                    else:
-                        # groups[1] is AM/PM, not minute
-                        minute = 0
-                        period = groups[1].upper() if groups[1] else None
+                    minute = 0
+                    period = None
+                    
+                    # Determine which group has the period (AM/PM)
+                    for group in groups[1:]:
+                        if group and group.upper() in ['AM', 'PM']:
+                            period = group.upper()
+                            break
+                        elif group and group.isdigit():
+                            minute = int(group)
                     
                     if period:
                         if period == 'PM' and hour != 12:
@@ -377,6 +380,7 @@ class EventExtractor:
                         elif period == 'AM' and hour == 12:
                             hour = 0
                     
+                    logger.debug(f"Extracted time from range: {hour}:{minute:02d}")
                     return {'hour': hour, 'minute': minute}
                 except (ValueError, IndexError) as e:
                     logger.debug(f"Error parsing time range: {e}")
@@ -388,21 +392,26 @@ class EventExtractor:
             if match:
                 groups = match.groups()
                 
-                if len(groups) == 3:  # HH:MM AM/PM
+                # Filter out None values
+                groups = [g for g in groups if g is not None]
+                
+                if len(groups) >= 3:  # HH:MM AM/PM or HH.MM AM/PM
                     hour = int(groups[0])
                     minute = int(groups[1])
-                    period = groups[2].upper()
+                    period = groups[2].upper() if groups[2] else None
                     
-                    if period == 'PM' and hour != 12:
-                        hour += 12
-                    elif period == 'AM' and hour == 12:
-                        hour = 0
+                    if period and period in ['AM', 'PM']:
+                        if period == 'PM' and hour != 12:
+                            hour += 12
+                        elif period == 'AM' and hour == 12:
+                            hour = 0
                     
+                    logger.debug(f"Extracted time: {hour}:{minute:02d}")
                     return {'hour': hour, 'minute': minute}
                 
                 elif len(groups) == 2:
                     try:
-                        if groups[1] and groups[1].upper() in ['AM', 'PM']:  # H AM/PM
+                        if groups[1].upper() in ['AM', 'PM']:  # H AM/PM or at H AM/PM
                             hour = int(groups[0])
                             period = groups[1].upper()
                             
@@ -411,10 +420,12 @@ class EventExtractor:
                             elif period == 'AM' and hour == 12:
                                 hour = 0
                             
+                            logger.debug(f"Extracted time: {hour}:00")
                             return {'hour': hour, 'minute': 0}
-                        elif groups[1] and groups[1].isdigit():  # HH.MM
+                        elif groups[1].isdigit():  # HH.MM (24-hour format)
                             hour = int(groups[0])
                             minute = int(groups[1])
+                            logger.debug(f"Extracted time (24h): {hour}:{minute:02d}")
                             return {'hour': hour, 'minute': minute}
                     except (ValueError, AttributeError) as e:
                         logger.debug(f"Error parsing time: {e}")
