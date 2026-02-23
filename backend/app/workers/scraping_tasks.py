@@ -207,6 +207,13 @@ async def _scrape_society_posts_async(society_id: str):
                 # Extract post ID from URL (e.g., https://instagram.com/p/ABC123/)
                 post_id = post_data['url'].split('/p/')[-1].rstrip('/')
                 
+                # Filter out old posts (>7 days old)
+                post_timestamp = post_data['timestamp']
+                post_age = datetime.now() - post_timestamp
+                if post_age.days > 7:
+                    logger.info(f"Skipping old post from @{society.instagram_handle}: {post_age.days} days old")
+                    continue
+                
                 # Check if post already exists
                 existing_query = select(Post).where(
                     Post.society_id == society.id,
@@ -324,9 +331,10 @@ async def _process_scraped_content_async(content_type: str, content_id: str):
             logger.warning(f"No text found for {content_type} {content_id}")
             return {"error": "Content not found or empty"}
         
-        # Extract event
+        # Extract event with post timestamp for better date validation
+        post_timestamp = content.detected_at if hasattr(content, 'detected_at') else None
         logger.info(f"Processing {content_type} {content_id} with {len(text)} chars")
-        event_data = extractor.extract_event(text, content_type)
+        event_data = extractor.extract_event(text, content_type, post_timestamp)
         
         if event_data:
             # Check for duplicate events (same time + location within 1 hour window)

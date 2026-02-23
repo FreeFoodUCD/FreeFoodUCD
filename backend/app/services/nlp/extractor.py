@@ -288,7 +288,7 @@ class EventExtractor:
     
     # ========== Event Detail Extraction (called AFTER classification) ==========
     
-    def extract_event(self, text: str, source_type: str = 'post') -> Optional[Dict]:
+    def extract_event(self, text: str, source_type: str = 'post', post_timestamp: Optional[datetime] = None) -> Optional[Dict]:
         """
         Extract event details from text.
         
@@ -298,6 +298,7 @@ class EventExtractor:
         Args:
             text: Text to extract from (caption + OCR text combined)
             source_type: 'post' or 'story'
+            post_timestamp: When the post was made (for date validation)
             
         Returns:
             Dictionary with event details or None if classification fails
@@ -308,8 +309,15 @@ class EventExtractor:
         
         # Extract event details
         time = self._extract_time(text)
-        date = self._extract_date(text.lower())
+        date = self._extract_date_v2(text.lower(), post_timestamp)
         location = self._extract_location(text)
+        
+        # Validate date is not in the past
+        if date:
+            now = datetime.now(self.timezone)
+            if date < now - timedelta(days=1):
+                logger.warning(f"Extracted date {date} is in the past, rejecting event")
+                return None
         
         # Combine date and time
         start_time = self._combine_datetime(date, time)
@@ -399,47 +407,142 @@ class EventExtractor:
         return None
     
     def _extract_date(self, text: str) -> Optional[datetime]:
-        """Extract date from text."""
-        now = datetime.now(self.timezone)
+        """
+        DEPRECATED: Use _extract_date_v2 instead.
+        Kept for backward compatibility.
+        """
+        return self._extract_date_v2(text, None)
+    
+    def _extract_date_v2(self, text: str, post_timestamp: Optional[datetime] = None) -> Optional[datetime]:
+        """
+        Extract date from text with improved validation.
         
-        # Check for date keywords
-        for keyword, days_offset in self.date_keywords.items():
-            if keyword in text:
-                if callable(days_offset):
-                    days_offset = days_offset()
-                return now + timedelta(days=days_offset)
+        Args:
+            text: Text to extract date from (lowercase)
+            post_timestamp: When the post was made (for validation)
+            
+        Returns:
+            Extracted datetime or None
+        """
+        now = post_timestamp or datetime.now(self.timezone)
+        text_lower = text.lower()
         
-        # Try to parse date formats (dd/mm, mm/dd, etc.)
+        # Step 1: Extract all date candidates
+        candidates = []
+        
+        # A. Explicit dates with day-of-week (highest priority)
+        # "wednesday the 21st", "monday 20/10"
+        weekday_pattern = r'(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\s+(?:the\s+)?(\d{1,2})(?:st|nd|rd|th)?(?:\s*/\s*(\d{1,2}))?'
+        for match in re.finditer(weekday_pattern, text_lower):
+            weekday_name = match.group(1)
+            day = int(match.group(2))
+            month = int(match.group(3)) if match.group(3) else now.month
+            
+            # Map weekday name to number (0=Monday, 6=Sunday)
+            weekday_map = {
+                'monday': 0, 'tuesday': 1, 'wednesday': 2, 'thursday': 3,
+                'friday': 4, 'saturday': 5, 'sunday': 6
+            }
+            expected_weekday = weekday_map[weekday_name]
+            
+            # Try to create date
+            try:
+                # Try current year first
+                candidate = datetime(now.year, month, day, tzinfo=self.timezone)
+                
+                # Validate day-of-week matches
+                if candidate.weekday() == expected_weekday:
+                    # Check if it's in reasonable range
+                    if now - timedelta(days=1) <= candidate <= now + timedelta(days=90):
+                        candidates.append(('explicit_with_weekday', candidate, 1.0))
+                        logger.debug(f"Found date with validated weekday: {candidate.strftime('%A %d/%m/%Y')}")
+                    else:
+                        # Try next year
+                        candidate = datetime(now.year + 1, month, day, tzinfo=self.timezone)
+                        if candidate.weekday() == expected_weekday:
+                            if candidate <= now + timedelta(days=90):
+                                candidates.append(('explicit_with_weekday', candidate, 1.0))
+                else:
+                    logger.debug(f"Day-of-week mismatch: {weekday_name} vs {candidate.strftime('%A')}")
+            except ValueError:
+                pass
+        
+        # B. Explicit dates without day-of-week
+        # "20/10", "21st", "21/02"
         date_patterns = [
-            r'(\d{1,2})/(\d{1,2})',  # dd/mm or mm/dd
-            r'(\d{1,2})-(\d{1,2})',  # dd-mm
+            (r'(\d{1,2})/(\d{1,2})(?:/(\d{2,4}))?', 'slash'),  # 20/10 or 20/10/25
+            (r'(\d{1,2})(?:st|nd|rd|th)\s+(?:of\s+)?(january|february|march|april|may|june|july|august|september|october|november|december)', 'day_month'),
+            (r'(january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{1,2})(?:st|nd|rd|th)?', 'month_day'),
         ]
         
-        for pattern in date_patterns:
-            match = re.search(pattern, text)
-            if match:
-                day = int(match.group(1))
-                month = int(match.group(2))
-                
-                # Assume current year
-                try:
-                    date = datetime(now.year, month, day, tzinfo=self.timezone)
-                    if date < now:
-                        # If date is in the past, assume next year
-                        date = datetime(now.year + 1, month, day, tzinfo=self.timezone)
-                    return date
-                except ValueError:
-                    # Invalid date, try swapping day/month
-                    try:
-                        date = datetime(now.year, day, month, tzinfo=self.timezone)
-                        if date < now:
-                            date = datetime(now.year + 1, day, month, tzinfo=self.timezone)
-                        return date
-                    except ValueError:
-                        pass
+        month_map = {
+            'january': 1, 'february': 2, 'march': 3, 'april': 4,
+            'may': 5, 'june': 6, 'july': 7, 'august': 8,
+            'september': 9, 'october': 10, 'november': 11, 'december': 12
+        }
         
-        # Default to today
-        return now
+        for pattern, pattern_type in date_patterns:
+            for match in re.finditer(pattern, text_lower):
+                try:
+                    if pattern_type == 'slash':
+                        day = int(match.group(1))
+                        month = int(match.group(2))
+                        year = int(match.group(3)) if match.group(3) else now.year
+                        if year < 100:  # 2-digit year
+                            year += 2000
+                    elif pattern_type == 'day_month':
+                        day = int(match.group(1))
+                        month = month_map[match.group(2)]
+                        year = now.year
+                    elif pattern_type == 'month_day':
+                        month = month_map[match.group(1)]
+                        day = int(match.group(2))
+                        year = now.year
+                    
+                    # Try to create date
+                    candidate = datetime(year, month, day, tzinfo=self.timezone)
+                    
+                    # If date is in past, try next year
+                    if candidate < now - timedelta(days=1):
+                        candidate = datetime(year + 1, month, day, tzinfo=self.timezone)
+                    
+                    # Check if in reasonable range (not too far in future)
+                    if candidate <= now + timedelta(days=90):
+                        candidates.append(('explicit_date', candidate, 0.8))
+                        logger.debug(f"Found explicit date: {candidate.strftime('%d/%m/%Y')}")
+                except ValueError:
+                    pass
+        
+        # C. Relative keywords (lowest priority)
+        for keyword, days_offset in self.date_keywords.items():
+            if keyword in text_lower:
+                if callable(days_offset):
+                    days_offset = days_offset()
+                candidate = now + timedelta(days=days_offset)
+                candidates.append(('relative_keyword', candidate, 0.6))
+                logger.debug(f"Found relative keyword '{keyword}': {candidate.strftime('%d/%m/%Y')}")
+        
+        # Step 2: Choose best candidate
+        if not candidates:
+            logger.debug("No date candidates found, defaulting to today")
+            return now
+        
+        # Sort by confidence (highest first), then by date (earliest first)
+        candidates.sort(key=lambda x: (-x[2], x[1]))
+        
+        best_type, best_date, best_confidence = candidates[0]
+        logger.info(f"Selected date: {best_date.strftime('%A %d/%m/%Y')} (type: {best_type}, confidence: {best_confidence})")
+        
+        # Final validation
+        if best_date < now - timedelta(days=1):
+            logger.warning(f"Best candidate {best_date} is in the past, rejecting")
+            return None
+        
+        if best_date > now + timedelta(days=90):
+            logger.warning(f"Best candidate {best_date} is too far in future, rejecting")
+            return None
+        
+        return best_date
     
     def _extract_location(self, text: str) -> Optional[Dict]:
         """Extract location from text."""

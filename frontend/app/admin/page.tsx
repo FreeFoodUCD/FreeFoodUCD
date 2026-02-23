@@ -172,6 +172,12 @@ export default function AdminDashboard() {
   const [errorLogs, setErrorLogs] = useState<ErrorLog[]>([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [newSociety, setNewSociety] = useState({
+    name: '',
+    instagram_handle: '',
+    scrape_posts: true,
+    scrape_stories: false
+  });
 
   // Check if admin key is stored
   useEffect(() => {
@@ -495,6 +501,47 @@ export default function AdminDashboard() {
     setLoading(false);
   };
 
+  const addSociety = async () => {
+    if (!newSociety.name || !newSociety.instagram_handle) {
+      setMessage('❌ Please fill in all required fields');
+      return;
+    }
+
+    setLoading(true);
+    setMessage('Adding society...');
+    try {
+      const response = await fetch(`${BASE_URL}/api/v1/admin/societies`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Key': adminKey
+        },
+        body: JSON.stringify(newSociety)
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setMessage(`✅ ${data.message}`);
+        // Reset form
+        setNewSociety({
+          name: '',
+          instagram_handle: '',
+          scrape_posts: true,
+          scrape_stories: false
+        });
+        // Reload societies list
+        loadSocieties();
+      } else {
+        const error = await response.json();
+        setMessage(`❌ ${error.detail || 'Failed to add society'}`);
+      }
+    } catch (error) {
+      setMessage('❌ Error adding society');
+      console.error('Error adding society:', error);
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
     if (isAuthenticated && activeTab === 'logs') {
       loadScrapingLogs();
@@ -690,16 +737,83 @@ export default function AdminDashboard() {
 
         {/* Societies Management Tab */}
         {activeTab === 'societies' && (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <div className="p-4 border-b flex justify-between items-center">
-              <h2 className="text-lg font-semibold">Societies Management</h2>
-              <button
-                onClick={loadSocieties}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-              >
-                Refresh
-              </button>
+          <div className="space-y-6">
+            {/* Add Society Form */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-lg font-semibold mb-4">Add New Society</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Society Name
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g., UCD Computer Science Society"
+                    value={newSociety.name}
+                    onChange={(e) => setNewSociety({...newSociety, name: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Instagram Handle
+                  </label>
+                  <div className="flex">
+                    <span className="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                      @
+                    </span>
+                    <input
+                      type="text"
+                      placeholder="ucdcompsoc"
+                      value={newSociety.instagram_handle}
+                      onChange={(e) => setNewSociety({...newSociety, instagram_handle: e.target.value})}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+                <div className="flex items-end">
+                  <button
+                    onClick={addSociety}
+                    disabled={loading || !newSociety.name || !newSociety.instagram_handle}
+                    className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  >
+                    Add Society
+                  </button>
+                </div>
+              </div>
+              <div className="mt-3 flex items-center gap-4 text-sm">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={newSociety.scrape_posts}
+                    onChange={(e) => setNewSociety({...newSociety, scrape_posts: e.target.checked})}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="text-gray-700">Scrape Posts</span>
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={newSociety.scrape_stories}
+                    onChange={(e) => setNewSociety({...newSociety, scrape_stories: e.target.checked})}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="text-gray-700">Scrape Stories</span>
+                </label>
+              </div>
             </div>
+
+            {/* Societies List */}
+            <div className="bg-white rounded-lg shadow overflow-hidden">
+              <div className="p-4 border-b flex justify-between items-center">
+                <h2 className="text-lg font-semibold">All Societies ({societies.length})</h2>
+                <button
+                  onClick={loadSocieties}
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                >
+                  Refresh
+                </button>
+              </div>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50">
@@ -759,6 +873,7 @@ export default function AdminDashboard() {
                   ))}
                 </tbody>
               </table>
+            </div>
             </div>
           </div>
         )}

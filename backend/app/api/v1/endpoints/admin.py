@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Header
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete, desc
 from typing import List, Optional
+from pydantic import BaseModel
 from app.db.base import get_db
 from app.db.models import User, Society, Event, Post, ScrapingLog, NotificationLog
 from app.core.config import settings
@@ -138,6 +139,59 @@ async def toggle_society(
     return {
         "message": f"Society {society.name} is now {'active' if society.is_active else 'inactive'}",
         "is_active": society.is_active
+    }
+
+
+class SocietyCreate(BaseModel):
+    """Schema for creating a new society."""
+    name: str
+    instagram_handle: str
+    scrape_posts: bool = True
+    scrape_stories: bool = False
+
+
+@router.post("/societies")
+async def create_society(
+    society_data: SocietyCreate,
+    db: AsyncSession = Depends(get_db),
+    _: bool = Depends(verify_admin_key)
+):
+    """Create a new society."""
+    # Check if society with this handle already exists
+    result = await db.execute(
+        select(Society).where(Society.instagram_handle == society_data.instagram_handle)
+    )
+    existing = result.scalar_one_or_none()
+    
+    if existing:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Society with Instagram handle @{society_data.instagram_handle} already exists"
+        )
+    
+    # Create new society
+    new_society = Society(
+        name=society_data.name,
+        instagram_handle=society_data.instagram_handle,
+        is_active=True,
+        scrape_posts=society_data.scrape_posts,
+        scrape_stories=society_data.scrape_stories
+    )
+    
+    db.add(new_society)
+    await db.commit()
+    await db.refresh(new_society)
+    
+    return {
+        "message": f"Society {society_data.name} created successfully",
+        "society": {
+            "id": str(new_society.id),
+            "name": new_society.name,
+            "instagram_handle": new_society.instagram_handle,
+            "is_active": new_society.is_active,
+            "scrape_posts": new_society.scrape_posts,
+            "scrape_stories": new_society.scrape_stories
+        }
     }
 
 
