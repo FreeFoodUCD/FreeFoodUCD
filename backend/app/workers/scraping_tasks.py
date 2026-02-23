@@ -1,6 +1,6 @@
 from celery import group
 from app.workers.celery_app import celery_app
-from app.db.base import async_session_maker
+from app.db.base import task_db_session
 from app.db.models import Society, Post, Story, Event, ScrapingLog
 from app.services.nlp.extractor import EventExtractor
 from app.services.scraper.apify_scraper import ApifyInstagramScraper
@@ -35,7 +35,7 @@ def scrape_all_stories(self):
 
 async def _scrape_all_stories_async():
     """Async implementation of scrape_all_stories."""
-    async with async_session_maker() as session:
+    async with task_db_session() as session:
         # Get all active societies that should be scraped
         query = select(Society).where(
             Society.is_active == True,
@@ -75,7 +75,7 @@ async def _scrape_society_stories_async(society_id: str):
     """Async implementation of scrape_society_stories."""
     start_time = datetime.now()
     
-    async with async_session_maker() as session:
+    async with task_db_session() as session:
         # Get society
         society = await session.get(Society, society_id)
         if not society:
@@ -138,7 +138,7 @@ def scrape_all_posts(self):
 
 async def _scrape_all_posts_async():
     """Async implementation of scrape_all_posts."""
-    async with async_session_maker() as session:
+    async with task_db_session() as session:
         query = select(Society).where(
             Society.is_active == True,
             Society.scrape_posts == True
@@ -173,7 +173,7 @@ async def _scrape_society_posts_async(society_id: str):
     logger.info(f"[DEBUG] _scrape_society_posts_async called with society_id: {society_id}")
     start_time = datetime.now()
     
-    async with async_session_maker() as session:
+    async with task_db_session() as session:
         society = await session.get(Society, society_id)
         if not society:
             print(f"[DEBUG] Society not found: {society_id}")
@@ -303,7 +303,7 @@ def process_scraped_content(content_type: str, content_id: str):
 
 async def _process_scraped_content_async(content_type: str, content_id: str):
     """Async implementation of process_scraped_content."""
-    async with async_session_maker() as session:
+    async with task_db_session() as session:
         extractor = EventExtractor()
         
         # Get content

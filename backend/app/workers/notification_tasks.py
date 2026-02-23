@@ -1,5 +1,5 @@
 from app.workers.celery_app import celery_app
-from app.db.base import async_session_maker
+from app.db.base import task_db_session
 from app.db.models import Event, User, UserSocietyPreference, NotificationLog
 from app.services.notifications.whatsapp import WhatsAppService
 from app.services.notifications.brevo import BrevoEmailService
@@ -27,7 +27,7 @@ def notify_event(self, event_id: str):
 
 async def _notify_event_async(event_id: str):
     """Async implementation of notify_event."""
-    async with async_session_maker() as session:
+    async with task_db_session() as session:
         # Get event with society
         event = await session.get(Event, event_id)
         if not event:
@@ -129,7 +129,7 @@ def send_verification_code(user_id: str, code: str, method: str):
 
 async def _send_verification_code_async(user_id: str, code: str, method: str):
     """Async implementation of send_verification_code."""
-    async with async_session_maker() as session:
+    async with task_db_session() as session:
         user = await session.get(User, user_id)
         if not user:
             return {"error": "User not found"}
@@ -159,7 +159,7 @@ def send_welcome_message(user_id: str):
 
 async def _send_welcome_message_async(user_id: str):
     """Async implementation of send_welcome_message."""
-    async with async_session_maker() as session:
+    async with task_db_session() as session:
         user = await session.get(User, user_id)
         if not user:
             return {"error": "User not found"}
@@ -194,7 +194,7 @@ def send_upcoming_event_notifications():
 
 async def _send_upcoming_event_notifications_async():
     """Async implementation of send_upcoming_event_notifications."""
-    async with async_session_maker() as session:
+    async with task_db_session() as session:
         # Get current time and 1 hour from now window
         now = datetime.now()
         one_hour_from_now = now + timedelta(hours=1)

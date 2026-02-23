@@ -1,5 +1,5 @@
 from app.workers.celery_app import celery_app
-from app.db.base import async_session_maker
+from app.db.base import task_db_session
 from app.db.models import Story, Event, ScrapingLog
 from sqlalchemy import select, delete
 from datetime import datetime, timedelta
@@ -20,7 +20,7 @@ def cleanup_expired_stories():
 
 async def _cleanup_expired_stories_async():
     """Async implementation of cleanup_expired_stories."""
-    async with async_session_maker() as session:
+    async with task_db_session() as session:
         # Delete stories older than 48 hours (give some buffer)
         cutoff_time = datetime.now() - timedelta(hours=48)
         
@@ -45,7 +45,7 @@ def archive_old_events():
 
 async def _archive_old_events_async():
     """Async implementation of archive_old_events."""
-    async with async_session_maker() as session:
+    async with task_db_session() as session:
         # Archive events older than 7 days
         cutoff_time = datetime.now() - timedelta(days=7)
         
@@ -75,7 +75,7 @@ def cleanup_old_logs():
 
 async def _cleanup_old_logs_async():
     """Async implementation of cleanup_old_logs."""
-    async with async_session_maker() as session:
+    async with task_db_session() as session:
         cutoff_time = datetime.now() - timedelta(days=30)
         
         query = delete(ScrapingLog).where(ScrapingLog.created_at < cutoff_time)
@@ -100,7 +100,7 @@ def health_check():
 async def _health_check_async():
     """Async implementation of health_check."""
     try:
-        async with async_session_maker() as session:
+        async with task_db_session() as session:
             # Check database connectivity
             await session.execute(select(1))
             
