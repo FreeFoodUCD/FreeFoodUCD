@@ -1,7 +1,7 @@
 """add post feedback table
 
 Revision ID: add_post_feedback
-Revises: add_reminder_fields_to_events
+Revises: add_reminder_fields
 Create Date: 2026-02-23 15:07:00.000000
 
 """
@@ -11,7 +11,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = 'add_post_feedback'
-down_revision = 'add_reminder_fields_to_events'
+down_revision = 'add_reminder_fields'
 branch_labels = None
 depends_on = None
 
