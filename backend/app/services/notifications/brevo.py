@@ -43,11 +43,7 @@ class BrevoEmailService:
                 },
                 "to": [{"email": email, "name": email.split("@")[0]}],
                 "subject": "Your FreeFood UCD Verification Code",
-                "headers": {
-                    "X-Priority": "1",
-                    "Importance": "high",
-                    "X-Mailer": "FreeFood UCD"
-                },
+                "headers": {},
                 "tags": ["transactional", "verification"],
                 "htmlContent": f"""
                 <!DOCTYPE html>
