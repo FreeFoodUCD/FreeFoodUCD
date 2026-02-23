@@ -48,7 +48,7 @@ async def list_users(
 
 @router.delete("/users/{user_id}")
 async def delete_user(
-    user_id: int,
+    user_id: str,
     db: AsyncSession = Depends(get_db),
     _: bool = Depends(verify_admin_key)
 ):
@@ -121,7 +121,7 @@ async def get_stats(
 
 @router.post("/societies/{society_id}/toggle")
 async def toggle_society(
-    society_id: int,
+    society_id: str,
     db: AsyncSession = Depends(get_db),
     _: bool = Depends(verify_admin_key)
 ):

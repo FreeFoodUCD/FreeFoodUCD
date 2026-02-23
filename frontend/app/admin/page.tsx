@@ -666,15 +666,13 @@ export default function AdminDashboard() {
                     )}
 
                     <div className="flex gap-2">
-                      {!event.reminder_sent && (
-                        <button
-                          onClick={() => sendReminder(event.id)}
-                          disabled={loading}
-                          className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 disabled:bg-gray-400"
-                        >
-                          Send Reminder Now
-                        </button>
-                      )}
+                      <button
+                        onClick={() => sendReminder(event.id)}
+                        disabled={loading}
+                        className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 disabled:bg-gray-400"
+                      >
+                        Send Reminder Now
+                      </button>
                       <button
                         onClick={() => deleteEvent(event.id, event.title)}
                         disabled={loading}
