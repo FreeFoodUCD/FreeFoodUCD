@@ -153,6 +153,33 @@ class NotificationLog(Base):
     user = relationship("User", back_populates="notification_logs")
 
 
+class PostFeedback(Base):
+    """Feedback on NLP classification and extraction accuracy."""
+    __tablename__ = "post_feedback"
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    post_id = Column(UUID(as_uuid=True), ForeignKey("posts.id", ondelete="CASCADE"), index=True)
+    admin_email = Column(String(255))  # Who reviewed it
+    is_correct = Column(Boolean)  # Overall correctness
+    
+    # Classification feedback
+    correct_classification = Column(Boolean)  # Was it actually free food?
+    classification_notes = Column(Text)
+    
+    # Extraction feedback
+    correct_date = Column(DateTime(timezone=True))
+    correct_time = Column(String(10))  # e.g., "14:30"
+    correct_location = Column(String(255))
+    extraction_notes = Column(Text)
+    
+    # General notes
+    notes = Column(Text)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), index=True)
+    
+    # Relationships
+    post = relationship("Post")
+
+
 class ScrapingLog(Base):
     """Log of scraping activities for monitoring."""
     __tablename__ = "scraping_logs"

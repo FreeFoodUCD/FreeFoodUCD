@@ -4,7 +4,7 @@ from sqlalchemy import select, delete, desc
 from typing import List, Optional
 from pydantic import BaseModel
 from app.db.base import get_db
-from app.db.models import User, Society, Event, Post, ScrapingLog, NotificationLog
+from app.db.models import User, Society, Event, Post, ScrapingLog, NotificationLog, PostFeedback
 from app.core.config import settings
 from datetime import datetime, timedelta
 import logging
@@ -192,6 +192,215 @@ async def create_society(
             "scrape_posts": new_society.scrape_posts,
             "scrape_stories": new_society.scrape_stories
         }
+    }
+
+
+class PostFeedbackCreate(BaseModel):
+    """Schema for submitting post feedback."""
+    is_correct: bool
+    correct_classification: Optional[bool] = None
+    classification_notes: Optional[str] = None
+    correct_date: Optional[datetime] = None
+    correct_time: Optional[str] = None
+    correct_location: Optional[str] = None
+    extraction_notes: Optional[str] = None
+    notes: Optional[str] = None
+
+
+@router.get("/posts/recent")
+async def get_recent_posts(
+    limit: int = 100,
+    days: int = 7,
+    db: AsyncSession = Depends(get_db),
+    _: bool = Depends(verify_admin_key)
+):
+    """
+    Get recent posts with their processing status and extracted events.
+    Shows posts from the last N days for review.
+    """
+    cutoff_date = datetime.now() - timedelta(days=days)
+    
+    # Get posts with society info
+    query = (
+        select(Post, Society, Event)
+        .join(Society, Post.society_id == Society.id)
+        .outerjoin(Event, Event.source_id == Post.id)
+        .where(Post.detected_at >= cutoff_date)
+        .order_by(desc(Post.detected_at))
+        .limit(limit)
+    )
+    
+    result = await db.execute(query)
+    rows = result.all()
+    
+    posts_data = []
+    for post, society, event in rows:
+        # Get feedback if exists
+        feedback_query = select(PostFeedback).where(PostFeedback.post_id == post.id)
+        feedback_result = await db.execute(feedback_query)
+        feedback = feedback_result.scalar_one_or_none()
+        
+        post_data = {
+            "id": str(post.id),
+            "society_name": society.name,
+            "society_handle": society.instagram_handle,
+            "caption": post.caption,
+            "source_url": post.source_url,
+            "detected_at": post.detected_at.isoformat(),
+            "is_free_food": post.is_free_food,
+            "processed": post.processed,
+            "event_created": event is not None,
+            "feedback_submitted": feedback is not None,
+        }
+        
+        # Add event data if exists
+        if event:
+            post_data["event"] = {
+                "id": str(event.id),
+                "title": event.title,
+                "start_time": event.start_time.isoformat() if event.start_time else None,
+                "location": event.location,
+                "confidence_score": event.confidence_score,
+                "notified": event.notified,
+                "users_notified": 0  # TODO: Count from notification_logs
+            }
+        
+        # Add feedback if exists
+        if feedback:
+            post_data["feedback"] = {
+                "is_correct": feedback.is_correct,
+                "notes": feedback.notes,
+                "created_at": feedback.created_at.isoformat()
+            }
+        
+        posts_data.append(post_data)
+    
+    return {
+        "total": len(posts_data),
+        "posts": posts_data
+    }
+
+
+@router.post("/posts/{post_id}/feedback")
+async def submit_post_feedback(
+    post_id: str,
+    feedback_data: PostFeedbackCreate,
+    x_admin_key: str = Header(...),
+    db: AsyncSession = Depends(get_db),
+    _: bool = Depends(verify_admin_key)
+):
+    """
+    Submit feedback on a post's NLP classification and extraction.
+    Used to track accuracy and improve the system.
+    """
+    # Check if post exists
+    post = await db.get(Post, post_id)
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    
+    # Check if feedback already exists
+    existing_query = select(PostFeedback).where(PostFeedback.post_id == post_id)
+    result = await db.execute(existing_query)
+    existing_feedback = result.scalar_one_or_none()
+    
+    if existing_feedback:
+        # Update existing feedback
+        existing_feedback.is_correct = feedback_data.is_correct
+        existing_feedback.correct_classification = feedback_data.correct_classification
+        existing_feedback.classification_notes = feedback_data.classification_notes
+        existing_feedback.correct_date = feedback_data.correct_date
+        existing_feedback.correct_time = feedback_data.correct_time
+        existing_feedback.correct_location = feedback_data.correct_location
+        existing_feedback.extraction_notes = feedback_data.extraction_notes
+        existing_feedback.notes = feedback_data.notes
+        existing_feedback.admin_email = x_admin_key[:50]  # Store partial key as identifier
+        
+        await db.commit()
+        
+        return {
+            "message": "Feedback updated successfully",
+            "feedback_id": str(existing_feedback.id)
+        }
+    else:
+        # Create new feedback
+        new_feedback = PostFeedback(
+            post_id=post_id,
+            admin_email=x_admin_key[:50],  # Store partial key as identifier
+            is_correct=feedback_data.is_correct,
+            correct_classification=feedback_data.correct_classification,
+            classification_notes=feedback_data.classification_notes,
+            correct_date=feedback_data.correct_date,
+            correct_time=feedback_data.correct_time,
+            correct_location=feedback_data.correct_location,
+            extraction_notes=feedback_data.extraction_notes,
+            notes=feedback_data.notes
+        )
+        
+        db.add(new_feedback)
+        await db.commit()
+        await db.refresh(new_feedback)
+        
+        return {
+            "message": "Feedback submitted successfully",
+            "feedback_id": str(new_feedback.id)
+        }
+
+
+@router.get("/posts/analytics")
+async def get_post_analytics(
+    days: int = 30,
+    db: AsyncSession = Depends(get_db),
+    _: bool = Depends(verify_admin_key)
+):
+    """
+    Get analytics on NLP accuracy based on feedback.
+    Shows overall accuracy and common failure patterns.
+    """
+    cutoff_date = datetime.now() - timedelta(days=days)
+    
+    # Get all posts with feedback
+    query = (
+        select(Post, PostFeedback)
+        .join(PostFeedback, Post.id == PostFeedback.post_id)
+        .where(Post.detected_at >= cutoff_date)
+    )
+    result = await db.execute(query)
+    feedback_rows = result.all()
+    
+    # Get all posts (for total count)
+    total_query = select(Post).where(Post.detected_at >= cutoff_date)
+    total_result = await db.execute(total_query)
+    total_posts = len(total_result.scalars().all())
+    
+    # Calculate metrics
+    total_reviewed = len(feedback_rows)
+    correct_count = sum(1 for _, feedback in feedback_rows if feedback.is_correct)
+    
+    accuracy = (correct_count / total_reviewed * 100) if total_reviewed > 0 else 0
+    
+    # Count common issues
+    classification_errors = sum(
+        1 for _, feedback in feedback_rows
+        if not feedback.is_correct and feedback.correct_classification is not None
+    )
+    
+    extraction_errors = sum(
+        1 for _, feedback in feedback_rows
+        if not feedback.is_correct and (
+            feedback.correct_date or feedback.correct_time or feedback.correct_location
+        )
+    )
+    
+    return {
+        "period_days": days,
+        "total_posts": total_posts,
+        "total_reviewed": total_reviewed,
+        "review_rate": (total_reviewed / total_posts * 100) if total_posts > 0 else 0,
+        "accuracy": round(accuracy, 1),
+        "correct_count": correct_count,
+        "incorrect_count": total_reviewed - correct_count,
+        "classification_errors": classification_errors,
+        "extraction_errors": extraction_errors
     }
 
 

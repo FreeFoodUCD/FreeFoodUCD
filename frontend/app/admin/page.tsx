@@ -57,8 +57,34 @@ interface Post {
   detected_at: string;
   is_free_food: boolean;
   processed: boolean;
-  has_event: boolean;
-  event_title: string | null;
+  event_created: boolean;
+  feedback_submitted: boolean;
+  event?: {
+    id: string;
+    title: string;
+    start_time: string | null;
+    location: string | null;
+    confidence_score: number;
+    notified: boolean;
+    users_notified: number;
+  };
+  feedback?: {
+    is_correct: boolean;
+    notes: string | null;
+    created_at: string;
+  };
+}
+
+interface PostAnalytics {
+  period_days: number;
+  total_posts: number;
+  total_reviewed: number;
+  review_rate: number;
+  accuracy: number;
+  correct_count: number;
+  incorrect_count: number;
+  classification_errors: number;
+  extraction_errors: number;
 }
 
 interface User {
@@ -170,6 +196,8 @@ export default function AdminDashboard() {
   const [notificationStats, setNotificationStats] = useState<NotificationStats | null>(null);
   const [systemHealth, setSystemHealth] = useState<SystemHealth | null>(null);
   const [errorLogs, setErrorLogs] = useState<ErrorLog[]>([]);
+  const [recentPosts, setRecentPosts] = useState<Post[]>([]);
+  const [postAnalytics, setPostAnalytics] = useState<PostAnalytics | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [newSociety, setNewSociety] = useState({
@@ -542,11 +570,65 @@ export default function AdminDashboard() {
     setLoading(false);
   };
 
+  const loadRecentPosts = async () => {
+    setLoading(true);
+    try {
+      const [postsRes, analyticsRes] = await Promise.all([
+        fetch(`${BASE_URL}/api/v1/admin/posts/recent?limit=50&days=7`, {
+          headers: { 'X-Admin-Key': adminKey }
+        }),
+        fetch(`${BASE_URL}/api/v1/admin/posts/analytics?days=30`, {
+          headers: { 'X-Admin-Key': adminKey }
+        })
+      ]);
+      
+      if (postsRes.ok) {
+        const data = await postsRes.json();
+        setRecentPosts(data.posts);
+      }
+      if (analyticsRes.ok) {
+        const data = await analyticsRes.json();
+        setPostAnalytics(data);
+      }
+    } catch (error) {
+      console.error('Error loading posts:', error);
+    }
+    setLoading(false);
+  };
+
+  const submitPostFeedback = async (postId: string, isCorrect: boolean, notes?: string) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${BASE_URL}/api/v1/admin/posts/${postId}/feedback`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Key': adminKey
+        },
+        body: JSON.stringify({
+          is_correct: isCorrect,
+          notes: notes || null
+        })
+      });
+
+      if (response.ok) {
+        setMessage(`✅ Feedback submitted`);
+        loadRecentPosts(); // Reload to show updated feedback
+      } else {
+        setMessage('❌ Failed to submit feedback');
+      }
+    } catch (error) {
+      setMessage('❌ Error submitting feedback');
+      console.error('Error submitting feedback:', error);
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
     if (isAuthenticated && activeTab === 'logs') {
       loadScrapingLogs();
     } else if (isAuthenticated && activeTab === 'posts') {
-      loadPosts();
+      loadRecentPosts();
     } else if (isAuthenticated && activeTab === 'users') {
       loadUsers();
     } else if (isAuthenticated && activeTab === 'events') {
@@ -1131,47 +1213,149 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* Posts Tab */}
+        {/* Posts Review Tab */}
         {activeTab === 'posts' && (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <div className="p-4 border-b flex justify-between items-center">
-              <h2 className="text-lg font-semibold">Scraped Posts</h2>
-              <button
-                onClick={loadPosts}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-              >
-                Refresh
-              </button>
-            </div>
-            <div className="divide-y divide-gray-200">
-              {posts.map((post) => (
-                <div key={post.id} className="p-4 hover:bg-gray-50">
+          <div className="space-y-6">
+            {/* Analytics Cards */}
+            {postAnalytics && (
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="bg-white rounded-lg shadow p-4">
+                  <h3 className="text-sm text-gray-600 mb-2">Accuracy (30 days)</h3>
+                  <p className="text-2xl font-bold text-green-600">{postAnalytics.accuracy}%</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {postAnalytics.correct_count}/{postAnalytics.total_reviewed} correct
+                  </p>
+                </div>
+                <div className="bg-white rounded-lg shadow p-4">
+                  <h3 className="text-sm text-gray-600 mb-2">Review Rate</h3>
+                  <p className="text-2xl font-bold text-blue-600">{postAnalytics.review_rate.toFixed(1)}%</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {postAnalytics.total_reviewed}/{postAnalytics.total_posts} reviewed
+                  </p>
+                </div>
+                <div className="bg-white rounded-lg shadow p-4">
+                  <h3 className="text-sm text-gray-600 mb-2">Classification Errors</h3>
+                  <p className="text-2xl font-bold text-red-600">{postAnalytics.classification_errors}</p>
+                  <p className="text-xs text-gray-500 mt-1">False positives/negatives</p>
+                </div>
+                <div className="bg-white rounded-lg shadow p-4">
+                  <h3 className="text-sm text-gray-600 mb-2">Extraction Errors</h3>
+                  <p className="text-2xl font-bold text-orange-600">{postAnalytics.extraction_errors}</p>
+                  <p className="text-xs text-gray-500 mt-1">Date/time/location issues</p>
+                </div>
+              </div>
+            )}
+
+            {/* Posts List */}
+            <div className="bg-white rounded-lg shadow overflow-hidden">
+              <div className="p-4 border-b flex justify-between items-center">
+                <div>
+                  <h2 className="text-lg font-semibold">Recent Posts (Last 7 Days)</h2>
+                  <p className="text-sm text-gray-600">Review NLP classification and extraction accuracy</p>
+                </div>
+                <button
+                  onClick={loadRecentPosts}
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                >
+                  Refresh
+                </button>
+              </div>
+              <div className="divide-y divide-gray-200">
+                {recentPosts.length === 0 ? (
+                  <div className="p-8 text-center text-gray-500">
+                    No posts found. Try scraping some societies first.
+                  </div>
+                ) : (
+                  recentPosts.map((post) => (
+                <div key={post.id} className="p-4 hover:bg-gray-50 border-b">
                   <div className="flex justify-between items-start mb-2">
                     <div>
                       <span className="font-semibold">{post.society_name}</span>
                       <span className="text-gray-500 text-sm ml-2">@{post.society_handle}</span>
+                      <span className="text-gray-400 text-xs ml-2">
+                        {new Date(post.detected_at).toLocaleDateString()}
+                      </span>
                     </div>
                     <div className="flex gap-2">
                       {post.is_free_food && (
-                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Free Food</span>
+                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">✅ Free Food</span>
                       )}
-                      {post.has_event && (
-                        <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">Has Event</span>
+                      {!post.is_free_food && post.processed && (
+                        <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">❌ Rejected</span>
+                      )}
+                      {post.event_created && (
+                        <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">📅 Event Created</span>
+                      )}
+                      {post.feedback_submitted && (
+                        <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">✓ Reviewed</span>
                       )}
                     </div>
                   </div>
-                  <p className="text-sm text-gray-700 mb-2">{post.caption}</p>
-                  {post.event_title && (
-                    <p className="text-sm text-purple-600 mb-2">📅 Event: {post.event_title}</p>
+                  
+                  <p className="text-sm text-gray-700 mb-3 line-clamp-3">{post.caption}</p>
+                  
+                  {post.event && (
+                    <div className="bg-purple-50 rounded-lg p-3 mb-3">
+                      <p className="text-sm font-semibold text-purple-900 mb-1">📅 {post.event.title}</p>
+                      <div className="text-xs text-purple-700 space-y-1">
+                        {post.event.start_time && (
+                          <p>🕒 {new Date(post.event.start_time).toLocaleString()}</p>
+                        )}
+                        {post.event.location && (
+                          <p>📍 {post.event.location}</p>
+                        )}
+                        <p>🎯 Confidence: {(post.event.confidence_score * 100).toFixed(0)}%</p>
+                        {post.event.notified && (
+                          <p className="text-green-700">✅ Users notified</p>
+                        )}
+                      </div>
+                    </div>
                   )}
-                  <div className="flex justify-between items-center text-xs text-gray-500">
-                    <span>{new Date(post.detected_at).toLocaleString()}</span>
-                    <a href={post.source_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                  
+                  {post.feedback && (
+                    <div className={`rounded-lg p-2 mb-3 text-xs ${
+                      post.feedback.is_correct ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+                    }`}>
+                      {post.feedback.is_correct ? '✅ Marked as correct' : '❌ Marked as incorrect'}
+                      {post.feedback.notes && <p className="mt-1">Note: {post.feedback.notes}</p>}
+                    </div>
+                  )}
+                  
+                  <div className="flex gap-2 items-center">
+                    {!post.feedback_submitted && (
+                      <>
+                        <button
+                          onClick={() => submitPostFeedback(post.id, true)}
+                          disabled={loading}
+                          className="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 disabled:bg-gray-400"
+                        >
+                          ✅ Correct
+                        </button>
+                        <button
+                          onClick={() => {
+                            const notes = prompt('What was wrong? (optional)');
+                            submitPostFeedback(post.id, false, notes || undefined);
+                          }}
+                          disabled={loading}
+                          className="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 disabled:bg-gray-400"
+                        >
+                          ❌ Wrong
+                        </button>
+                      </>
+                    )}
+                    <a
+                      href={post.source_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="ml-auto text-blue-600 hover:underline text-xs"
+                    >
                       View on Instagram →
                     </a>
                   </div>
                 </div>
-              ))}
+                  ))
+                )}
+              </div>
             </div>
           </div>
         )}
