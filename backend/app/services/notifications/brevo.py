@@ -43,6 +43,12 @@ class BrevoEmailService:
                 },
                 "to": [{"email": email, "name": email.split("@")[0]}],
                 "subject": "Your FreeFood UCD Verification Code",
+                "headers": {
+                    "X-Priority": "1",
+                    "Importance": "high",
+                    "X-Mailer": "FreeFood UCD"
+                },
+                "tags": ["transactional", "verification"],
                 "htmlContent": f"""
                 <!DOCTYPE html>
                 <html>
@@ -105,6 +111,17 @@ class BrevoEmailService:
                     </div>
                 </body>
                 </html>
+                """,
+                "textContent": f"""
+FreeFood UCD - Verification Code
+
+Your verification code: {code}
+
+Enter this code to complete your signup.
+Code expires in 10 minutes.
+
+Never miss free food on campus again!
+You'll get notified about free food events from UCD societies.
                 """
             }
             
@@ -138,7 +155,15 @@ class BrevoEmailService:
                     "email": self.from_email
                 },
                 "to": [{"email": email, "name": name}],
-                "subject": "You're in. 🍕",
+                "subject": "You're in 🍕",
+                "headers": {
+                    "X-Priority": "1",
+                    "Importance": "high",
+                    "X-Mailer": "FreeFood UCD",
+                    "List-Unsubscribe": f"<https://freefooducd.vercel.app/unsubscribe?email={email}>",
+                    "List-Unsubscribe-Post": "List-Unsubscribe=One-Click"
+                },
+                "tags": ["transactional", "welcome"],
                 "htmlContent": f"""
                 <!DOCTYPE html>
                 <html>
@@ -168,6 +193,17 @@ class BrevoEmailService:
                     </div>
                 </body>
                 </html>
+                """,
+                "textContent": f"""
+Welcome to FreeFood UCD
+
+Hi {name},
+
+You're all set. We'll ping you when there's free food on campus.
+
+Fun fact: There was once a "Fat Men's Club" in 18th century New York. Entry? 200lbs minimum. With our alerts, you'll qualify by finals.
+
+— FreeFood UCD
                 """
             }
             
@@ -242,14 +278,43 @@ class BrevoEmailService:
             </html>
             """
             
+            plain_text = f"""
+Free Food Alert - {society}
+
+{title}
+
+Society: {society}
+Location: {location}
+Time: {time}
+Date: {date}
+Source: Instagram {source.title()}
+
+{description if description else ''}
+
+Don't miss out!
+
+---
+You're receiving this because you signed up for FreeFood UCD alerts.
+Unsubscribe: https://freefooducd.vercel.app/unsubscribe?email={email}
+            """
+            
             data = {
                 "sender": {
                     "name": self.from_name,
                     "email": self.from_email
                 },
                 "to": [{"email": email, "name": email.split("@")[0]}],
-                "subject": f"🍕 Free Food Alert: {society}",
-                "htmlContent": html_content
+                "subject": f"Free Food: {society}",
+                "headers": {
+                    "X-Priority": "1",
+                    "Importance": "high",
+                    "X-Mailer": "FreeFood UCD",
+                    "List-Unsubscribe": f"<https://freefooducd.vercel.app/unsubscribe?email={email}>",
+                    "List-Unsubscribe-Post": "List-Unsubscribe=One-Click"
+                },
+                "tags": ["transactional", "event-notification"],
+                "htmlContent": html_content,
+                "textContent": plain_text
             }
             
             async with httpx.AsyncClient() as client:
@@ -313,14 +378,41 @@ class BrevoEmailService:
             </html>
             """
             
+            plain_text = f"""
+Reminder: Event Starting in 1 Hour!
+
+Don't forget! Free food event starting soon:
+
+{title}
+
+Society: {society}
+Location: {location}
+Time: {time}
+
+Head over now!
+
+---
+FreeFood UCD - Never miss free food again!
+Unsubscribe: https://freefooducd.vercel.app/unsubscribe?email={email}
+            """
+            
             data = {
                 "sender": {
                     "name": self.from_name,
                     "email": self.from_email
                 },
                 "to": [{"email": email, "name": email.split("@")[0]}],
-                "subject": f"⏰ Reminder: Free Food in 1 Hour - {society}",
-                "htmlContent": html_content
+                "subject": f"Reminder: {title} starts in 1 hour",
+                "headers": {
+                    "X-Priority": "1",
+                    "Importance": "high",
+                    "X-Mailer": "FreeFood UCD",
+                    "List-Unsubscribe": f"<https://freefooducd.vercel.app/unsubscribe?email={email}>",
+                    "List-Unsubscribe-Post": "List-Unsubscribe=One-Click"
+                },
+                "tags": ["transactional", "event-reminder"],
+                "htmlContent": html_content,
+                "textContent": plain_text
             }
             
             async with httpx.AsyncClient() as client:
