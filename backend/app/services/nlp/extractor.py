@@ -358,9 +358,9 @@ class EventExtractor:
                 logger.warning(f"Invalid time extracted: {hour}:{minute}")
                 return None
         
-        # First, check for time ranges (e.g., "6pm to 7pm", "from 2-3:30 PM", "2:00-3:30 PM")
+        # First, check for time ranges (e.g., "6:30pm to 7pm", "from 2-3:30 PM", "2:00-3:30 PM")
         range_patterns = [
-            r'(?:at\s+)?(\d{1,2})\s*(am|pm|AM|PM)\s+(?:to|-|–)\s+\d{1,2}\s*(?:am|pm|AM|PM)',  # 6pm to 7pm, at 6pm to 7pm
+            r'(?:at\s+)?(\d{1,2})\s*(?::(\d{2}))?\s*(am|pm|AM|PM)\s+(?:to|-|–)\s+\d{1,2}(?::\d{2})?\s*(?:am|pm|AM|PM)',  # 6:30pm to 7pm, at 6pm to 7pm
             r'from\s+(\d{1,2})\s*(?::(\d{2}))?\s*(?:-|–|to)\s*\d{1,2}(?::\d{2})?\s*(am|pm|AM|PM)',  # from 2-3:30 PM
             r'(\d{1,2})\s*(?::(\d{2}))?\s*(?:-|–)\s*\d{1,2}(?::\d{2})?\s*(am|pm|AM|PM)',  # 2-3:30 PM
             r'from\s+(\d{1,2})\s*(am|pm|AM|PM)\s*(?:-|–|to)',  # from 2 PM to
