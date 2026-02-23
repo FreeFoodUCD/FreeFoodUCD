@@ -126,7 +126,7 @@ export default function Home() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="i.am.fat@gmail.com"
+                    placeholder="sillybilly@gmail.com"
                     required
                     className="w-full pl-14 pr-5 py-5 md:py-6 rounded-2xl border-2 border-gray-200 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 text-lg md:text-xl bg-white transition-all"
                     disabled={isSubmitting || submitStatus === 'success'}
