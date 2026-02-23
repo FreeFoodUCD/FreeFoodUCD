@@ -85,18 +85,20 @@ asyncio.run(test())
 **Assumptions:**
 - 8 societies monitored
 - Each posts 2-3 times/week = ~20 posts/week
-- Scrape last 3 posts every 30 minutes
+- Scrape last 3 posts daily at 9 AM UTC
 
 **Monthly Usage:**
 - Posts scraped per run: 8 societies × 3 posts = 24 posts
-- Runs per day: 48 (every 30 min)
-- Posts per day: 24 × 48 = 1,152 posts
-- Posts per month: ~35,000 posts
+- Runs per day: 1 (daily at 9 AM)
+- Posts per day: 24 posts
+- Posts per month: ~720 posts
 
 **Monthly Cost:**
 - Platform: $49
-- Usage: 35,000 posts × $0.25/1000 = $8.75
-- **Total: ~$58/month**
+- Usage: 720 posts × $0.25/1000 = $0.18
+- **Total: ~$49/month** (mostly platform fee)
+
+**Note:** Daily scraping is much more cost-effective than every 30 minutes while still catching all new posts.
 
 ## Configuration
 
@@ -105,14 +107,20 @@ asyncio.run(test())
 Edit `backend/app/workers/celery_app.py`:
 
 ```python
-# Scrape posts every 30 minutes
+# Scrape posts daily at 9 AM UTC
 beat_schedule = {
-    'scrape-posts': {
-        'task': 'app.workers.scraping_tasks.scrape_all_posts',
-        'schedule': crontab(minute='*/30'),
+    'daily-scrape': {
+        'task': 'app.workers.scraping_tasks.scrape_all_societies',
+        'schedule': crontab(hour=9, minute=0),
     },
 }
 ```
+
+**Why daily?**
+- Societies typically post 2-3 times per week
+- Daily scraping catches all new posts
+- Much more cost-effective (~$49/month vs ~$58/month)
+- Reduces API load and rate limiting issues
 
 ### Max Posts Per Society
 

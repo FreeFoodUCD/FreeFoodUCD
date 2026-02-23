@@ -1,15 +1,15 @@
 # FreeFood UCD 🍕
 
-Automatically detect when UCD societies post about free food on Instagram and notify students via WhatsApp or email.
+Automatically detect when UCD societies post about free food on Instagram and notify students via email.
 
 ## Features
 
 - 🔍 **Instagram Scraping** - Monitors UCD society accounts via Apify
 - 🧠 **Smart Filtering** - 6-layer NLP validation (rejects other colleges, off-campus, paid events)
 - 📸 **OCR Support** - Extracts text from post images
-- 📱 **WhatsApp Notifications** - Primary notification channel via Twilio
-- 📧 **Email Notifications** - Secondary channel via Resend
-- 🎯 **Real-time Detection** - Scrapes every 30 minutes
+- 📧 **Email Notifications** - Instant alerts via Brevo
+- ⏰ **Event Reminders** - 1-hour before event notifications
+- 🎯 **Daily Scraping** - Automated daily checks at 9 AM UTC
 - 🗄️ **PostgreSQL Database** - Stores events, posts, and user preferences
 
 ## Tech Stack
@@ -67,8 +67,9 @@ cp backend/.env.example backend/.env
 # - DATABASE_URL
 # - REDIS_URL
 # - APIFY_API_TOKEN (get from https://apify.com)
-# - TWILIO_* (WhatsApp credentials)
-# - RESEND_API_KEY (email service)
+# - BREVO_API_KEY (email service)
+# - BREVO_FROM_EMAIL
+# - ADMIN_API_KEY
 ```
 
 ### 4. Initialize Database
@@ -159,7 +160,7 @@ FreeFoodUCD/
 
 ## How It Works
 
-1. **Scraping** - Celery Beat triggers scraping every 30 minutes
+1. **Scraping** - Celery Beat triggers scraping daily at 9 AM UTC
 2. **Apify** - Scrapes last 3 posts from each UCD society
 3. **OCR** - Extracts text from post images (event details often in images)
 4. **NLP Filtering** - 6-layer validation:
@@ -170,7 +171,8 @@ FreeFoodUCD/
    - ✅ Requires UCD location (campus buildings)
    - ✅ Extracts time, date, location
 5. **Database** - Stores events with duplicate detection
-6. **Notifications** - Sends WhatsApp/Email to subscribed users
+6. **Notifications** - Sends email alerts to subscribed users via Brevo
+7. **Reminders** - Sends 1-hour before event reminders automatically
 
 ## Apify Setup
 
@@ -216,9 +218,9 @@ Edit `backend/app/workers/celery_app.py`:
 
 ```python
 beat_schedule = {
-    'scrape-posts': {
-        'task': 'app.workers.scraping_tasks.scrape_all_posts',
-        'schedule': crontab(minute='*/30'),  # Every 30 minutes
+    'daily-scrape': {
+        'task': 'app.workers.scraping_tasks.scrape_all_societies',
+        'schedule': crontab(hour=9, minute=0),  # Daily at 9 AM UTC
     },
 }
 ```

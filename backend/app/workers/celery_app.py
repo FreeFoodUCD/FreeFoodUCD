@@ -7,7 +7,7 @@ celery_app = Celery(
     "freefood",
     broker=settings.REDIS_URL,
     backend=settings.REDIS_URL,
-    include=['app.workers.scraping_tasks', 'app.workers.notification_tasks']
+    include=['app.workers.scraping_tasks', 'app.workers.notification_tasks', 'app.workers.maintenance_tasks']
 )
 
 # Configure Celery
@@ -25,6 +25,9 @@ celery_app.conf.update(
     # Use Redis for beat schedule instead of file (fixes permission issues)
     beat_scheduler='celery.beat:PersistentScheduler',
     beat_schedule_filename='/tmp/celerybeat-schedule',
+    # IMPORTANT: Worker must consume from all queues
+    task_default_queue='celery',
+    task_create_missing_queues=True,
 )
 
 # Celery Beat schedule for periodic tasks

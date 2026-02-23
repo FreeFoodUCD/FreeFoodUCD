@@ -4,7 +4,9 @@
 
 FreeFood UCD is a notification system that monitors UCD society Instagram accounts for free food events and alerts students via email.
 
-**Core Flow:** Instagram → Scraper → Event Detection → Email Notification
+**Core Flow:** Instagram → Apify Scraper → NLP Event Detection → Brevo Email Notification
+
+**Current Status:** Email notifications only (WhatsApp planned for future)
 
 ---
 
@@ -440,23 +442,27 @@ ENVIRONMENT=production
 
 ## 📈 Future Enhancements
 
-### **Phase 1 (Current)**
-- ✅ Email notifications
-- ✅ Daily scraping
-- ✅ Event reminders
-- ✅ Admin dashboard
+### **Phase 1 (Current - Completed)**
+- ✅ Email notifications via Brevo
+- ✅ Daily scraping at 9 AM UTC
+- ✅ Event reminders (1 hour before)
+- ✅ Admin dashboard (9 tabs)
+- ✅ Email verification
+- ✅ OCR text extraction
 
-### **Phase 2 (Planned)**
-- WhatsApp notifications (Twilio)
-- Real-time scraping (webhooks)
-- Mobile app (React Native)
-- Event categories/tags
+### **Phase 2 (Planned - Next)**
+- 📱 WhatsApp notifications (Twilio)
+- 🔄 User preferences (society filtering)
+- 📊 Analytics dashboard
+- 🔔 Unsubscribe functionality
+- 📱 Mobile-optimized UI
 
 ### **Phase 3 (Future)**
-- Multi-university support
-- AI-powered event extraction
-- User event submissions
-- Social features (comments, ratings)
+- 🌍 Multi-university support
+- 🤖 AI-powered event extraction
+- 👥 User event submissions
+- 💬 Social features (comments, ratings)
+- 📲 Mobile app (React Native)
 
 ---
 
