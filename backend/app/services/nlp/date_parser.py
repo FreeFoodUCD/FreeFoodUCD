@@ -446,8 +446,8 @@ class DateParser:
     def _create_date(self, year: int, month: int, day: int) -> Optional[datetime]:
         """Safely create a datetime object."""
         try:
-            return datetime(year, month, day, tzinfo=self.timezone)
-        except ValueError:
+            return self.timezone.localize(datetime(year, month, day))
+        except (ValueError, AttributeError):
             return None
     
     def _validate_date(self, date: datetime, ref_date: datetime) -> bool:
