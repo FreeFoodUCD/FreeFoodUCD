@@ -147,14 +147,19 @@ You'll get notified about free food events from UCD societies.
             Dict with success status
         """
         try:
-            name = email.split("@")[0].capitalize()
+            # Extract first name from email (before @ and before any dots/numbers)
+            email_prefix = email.split("@")[0]
+            # Remove numbers and split by dots/underscores to get first part
+            name_parts = email_prefix.replace(".", " ").replace("_", " ").split()
+            # Get first part and capitalize, or just use "there" if it's not a name
+            first_name = name_parts[0].capitalize() if name_parts and name_parts[0].isalpha() else None
             
             data = {
                 "sender": {
                     "name": self.from_name,
                     "email": self.from_email
                 },
-                "to": [{"email": email, "name": name}],
+                "to": [{"email": email, "name": first_name or email.split("@")[0]}],
                 "subject": "You're in 🍕",
                 "headers": {
                     "X-Priority": "1",
@@ -174,7 +179,7 @@ You'll get notified about free food events from UCD societies.
                     </div>
                     
                     <div style="padding: 0 20px;">
-                        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Hi {name},</p>
+                        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Hi{f" {first_name}" if first_name else ""},</p>
                         
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
                             You're all set. We'll ping you when there's free food on campus.
@@ -197,7 +202,7 @@ You'll get notified about free food events from UCD societies.
                 "textContent": f"""
 Welcome to FreeFood UCD
 
-Hi {name},
+Hi{f" {first_name}" if first_name else ""},
 
 You're all set. We'll ping you when there's free food on campus.
 
