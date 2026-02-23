@@ -232,16 +232,33 @@ async def get_recent_posts(
     
     result = await db.execute(query)
     rows = result.all()
-    
+
+    from app.services.nlp.extractor import EventExtractor
+    extractor = EventExtractor()
+
+    seen_post_ids = set()
     posts_data = []
     for post, society, event in rows:
+        # Skip duplicate post rows caused by multiple events per post
+        post_id_str = str(post.id)
+        if post_id_str in seen_post_ids:
+            continue
+        seen_post_ids.add(post_id_str)
+
         # Get feedback if exists
         feedback_query = select(PostFeedback).where(PostFeedback.post_id == post.id)
         feedback_result = await db.execute(feedback_query)
         feedback = feedback_result.scalar_one_or_none()
-        
+
+        # Compute rejection reason for rejected posts
+        rejection_reason = None
+        if not post.is_free_food and post.caption:
+            reason = extractor.get_rejection_reason(post.caption)
+            if reason != "Accepted":
+                rejection_reason = reason
+
         post_data = {
-            "id": str(post.id),
+            "id": post_id_str,
             "society_name": society.name,
             "society_handle": society.instagram_handle,
             "caption": post.caption,
@@ -251,8 +268,9 @@ async def get_recent_posts(
             "processed": post.processed,
             "event_created": event is not None,
             "feedback_submitted": feedback is not None,
+            "rejection_reason": rejection_reason,
         }
-        
+
         # Add event data if exists
         if event:
             post_data["event"] = {
@@ -264,7 +282,7 @@ async def get_recent_posts(
                 "notified": event.notified,
                 "users_notified": 0  # TODO: Count from notification_logs
             }
-        
+
         # Add feedback if exists
         if feedback:
             post_data["feedback"] = {
@@ -272,9 +290,9 @@ async def get_recent_posts(
                 "notes": feedback.notes,
                 "created_at": feedback.created_at.isoformat()
             }
-        
+
         posts_data.append(post_data)
-    
+
     return {
         "total": len(posts_data),
         "posts": posts_data
@@ -291,20 +309,22 @@ async def submit_post_feedback(
 ):
     """
     Submit feedback on a post's NLP classification and extraction.
-    Used to track accuracy and improve the system.
+    - is_correct=True on a rejected post → creates an Event and marks post as free food.
+    - is_correct=False on an accepted post → deactivates its events.
     """
+    from app.services.nlp.extractor import EventExtractor
+
     # Check if post exists
     post = await db.get(Post, post_id)
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
-    
-    # Check if feedback already exists
+
+    # Upsert feedback record
     existing_query = select(PostFeedback).where(PostFeedback.post_id == post_id)
     result = await db.execute(existing_query)
     existing_feedback = result.scalar_one_or_none()
-    
+
     if existing_feedback:
-        # Update existing feedback
         existing_feedback.is_correct = feedback_data.is_correct
         existing_feedback.correct_classification = feedback_data.correct_classification
         existing_feedback.classification_notes = feedback_data.classification_notes
@@ -313,19 +333,13 @@ async def submit_post_feedback(
         existing_feedback.correct_location = feedback_data.correct_location
         existing_feedback.extraction_notes = feedback_data.extraction_notes
         existing_feedback.notes = feedback_data.notes
-        existing_feedback.admin_email = x_admin_key[:50]  # Store partial key as identifier
-        
-        await db.commit()
-        
-        return {
-            "message": "Feedback updated successfully",
-            "feedback_id": str(existing_feedback.id)
-        }
+        existing_feedback.admin_email = x_admin_key[:50]
+        feedback_id = str(existing_feedback.id)
+        message = "Feedback updated successfully"
     else:
-        # Create new feedback
         new_feedback = PostFeedback(
             post_id=post_id,
-            admin_email=x_admin_key[:50],  # Store partial key as identifier
+            admin_email=x_admin_key[:50],
             is_correct=feedback_data.is_correct,
             correct_classification=feedback_data.correct_classification,
             classification_notes=feedback_data.classification_notes,
@@ -335,15 +349,80 @@ async def submit_post_feedback(
             extraction_notes=feedback_data.extraction_notes,
             notes=feedback_data.notes
         )
-        
         db.add(new_feedback)
-        await db.commit()
-        await db.refresh(new_feedback)
-        
-        return {
-            "message": "Feedback submitted successfully",
-            "feedback_id": str(new_feedback.id)
-        }
+        await db.flush()
+        feedback_id = str(new_feedback.id)
+        message = "Feedback submitted successfully"
+
+    # --- Apply event effects ---
+
+    if feedback_data.is_correct and not post.is_free_food:
+        # Admin says this rejected post actually had free food — create event
+        post.is_free_food = True
+        post.processed = True
+
+        existing_event_result = await db.execute(
+            select(Event).where(Event.source_id == post.id, Event.source_type == 'post')
+        )
+        existing_event = existing_event_result.scalar_one_or_none()
+
+        if existing_event:
+            existing_event.is_active = True
+            message += " and event reactivated"
+        else:
+            extractor = EventExtractor()
+            event_data = extractor.extract_event(post.caption or "")
+
+            # Build start_time: prefer admin-supplied correct_date/correct_time over NLP
+            start_time = None
+            if feedback_data.correct_date:
+                start_time = feedback_data.correct_date
+                if feedback_data.correct_time:
+                    parsed_time = extractor.time_parser.parse_time(
+                        feedback_data.correct_time.lower()
+                    )
+                    if parsed_time and start_time:
+                        start_time = start_time.replace(
+                            hour=parsed_time['hour'],
+                            minute=parsed_time['minute'],
+                            second=0, microsecond=0
+                        )
+            elif event_data:
+                start_time = event_data.get('start_time')
+
+            new_event = Event(
+                society_id=post.society_id,
+                title=event_data.get('title', 'Free Food Event') if event_data else 'Free Food Event',
+                description=(post.caption or "")[:500],
+                location=feedback_data.correct_location or (
+                    event_data.get('location') if event_data else None
+                ),
+                start_time=start_time,
+                source_type='post',
+                source_id=post.id,
+                confidence_score=event_data.get('confidence_score', 0.5) if event_data else 0.5,
+                raw_text=post.caption,
+                is_active=True
+            )
+            db.add(new_event)
+            message += " and event created"
+
+    elif not feedback_data.is_correct and post.is_free_food:
+        # Admin says this accepted post was wrong — deactivate its events
+        post.is_free_food = False
+        events_result = await db.execute(
+            select(Event).where(Event.source_id == post.id, Event.source_type == 'post')
+        )
+        for evt in events_result.scalars().all():
+            evt.is_active = False
+        message += " and events deactivated"
+
+    await db.commit()
+
+    return {
+        "message": message,
+        "feedback_id": feedback_id
+    }
 
 
 @router.get("/posts/analytics")
@@ -584,22 +663,46 @@ async def trigger_scrape(
             
             if event_data and event_data.get('confidence_score', 0) >= 0.3:
                 print(f"[DEBUG] Creating event with confidence {event_data.get('confidence_score')}")
-                event = Event(
-                    society_id=society.id,
-                    title=event_data.get('title', f"Free Food from {society.name}"),
-                    description=post_data['caption'][:500],
-                    location=event_data.get('location'),
-                    start_time=event_data.get('start_time'),
-                    source_type='post',
-                    source_id=post.id,
-                    confidence_score=event_data.get('confidence_score'),
-                    raw_text=post_data['caption'],
-                    is_active=True
+
+                # Check if an event already exists for this post
+                existing_event_result = await db.execute(
+                    select(Event).where(Event.source_id == post.id, Event.source_type == 'post')
                 )
-                db.add(event)
-                new_events += 1
+                existing_event = existing_event_result.scalar_one_or_none()
+
+                if existing_event and force_reprocess:
+                    # Update existing event instead of creating a duplicate
+                    existing_event.title = event_data.get('title', f"Free Food from {society.name}")
+                    existing_event.description = post_data['caption'][:500]
+                    existing_event.location = event_data.get('location')
+                    existing_event.start_time = event_data.get('start_time')
+                    existing_event.end_time = event_data.get('end_time')
+                    existing_event.confidence_score = event_data.get('confidence_score')
+                    existing_event.raw_text = post_data['caption']
+                    existing_event.is_active = True
+                elif not existing_event:
+                    event = Event(
+                        society_id=society.id,
+                        title=event_data.get('title', f"Free Food from {society.name}"),
+                        description=post_data['caption'][:500],
+                        location=event_data.get('location'),
+                        start_time=event_data.get('start_time'),
+                        end_time=event_data.get('end_time'),
+                        source_type='post',
+                        source_id=post.id,
+                        confidence_score=event_data.get('confidence_score'),
+                        raw_text=post_data['caption'],
+                        is_active=True
+                    )
+                    db.add(event)
+                    new_events += 1
+
+                # Mark post as accepted free food
+                post.is_free_food = True
+                post.processed = True
             else:
                 print(f"[DEBUG] Event rejected - confidence too low or None")
+                post.processed = True
         
         await db.commit()
         

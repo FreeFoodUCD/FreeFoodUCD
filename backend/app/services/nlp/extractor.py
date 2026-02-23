@@ -5,6 +5,7 @@ from typing import Optional, Dict, List, Tuple
 import pytz
 import logging
 from app.services.nlp.date_parser import DateParser
+from app.services.nlp.time_parser import TimeParser
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +26,8 @@ class EventExtractor:
     def __init__(self):
         self.timezone = pytz.timezone('Europe/Dublin')
         self.date_parser = DateParser(self.timezone)
-        self.ucd_buildings = self.load_ucd_buildings()
+        self.time_parser = TimeParser()
+        self.ucd_buildings = sorted(self.load_ucd_buildings(), key=len, reverse=True)
         self.other_colleges = self.load_other_colleges()
         self.off_campus_venues = self.load_off_campus_venues()
         self.nightlife_keywords = self.load_nightlife_keywords()
@@ -50,39 +52,18 @@ class EventExtractor:
             'complimentary food', 'italian food'
         ]
         
-        # Time patterns (for extraction after classification)
-        self.time_patterns = [
-            r'(\d{1,2}):(\d{2})\s*(am|pm|AM|PM)',  # 6:30 PM
-            r'(\d{1,2})\s*(am|pm|AM|PM)',  # 6 PM
-            r'at\s+(\d{1,2})\s*(am|pm|AM|PM)',  # at 6 PM (require AM/PM)
-            r'(\d{1,2})\.(\d{2})\s*(am|pm|AM|PM)?',  # 18.30 or 6.30 PM
-        ]
-        
-        # Date keywords (for extraction after classification)
-        self.date_keywords = {
-            'today': 0,
-            'tonight': 0,
-            'tomorrow': 1,
-            'monday': self._days_until_weekday(0),
-            'tuesday': self._days_until_weekday(1),
-            'wednesday': self._days_until_weekday(2),
-            'thursday': self._days_until_weekday(3),
-            'friday': self._days_until_weekday(4),
-            'saturday': self._days_until_weekday(5),
-            'sunday': self._days_until_weekday(6),
-        }
     
     def load_ucd_buildings(self) -> List[str]:
         """Load list of UCD buildings and campus keywords."""
         return [
-            'newman building', 'newman', 'obrien centre', 'obrien',
-            'james joyce library', 'library', 'student centre',
-            'science centre', 'science', 'engineering building',
+            'newman building', 'engineering building', 'arts building',
+            'agriculture building', 'science centre', 'student centre',
+            'james joyce library', 'health sciences', 'conway institute',
             'quinn school', 'sutherland school', 'moore centre',
-            'roebuck castle', 'belfield', 'arts building',
-            'agriculture building', 'veterinary', 'smurfit',
-            'lochlann quinn', 'health sciences', 'conway institute',
-            'astra hall', 'ucd', 'campus'
+            'lochlann quinn', 'roebuck castle', 'astra hall',
+            'obrien centre', 'eng building', 'science block', 'art block',
+            'newman', 'obrien', 'library', 'science', 'belfield',
+            'veterinary', 'smurfit', 'ucd', 'campus'
         ]
     
     def load_other_colleges(self) -> List[str]:
@@ -253,17 +234,17 @@ class EventExtractor:
         Allow €2 membership only.
         Reject ANY other price mention.
         """
-        # Allow €2 or e2 membership only
-        if 'e2' in text or '€2' in text or 'euro 2' in text:
+        # Allow €2 membership only
+        if re.search(r'€2\b|\beuro\s+2\b|\b2\s*euro\b', text) or '€2' in text:
             if any(word in text for word in ['membership', 'ucard', 'sign up', 'member']):
                 # Check if there are OTHER prices mentioned
-                euro_matches = re.findall(r'€\d+|e\d+|euro \d+', text)
+                euro_matches = re.findall(r'€\d+|\beuro\s+\d+|\b\d+\s*euro', text)
                 if len(euro_matches) == 1:
                     logger.debug("Found €2 membership - allowed")
                     return False  # Only €2 mentioned, it's membership
-        
+
         # Reject ANY other price mention
-        if re.search(r'€\d+|e\d+|euro \d+', text):
+        if re.search(r'€\d+|\beuro\s+\d+|\b\d+\s*euro', text):
             logger.debug("Found price indicator")
             return True
         
@@ -287,7 +268,37 @@ class EventExtractor:
     def _has_ucd_location(self, text: str) -> bool:
         """Check if text mentions UCD campus location."""
         return any(building in text for building in self.ucd_buildings)
-    
+
+    def get_rejection_reason(self, text: str) -> str:
+        """
+        Return a human-readable reason why a post was rejected (or 'Accepted').
+        Runs the same checks as classify_event but surfaces which rule fired.
+        """
+        clean_text = self._preprocess_text(text)
+
+        if not self._has_explicit_food(clean_text):
+            return "No explicit food keyword found"
+
+        if self._is_other_college(clean_text):
+            for college in self.other_colleges:
+                if college in clean_text:
+                    return f"Mentions other college: '{college}'"
+
+        if self._is_off_campus(clean_text):
+            for venue in self.off_campus_venues:
+                if venue in clean_text:
+                    return f"Mentions off-campus venue: '{venue}'"
+
+        if self._is_paid_event(clean_text):
+            return "Appears to be a paid event (price/ticket mention)"
+
+        if self._is_nightlife_event(clean_text):
+            for keyword in self.nightlife_keywords:
+                if keyword in clean_text:
+                    return f"Nightlife event keyword: '{keyword}'"
+
+        return "Accepted"
+
     # ========== Event Detail Extraction (called AFTER classification) ==========
     
     def extract_event(self, text: str, source_type: str = 'post', post_timestamp: Optional[datetime] = None) -> Optional[Dict]:
@@ -310,26 +321,29 @@ class EventExtractor:
             return None
         
         # Extract event details
-        time = self._extract_time(text)
+        time_range = self.time_parser.parse_time_range(text.lower())
+        time = time_range['start'] if time_range else None
+        end_time_dict = time_range['end'] if time_range else None
         date = self.date_parser.parse_date(text.lower(), post_timestamp)
         location = self._extract_location(text)
-        
+
         # Validate date is not in the past
         if date:
             now = datetime.now(self.timezone)
             if date < now - timedelta(days=1):
                 logger.warning(f"Extracted date {date} is in the past, rejecting event")
                 return None
-        
+
         # Combine date and time
         start_time = self._combine_datetime(date, time)
-        
+        end_time = self._combine_datetime(date, end_time_dict) if end_time_dict else None
+
         # Generate title
         title = self._generate_title(text, location)
-        
+
         # Calculate confidence (simplified - just for compatibility)
         confidence = 1.0 if (time and location) else 0.8
-        
+
         return {
             'title': title,
             'description': text[:500] if len(text) > 500 else text,
@@ -337,7 +351,7 @@ class EventExtractor:
             'location_building': location.get('building') if location else None,
             'location_room': location.get('room') if location else None,
             'start_time': start_time,
-            'end_time': None,
+            'end_time': end_time,
             'confidence_score': confidence,
             'raw_text': text,
             'extracted_data': {
@@ -346,109 +360,6 @@ class EventExtractor:
                 'location_found': location is not None,
             }
         }
-    
-    def _extract_time(self, text: str) -> Optional[Dict]:
-        """Extract time from text, prioritizing start times in ranges."""
-        
-        def validate_time(hour: int, minute: int) -> Optional[Dict]:
-            """Validate and return time dict, or None if invalid."""
-            if 0 <= hour <= 23 and 0 <= minute <= 59:
-                return {'hour': hour, 'minute': minute}
-            else:
-                logger.warning(f"Invalid time extracted: {hour}:{minute}")
-                return None
-        
-        # First, check for time ranges (e.g., "6:30pm to 7pm", "from 2-3:30 PM", "2:00-3:30 PM")
-        range_patterns = [
-            r'(?:at\s+)?(\d{1,2})\s*(?::(\d{2}))?\s*(am|pm|AM|PM)\s+(?:to|-|–)\s+\d{1,2}(?::\d{2})?\s*(?:am|pm|AM|PM)',  # 6:30pm to 7pm, at 6pm to 7pm
-            r'from\s+(\d{1,2})\s*(?::(\d{2}))?\s*(?:-|–|to)\s*\d{1,2}(?::\d{2})?\s*(am|pm|AM|PM)',  # from 2-3:30 PM
-            r'(\d{1,2})\s*(?::(\d{2}))?\s*(?:-|–)\s*\d{1,2}(?::\d{2})?\s*(am|pm|AM|PM)',  # 2-3:30 PM
-            r'from\s+(\d{1,2})\s*(am|pm|AM|PM)\s*(?:-|–|to)',  # from 2 PM to
-        ]
-        
-        for pattern in range_patterns:
-            match = re.search(pattern, text, re.IGNORECASE)
-            if match:
-                groups = match.groups()
-                try:
-                    hour = int(groups[0])
-                    minute = 0
-                    period = None
-                    
-                    # Determine which group has the period (AM/PM)
-                    for group in groups[1:]:
-                        if group and group.upper() in ['AM', 'PM']:
-                            period = group.upper()
-                            break
-                        elif group and group.isdigit():
-                            minute = int(group)
-                    
-                    if period:
-                        if period == 'PM' and hour != 12:
-                            hour += 12
-                        elif period == 'AM' and hour == 12:
-                            hour = 0
-                    
-                    logger.debug(f"Extracted time from range: {hour}:{minute:02d}")
-                    result = validate_time(hour, minute)
-                    if result:
-                        return result
-                except (ValueError, IndexError) as e:
-                    logger.debug(f"Error parsing time range: {e}")
-                    continue
-        
-        # If no range found, use regular time patterns
-        for pattern in self.time_patterns:
-            match = re.search(pattern, text, re.IGNORECASE)
-            if match:
-                groups = match.groups()
-                
-                # Filter out None values
-                groups = [g for g in groups if g is not None]
-                
-                if len(groups) >= 3:  # HH:MM AM/PM or HH.MM AM/PM
-                    hour = int(groups[0])
-                    minute = int(groups[1])
-                    period = groups[2].upper() if groups[2] else None
-                    
-                    if period and period in ['AM', 'PM']:
-                        if period == 'PM' and hour != 12:
-                            hour += 12
-                        elif period == 'AM' and hour == 12:
-                            hour = 0
-                    
-                    logger.debug(f"Extracted time: {hour}:{minute:02d}")
-                    result = validate_time(hour, minute)
-                    if result:
-                        return result
-                
-                elif len(groups) == 2:
-                    try:
-                        if groups[1].upper() in ['AM', 'PM']:  # H AM/PM or at H AM/PM
-                            hour = int(groups[0])
-                            period = groups[1].upper()
-                            
-                            if period == 'PM' and hour != 12:
-                                hour += 12
-                            elif period == 'AM' and hour == 12:
-                                hour = 0
-                            
-                            logger.debug(f"Extracted time: {hour}:00")
-                            result = validate_time(hour, 0)
-                            if result:
-                                return result
-                        elif groups[1].isdigit():  # HH.MM (24-hour format)
-                            hour = int(groups[0])
-                            minute = int(groups[1])
-                            logger.debug(f"Extracted time (24h): {hour}:{minute:02d}")
-                            result = validate_time(hour, minute)
-                            if result:
-                                return result
-                    except (ValueError, AttributeError) as e:
-                        logger.debug(f"Error parsing time: {e}")
-                        continue
-        
-        return None
     
     def _extract_location(self, text: str) -> Optional[Dict]:
         """Extract location from text."""
@@ -536,15 +447,4 @@ class EventExtractor:
         
         return "Free Food Event"
     
-    def _days_until_weekday(self, target_weekday: int):
-        """Calculate days until target weekday."""
-        def calculate():
-            now = datetime.now(self.timezone)
-            current_weekday = now.weekday()
-            days = (target_weekday - current_weekday) % 7
-            if days == 0:
-                days = 7  # Next week if same day
-            return days
-        return calculate
-
 # Made with Bob

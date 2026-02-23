@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from typing import Optional
@@ -71,6 +71,7 @@ def generate_verification_code() -> str:
 @router.post("/users/signup", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 async def signup_user(
     user_data: UserSignupRequest,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db)
 ):
     """
@@ -94,11 +95,8 @@ async def signup_user(
             await db.commit()
             await db.refresh(existing_user)
             
-            # Resend verification code
-            try:
-                await brevo.send_verification_email(user_data.email, verification_code)
-            except Exception as e:
-                print(f"Error sending verification code: {e}")
+            # Resend verification code in background
+            background_tasks.add_task(brevo.send_verification_email, user_data.email, verification_code)
             
             return UserResponse(
                 id=existing_user.id,
@@ -131,12 +129,8 @@ async def signup_user(
     await db.commit()
     await db.refresh(new_user)
     
-    # Send verification code via Brevo
-    try:
-        await brevo.send_verification_email(user_data.email, verification_code)
-    except Exception as e:
-        # Log error but don't fail signup
-        print(f"Error sending verification code: {e}")
+    # Send verification code via Brevo in background (returns immediately)
+    background_tasks.add_task(brevo.send_verification_email, user_data.email, verification_code)
     
     return UserResponse(
         id=new_user.id,
@@ -247,6 +241,7 @@ async def update_society_preference(
 @router.post("/users/verify")
 async def verify_user(
     verify_data: VerifyCodeRequest,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db)
 ):
     """
@@ -298,11 +293,8 @@ async def verify_user(
     await db.commit()
     await db.refresh(user)
     
-    # Send welcome email
-    try:
-        await brevo.send_welcome_email(verify_data.email)
-    except Exception as e:
-        print(f"Error sending welcome message: {e}")
+    # Send welcome email in background (returns immediately)
+    background_tasks.add_task(brevo.send_welcome_email, verify_data.email)
     
     return {
         "message": "Verification successful",
