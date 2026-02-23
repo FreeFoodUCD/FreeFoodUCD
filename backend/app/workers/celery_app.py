@@ -1,6 +1,10 @@
 from celery import Celery
 from celery.schedules import crontab
+from celery.signals import worker_process_init, worker_process_shutdown
 from app.core.config import settings
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Create Celery app
 celery_app = Celery(
@@ -30,7 +34,34 @@ celery_app.conf.update(
     task_create_missing_queues=True,
     # Fix Celery 6.0 deprecation warning
     broker_connection_retry_on_startup=True,
+    # Use solo pool to avoid fork issues with asyncio
+    worker_pool='solo',
 )
+
+
+@worker_process_init.connect
+def init_worker(**kwargs):
+    """Initialize worker process - dispose of any inherited engine connections."""
+    logger.info("Initializing worker process")
+    try:
+        from app.db.base import dispose_engine
+        # Dispose of the engine to ensure fresh connections in this process
+        dispose_engine()
+        logger.info("Disposed of inherited database engine")
+    except Exception as e:
+        logger.warning(f"Could not dispose engine on worker init: {e}")
+
+
+@worker_process_shutdown.connect
+def shutdown_worker(**kwargs):
+    """Clean up worker process resources."""
+    logger.info("Shutting down worker process")
+    try:
+        from app.db.base import dispose_engine
+        dispose_engine()
+        logger.info("Disposed of database engine on shutdown")
+    except Exception as e:
+        logger.warning(f"Could not dispose engine on worker shutdown: {e}")
 
 # Celery Beat schedule for periodic tasks
 celery_app.conf.beat_schedule = {
