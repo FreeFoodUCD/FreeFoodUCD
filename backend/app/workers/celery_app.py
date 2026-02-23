@@ -28,6 +28,8 @@ celery_app.conf.update(
     # IMPORTANT: Worker must consume from all queues
     task_default_queue='celery',
     task_create_missing_queues=True,
+    # Fix Celery 6.0 deprecation warning
+    broker_connection_retry_on_startup=True,
 )
 
 # Celery Beat schedule for periodic tasks
