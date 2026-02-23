@@ -358,17 +358,27 @@ class EventExtractor:
             match = re.search(pattern, text, re.IGNORECASE)
             if match:
                 groups = match.groups()
-                hour = int(groups[0])
-                minute = int(groups[1]) if groups[1] else 0
-                period = groups[2].upper() if len(groups) > 2 and groups[2] else None
-                
-                if period:
-                    if period == 'PM' and hour != 12:
-                        hour += 12
-                    elif period == 'AM' and hour == 12:
-                        hour = 0
-                
-                return {'hour': hour, 'minute': minute}
+                try:
+                    hour = int(groups[0])
+                    # Check if groups[1] is a number (minute) or AM/PM
+                    if groups[1] and groups[1].lower() not in ['am', 'pm']:
+                        minute = int(groups[1])
+                        period = groups[2].upper() if len(groups) > 2 and groups[2] else None
+                    else:
+                        # groups[1] is AM/PM, not minute
+                        minute = 0
+                        period = groups[1].upper() if groups[1] else None
+                    
+                    if period:
+                        if period == 'PM' and hour != 12:
+                            hour += 12
+                        elif period == 'AM' and hour == 12:
+                            hour = 0
+                    
+                    return {'hour': hour, 'minute': minute}
+                except (ValueError, IndexError) as e:
+                    logger.debug(f"Error parsing time range: {e}")
+                    continue
         
         # If no range found, use regular time patterns
         for pattern in self.time_patterns:
@@ -388,21 +398,25 @@ class EventExtractor:
                     
                     return {'hour': hour, 'minute': minute}
                 
-                elif len(groups) == 2 and groups[1].upper() in ['AM', 'PM']:  # H AM/PM
-                    hour = int(groups[0])
-                    period = groups[1].upper()
-                    
-                    if period == 'PM' and hour != 12:
-                        hour += 12
-                    elif period == 'AM' and hour == 12:
-                        hour = 0
-                    
-                    return {'hour': hour, 'minute': 0}
-                
-                elif len(groups) == 2 and groups[1].isdigit():  # HH.MM
-                    hour = int(groups[0])
-                    minute = int(groups[1])
-                    return {'hour': hour, 'minute': minute}
+                elif len(groups) == 2:
+                    try:
+                        if groups[1] and groups[1].upper() in ['AM', 'PM']:  # H AM/PM
+                            hour = int(groups[0])
+                            period = groups[1].upper()
+                            
+                            if period == 'PM' and hour != 12:
+                                hour += 12
+                            elif period == 'AM' and hour == 12:
+                                hour = 0
+                            
+                            return {'hour': hour, 'minute': 0}
+                        elif groups[1] and groups[1].isdigit():  # HH.MM
+                            hour = int(groups[0])
+                            minute = int(groups[1])
+                            return {'hour': hour, 'minute': minute}
+                    except (ValueError, AttributeError) as e:
+                        logger.debug(f"Error parsing time: {e}")
+                        continue
         
         return None
     
