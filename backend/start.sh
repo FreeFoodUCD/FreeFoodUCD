@@ -85,9 +85,9 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000 &
 # Wait a bit for FastAPI to start
 sleep 3
 
-# Start Celery worker
+# Start Celery worker with solo pool (fixes asyncio event loop issues)
 echo "👷 Starting Celery worker..."
-celery -A app.workers.celery_app worker --loglevel=info &
+celery -A app.workers.celery_app worker --loglevel=info --pool=solo &
 
 # Wait a bit for worker to start
 sleep 2
