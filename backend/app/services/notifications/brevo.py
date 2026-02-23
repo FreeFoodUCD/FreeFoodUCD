@@ -130,34 +130,49 @@ class BrevoEmailService:
             Dict with success status
         """
         try:
+            name = email.split("@")[0].capitalize()
+            
             data = {
                 "sender": {
                     "name": self.from_name,
                     "email": self.from_email
                 },
-                "to": [{"email": email, "name": email.split("@")[0]}],
-                "subject": "🎉 You're All Set - FreeFood UCD",
-                "htmlContent": """
+                "to": [{"email": email, "name": name}],
+                "subject": "You're in. Now, let's get you fed. 🍕",
+                "htmlContent": f"""
                 <!DOCTYPE html>
                 <html>
-                <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; padding: 40px; text-align: center; color: white;">
-                        <div style="font-size: 64px; margin-bottom: 20px;">🎉</div>
-                        <div style="font-size: 32px; font-weight: bold; margin-bottom: 20px;">Welcome to FreeFood UCD!</div>
-                        <div style="font-size: 18px; margin-bottom: 30px;">
-                            You're all set! We'll notify you whenever there's free food on campus.
+                <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; padding: 40px; text-align: center; color: white; margin-bottom: 30px;">
+                        <div style="font-size: 64px; margin-bottom: 20px;">🍕</div>
+                        <div style="font-size: 28px; font-weight: bold; margin-bottom: 10px;">Welcome to FreeFood UCD</div>
+                    </div>
+                    
+                    <div style="padding: 0 20px;">
+                        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Hi {name},</p>
+                        
+                        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                            You've officially joined the elite ranks of UCD students who refuse to pay €9 for a lukewarm panini when there's free pizza three buildings away.
+                        </p>
+                        
+                        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                            <strong>Yes, it is that serious.</strong>
+                        </p>
+                        
+                        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
+                            Our bots are currently crawling every UCD society page and Instagram story. The second a "Free Pizza," "Donuts in Newman," or "Leftover Catering" post drops, you'll be the first to know.
+                        </p>
+                        
+                        <div style="background: #f3f4f6; border-left: 4px solid #667eea; border-radius: 8px; padding: 20px; margin: 30px 0;">
+                            <p style="font-size: 14px; font-weight: 600; margin-bottom: 10px; color: #667eea;">While you wait for the first alert, here is a "Heavy" Fact:</p>
+                            <p style="font-size: 14px; line-height: 1.6; margin: 0; color: #4b5563;">
+                                Did you know that in the 18th century, being "rotund" was such a flex of wealth that there was a "Fat Men's Club" in New York? To get in, you had to weigh at least 200lbs and pass a weigh-in at the door. We aren't saying you should start a UCD chapter... but with the amount of free food we're about to find you, you might qualify by finals week.
+                            </p>
                         </div>
                         
-                        <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; margin: 20px 0; text-align: left;">
-                            <div style="margin: 15px 0; font-size: 16px;">🍕 Get instant notifications about free food events</div>
-                            <div style="margin: 15px 0; font-size: 16px;">🎓 From all major UCD societies</div>
-                            <div style="margin: 15px 0; font-size: 16px;">⚡ Real-time updates from Instagram</div>
-                            <div style="margin: 15px 0; font-size: 16px;">📧 Delivered straight to your inbox</div>
-                        </div>
-                        
-                        <div style="margin-top: 30px; font-size: 14px; opacity: 0.9;">
-                            Never miss free food on campus again! 🚀
-                        </div>
+                        <p style="font-size: 14px; color: #6b7280; margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                            FreeFood UCD - Because student budgets are tight, but our alerts are tighter.
+                        </p>
                     </div>
                 </body>
                 </html>

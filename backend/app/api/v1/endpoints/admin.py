@@ -719,7 +719,7 @@ async def send_event_reminder(
     db: AsyncSession = Depends(get_db),
     _: bool = Depends(verify_admin_key)
 ):
-    """Manually trigger reminder notification for an event."""
+    """Manually trigger reminder notification for an event (does not affect automatic 1-hour reminder)."""
     from app.services.notifications.brevo import BrevoEmailService
     
     event = await db.get(Event, event_id)
@@ -739,48 +739,44 @@ async def send_event_reminder(
     if not users:
         return {"message": "No active users to notify", "users_notified": 0}
     
-    # Prepare event data
+    # Prepare event data for reminder
     event_data = {
         "society_name": society.name if society else "Unknown Society",
         "title": event.title,
         "location": event.location or "TBA",
         "start_time": event.start_time.strftime("%I:%M %p") if event.start_time else "TBA",
-        "date": event.start_time.strftime("%A, %B %d, %Y") if event.start_time else "TBA",
-        "source_type": event.source_type or "post"
     }
     
-    # Send notifications (email only for now)
+    # Send reminder notifications (email only for now)
     email_service = BrevoEmailService()
     
     whatsapp_count = 0
     email_count = 0
     
     for user in users:
-        # Send email if verified
+        # Send email reminder if verified
         if user.email_verified and user.email:
             try:
-                await email_service.send_event_notification(user.email, event_data)
+                await email_service.send_event_reminder(user.email, event_data)
                 email_count += 1
             except Exception as e:
-                logger.error(f"Failed to send email to {user.email}: {e}")
+                logger.error(f"Failed to send reminder email to {user.email}: {e}")
         
         # Skip WhatsApp for now (credentials not configured)
         # if user.whatsapp_verified and user.phone_number:
         #     try:
         #         whatsapp_service = WhatsAppService()
-        #         await whatsapp_service.send_event_notification(user.phone_number, event_data)
+        #         await whatsapp_service.send_event_reminder(user.phone_number, event_data)
         #         whatsapp_count += 1
         #     except Exception as e:
         #         logger.error(f"Failed to send WhatsApp to {user.phone_number}: {e}")
     
-    # Mark reminder as sent
-    from datetime import timezone
-    event.reminder_sent = True
-    event.reminder_sent_at = datetime.now(timezone.utc)
+    # DO NOT mark reminder_sent as True - this allows automatic 1-hour reminder to still fire
+    # Manual reminders are independent of automatic reminders
     await db.commit()
     
     return {
-        "message": f"Reminder sent for event: {event.title}",
+        "message": f"Manual reminder sent for event: {event.title}",
         "users_notified": len(users),
         "whatsapp_sent": whatsapp_count,
         "email_sent": email_count
