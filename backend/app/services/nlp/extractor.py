@@ -349,6 +349,15 @@ class EventExtractor:
     
     def _extract_time(self, text: str) -> Optional[Dict]:
         """Extract time from text, prioritizing start times in ranges."""
+        
+        def validate_time(hour: int, minute: int) -> Optional[Dict]:
+            """Validate and return time dict, or None if invalid."""
+            if 0 <= hour <= 23 and 0 <= minute <= 59:
+                return {'hour': hour, 'minute': minute}
+            else:
+                logger.warning(f"Invalid time extracted: {hour}:{minute}")
+                return None
+        
         # First, check for time ranges (e.g., "6pm to 7pm", "from 2-3:30 PM", "2:00-3:30 PM")
         range_patterns = [
             r'(?:at\s+)?(\d{1,2})\s*(am|pm|AM|PM)\s+(?:to|-|–)\s+\d{1,2}\s*(?:am|pm|AM|PM)',  # 6pm to 7pm, at 6pm to 7pm
@@ -381,7 +390,9 @@ class EventExtractor:
                             hour = 0
                     
                     logger.debug(f"Extracted time from range: {hour}:{minute:02d}")
-                    return {'hour': hour, 'minute': minute}
+                    result = validate_time(hour, minute)
+                    if result:
+                        return result
                 except (ValueError, IndexError) as e:
                     logger.debug(f"Error parsing time range: {e}")
                     continue
@@ -407,7 +418,9 @@ class EventExtractor:
                             hour = 0
                     
                     logger.debug(f"Extracted time: {hour}:{minute:02d}")
-                    return {'hour': hour, 'minute': minute}
+                    result = validate_time(hour, minute)
+                    if result:
+                        return result
                 
                 elif len(groups) == 2:
                     try:
@@ -421,12 +434,16 @@ class EventExtractor:
                                 hour = 0
                             
                             logger.debug(f"Extracted time: {hour}:00")
-                            return {'hour': hour, 'minute': 0}
+                            result = validate_time(hour, 0)
+                            if result:
+                                return result
                         elif groups[1].isdigit():  # HH.MM (24-hour format)
                             hour = int(groups[0])
                             minute = int(groups[1])
                             logger.debug(f"Extracted time (24h): {hour}:{minute:02d}")
-                            return {'hour': hour, 'minute': minute}
+                            result = validate_time(hour, minute)
+                            if result:
+                                return result
                     except (ValueError, AttributeError) as e:
                         logger.debug(f"Error parsing time: {e}")
                         continue
@@ -485,7 +502,20 @@ class EventExtractor:
             date = datetime.now(self.timezone)
         
         if time:
-            return date.replace(hour=time['hour'], minute=time['minute'], second=0, microsecond=0)
+            # Validate hour and minute
+            hour = time.get('hour', 18)
+            minute = time.get('minute', 0)
+            
+            if not (0 <= hour <= 23):
+                logger.warning(f"Invalid hour {hour}, defaulting to 18:00")
+                hour = 18
+                minute = 0
+            
+            if not (0 <= minute <= 59):
+                logger.warning(f"Invalid minute {minute}, defaulting to 0")
+                minute = 0
+            
+            return date.replace(hour=hour, minute=minute, second=0, microsecond=0)
         else:
             # Default to 6 PM if no time specified
             return date.replace(hour=18, minute=0, second=0, microsecond=0)
