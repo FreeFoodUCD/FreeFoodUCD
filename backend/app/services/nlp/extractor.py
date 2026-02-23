@@ -338,7 +338,31 @@ class EventExtractor:
         }
     
     def _extract_time(self, text: str) -> Optional[Dict]:
-        """Extract time from text."""
+        """Extract time from text, prioritizing start times in ranges."""
+        # First, check for time ranges (e.g., "from 2-3:30 PM", "2:00-3:30 PM")
+        range_patterns = [
+            r'from\s+(\d{1,2})\s*(?::(\d{2}))?\s*(?:-|–|to)\s*\d{1,2}(?::\d{2})?\s*(am|pm|AM|PM)',  # from 2-3:30 PM
+            r'(\d{1,2})\s*(?::(\d{2}))?\s*(?:-|–)\s*\d{1,2}(?::\d{2})?\s*(am|pm|AM|PM)',  # 2-3:30 PM
+            r'from\s+(\d{1,2})\s*(am|pm|AM|PM)\s*(?:-|–|to)',  # from 2 PM to
+        ]
+        
+        for pattern in range_patterns:
+            match = re.search(pattern, text, re.IGNORECASE)
+            if match:
+                groups = match.groups()
+                hour = int(groups[0])
+                minute = int(groups[1]) if groups[1] else 0
+                period = groups[2].upper() if len(groups) > 2 and groups[2] else None
+                
+                if period:
+                    if period == 'PM' and hour != 12:
+                        hour += 12
+                    elif period == 'AM' and hour == 12:
+                        hour = 0
+                
+                return {'hour': hour, 'minute': minute}
+        
+        # If no range found, use regular time patterns
         for pattern in self.time_patterns:
             match = re.search(pattern, text, re.IGNORECASE)
             if match:
