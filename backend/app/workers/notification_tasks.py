@@ -61,7 +61,7 @@ async def _notify_event_async(event_id: str):
         
         # Mark event as notified
         event.notified = True
-        event.notification_sent_at = datetime.now()
+        event.notification_sent_at = datetime.now(timezone.utc)
         await session.commit()
         
         return {
@@ -180,7 +180,7 @@ async def _send_welcome_message_async(user_id: str):
 
 
 # Import datetime
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 
 @celery_app.task
@@ -196,11 +196,10 @@ async def _send_upcoming_event_notifications_async():
     """Async implementation of send_upcoming_event_notifications."""
     async with task_db_session() as session:
         # Get current time and 1 hour from now window
-        now = datetime.now()
-        one_hour_from_now = now + timedelta(hours=1)
-        # Check events starting between 50-70 minutes from now (10 min window)
-        window_start = now + timedelta(minutes=50)
-        window_end = now + timedelta(minutes=70)
+        now = datetime.now(timezone.utc)
+        # Check events starting between 45-75 minutes from now (wider 30-min window for safety)
+        window_start = now + timedelta(minutes=45)
+        window_end = now + timedelta(minutes=75)
         
         # Find events that:
         # 1. Start in approximately 1 hour
@@ -274,7 +273,7 @@ async def _send_upcoming_event_notifications_async():
             
             # Mark event as reminded
             event.reminder_sent = True
-            event.reminder_sent_at = datetime.now()
+            event.reminder_sent_at = datetime.now(timezone.utc)
             total_notified += len(users)
         
         await session.commit()

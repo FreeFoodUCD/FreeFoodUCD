@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
 from sqlalchemy.orm import selectinload
 from typing import List, Optional
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from uuid import UUID
 from pydantic import BaseModel, Field
 
@@ -73,7 +73,7 @@ async def get_events(
     
     # Apply date filter
     if date_filter:
-        now = datetime.now()
+        now = datetime.now(timezone.utc)
         if date_filter.lower() == "today":
             start_of_day = now.replace(hour=0, minute=0, second=0, microsecond=0)
             end_of_day = start_of_day + timedelta(days=1)
@@ -94,10 +94,12 @@ async def get_events(
                 )
             )
         elif date_filter.lower() == "24h":
+            # Show events that started up to 2h ago (still ongoing) or start within next 24h
+            lookback = now - timedelta(hours=2)
             end_of_24h = now + timedelta(hours=24)
             query = query.where(
                 and_(
-                    Event.start_time >= now,
+                    Event.start_time >= lookback,
                     Event.start_time <= end_of_24h
                 )
             )
@@ -105,7 +107,7 @@ async def get_events(
             end_of_week = now + timedelta(days=7)
             query = query.where(
                 and_(
-                    Event.start_time >= now,
+                    Event.start_time >= now - timedelta(hours=2),
                     Event.start_time <= end_of_week
                 )
             )
