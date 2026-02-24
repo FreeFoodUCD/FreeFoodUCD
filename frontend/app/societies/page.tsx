@@ -112,7 +112,7 @@ export default function SocietiesPage() {
               let us know and we'll add them
             </p>
             <a
-              href="mailto:hello@freefooducd.ie"
+              href="mailto:freefooducd@outlook.com"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-accent text-white font-bold hover:bg-accent-dark transition-all shadow-md hover:shadow-lg"
             >
               suggest a society
