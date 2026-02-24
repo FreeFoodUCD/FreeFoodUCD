@@ -603,6 +603,7 @@ async def trigger_scrape(
         
         new_posts = 0
         new_events = 0
+        new_event_ids = []
         extractor = EventExtractor()
         
         for post_data in posts_data:
@@ -695,6 +696,8 @@ async def trigger_scrape(
                         is_active=True
                     )
                     db.add(event)
+                    await db.flush()
+                    new_event_ids.append(str(event.id))
                     new_events += 1
 
                 # Mark post as accepted free food
@@ -705,7 +708,16 @@ async def trigger_scrape(
                 post.processed = True
         
         await db.commit()
-        
+
+        # Send discovery notifications for newly created events
+        if new_event_ids:
+            from app.workers.notification_tasks import _notify_event_async
+            for event_id in new_event_ids:
+                try:
+                    await _notify_event_async(event_id)
+                except Exception as e:
+                    logger.error(f"Failed to send notification for event {event_id}: {e}")
+
         return {
             "message": f"Scraping completed for @{society_handle}",
             "society": society.name,

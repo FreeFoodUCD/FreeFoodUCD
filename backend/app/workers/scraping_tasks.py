@@ -410,7 +410,14 @@ async def _process_scraped_content_async(content_type: str, content_id: str):
             
             await session.commit()
             await session.refresh(event)
-            
+
+            # Send discovery notifications
+            try:
+                from app.workers.notification_tasks import _notify_event_async
+                await _notify_event_async(str(event.id))
+            except Exception as notify_error:
+                logger.error(f"Failed to send notifications for event {event.id}: {notify_error}")
+
             return {
                 "event_created": True,
                 "event_id": str(event.id),
