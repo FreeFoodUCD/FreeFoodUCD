@@ -137,7 +137,7 @@ async def get_events(
     count_query = select(func.count()).select_from(Event).where(Event.is_active == True)
     if date_filter or society_id:
         # Apply same filters to count
-        count_query = query.with_only_columns(func.count())
+        count_query = query.with_only_columns(func.count()).order_by(None)
     
     total_result = await db.execute(count_query)
     total = total_result.scalar()
