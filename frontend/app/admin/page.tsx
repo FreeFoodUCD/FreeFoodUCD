@@ -36,16 +36,28 @@ interface DashboardStats {
   };
 }
 
-interface ScrapingLog {
-  id: string;
-  society_name: string;
-  society_handle: string;
-  scrape_type: string;
+interface ScrapeFeedItem {
+  time: string;
+  society: string;
+  handle: string;
   status: string;
-  items_found: number;
-  error_message: string | null;
-  duration_ms: number;
-  created_at: string;
+  posts_found: number;
+  events_created: number;
+  new_event_titles: string[];
+}
+
+interface RecentActivity {
+  scrapes_24h: number;
+  new_events_24h: number;
+  new_events: {
+    title: string;
+    society: string;
+    location: string | null;
+    start_time: string | null;
+    created_at: string | null;
+    notified: boolean;
+  }[];
+  scrape_feed: ScrapeFeedItem[];
 }
 
 interface Post {
@@ -187,7 +199,7 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('dashboard');
   
   const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [logs, setLogs] = useState<ScrapingLog[]>([]);
+  const [recentActivity, setRecentActivity] = useState<RecentActivity | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [upcomingEvents, setUpcomingEvents] = useState<UpcomingEvent[]>([]);
@@ -246,31 +258,14 @@ export default function AdminDashboard() {
   const loadDashboardData = async (key: string) => {
     setLoading(true);
     try {
-      const response = await fetch(`${BASE_URL}/api/v1/admin/dashboard-stats`, {
-        headers: { 'X-Admin-Key': key }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setStats(data);
-      }
+      const [statsRes, activityRes] = await Promise.all([
+        fetch(`${BASE_URL}/api/v1/admin/dashboard-stats`, { headers: { 'X-Admin-Key': key } }),
+        fetch(`${BASE_URL}/api/v1/admin/recent-activity`, { headers: { 'X-Admin-Key': key } }),
+      ]);
+      if (statsRes.ok) setStats(await statsRes.json());
+      if (activityRes.ok) setRecentActivity(await activityRes.json());
     } catch (error) {
       console.error('Error loading dashboard:', error);
-    }
-    setLoading(false);
-  };
-
-  const loadScrapingLogs = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(`${BASE_URL}/api/v1/admin/scraping-logs?limit=50`, {
-        headers: { 'X-Admin-Key': adminKey }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setLogs(data.logs);
-      }
-    } catch (error) {
-      console.error('Error loading logs:', error);
     }
     setLoading(false);
   };
@@ -519,7 +514,6 @@ export default function AdminDashboard() {
         const data = await response.json();
         setMessage(`✅ ${data.message}`);
         loadDashboardData(adminKey);
-        loadScrapingLogs();
       } else {
         setMessage('❌ Scraping failed');
       }
@@ -625,9 +619,7 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
-    if (isAuthenticated && activeTab === 'logs') {
-      loadScrapingLogs();
-    } else if (isAuthenticated && activeTab === 'posts') {
+    if (isAuthenticated && activeTab === 'posts') {
       loadRecentPosts();
     } else if (isAuthenticated && activeTab === 'users') {
       loadUsers();
@@ -687,7 +679,7 @@ export default function AdminDashboard() {
       {/* Tabs */}
       <div className="max-w-7xl mx-auto px-4 py-4">
         <div className="flex space-x-4 border-b overflow-x-auto">
-          {['dashboard', 'events', 'societies', 'notifications', 'health', 'logs', 'posts', 'users', 'scrape'].map((tab) => (
+          {['dashboard', 'events', 'societies', 'notifications', 'health', 'posts', 'users', 'scrape'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -721,6 +713,68 @@ export default function AdminDashboard() {
             <div className="col-span-full">
               <ScrapingStatus scraping={stats.scraping} onRefresh={() => loadDashboardData(adminKey)} />
             </div>
+            {recentActivity && (
+              <div className="col-span-full bg-white rounded-lg shadow overflow-hidden">
+                <div className="p-4 border-b flex justify-between items-center">
+                  <div>
+                    <h3 className="text-lg font-semibold">Recent Scraping Activity</h3>
+                    <p className="text-sm text-gray-500 mt-0.5">
+                      {recentActivity.scrapes_24h} scrapes · {recentActivity.new_events_24h} new events in last 24h
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => loadDashboardData(adminKey)}
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm"
+                  >
+                    Refresh
+                  </button>
+                </div>
+
+                {/* New events today */}
+                {recentActivity.new_events.length > 0 && (
+                  <div className="p-4 border-b bg-green-50">
+                    <p className="text-sm font-semibold text-green-800 mb-2">New events created (24h)</p>
+                    <div className="space-y-1">
+                      {recentActivity.new_events.map((e, i) => (
+                        <div key={i} className="flex items-center justify-between text-sm">
+                          <span className="font-medium text-gray-800">{e.title}</span>
+                          <div className="flex items-center gap-3 text-gray-500 text-xs">
+                            <span>{e.society}</span>
+                            {e.start_time && <span>{new Date(e.start_time).toLocaleString()}</span>}
+                            {e.notified
+                              ? <span className="text-green-600">✅ notified</span>
+                              : <span className="text-yellow-600">⏳ pending</span>}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Scrape feed */}
+                <div className="divide-y divide-gray-100">
+                  {recentActivity.scrape_feed.length === 0 ? (
+                    <p className="p-6 text-center text-gray-400 text-sm">No scrapes yet</p>
+                  ) : (
+                    recentActivity.scrape_feed.map((item, i) => (
+                      <div key={i} className="px-4 py-3 flex items-center justify-between text-sm">
+                        <div className="flex items-center gap-3">
+                          <span className={`w-2 h-2 rounded-full ${item.status === 'success' ? 'bg-green-400' : 'bg-red-400'}`} />
+                          <span className="font-medium text-gray-700">@{item.handle}</span>
+                          <span className="text-gray-400">{new Date(item.time).toLocaleString()}</span>
+                        </div>
+                        <div className="flex items-center gap-4 text-gray-500">
+                          <span>{item.posts_found} post{item.posts_found !== 1 ? 's' : ''}</span>
+                          {item.events_created > 0
+                            ? <span className="text-green-600 font-medium">+{item.events_created} event{item.events_created !== 1 ? 's' : ''}</span>
+                            : <span className="text-gray-300">no events</span>}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -1162,53 +1216,6 @@ export default function AdminDashboard() {
                   ))
                 )}
               </div>
-            </div>
-          </div>
-        )}
-
-        {/* Scraping Logs Tab */}
-        {activeTab === 'logs' && (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <div className="p-4 border-b flex justify-between items-center">
-              <h2 className="text-lg font-semibold">Scraping Logs</h2>
-              <button
-                onClick={loadScrapingLogs}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-              >
-                Refresh
-              </button>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Time</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Society</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Items</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Duration</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {logs.map((log) => (
-                    <tr key={log.id}>
-                      <td className="px-4 py-3 text-sm">{new Date(log.created_at).toLocaleString()}</td>
-                      <td className="px-4 py-3 text-sm">@{log.society_handle}</td>
-                      <td className="px-4 py-3 text-sm">{log.scrape_type}</td>
-                      <td className="px-4 py-3 text-sm">
-                        <span className={`px-2 py-1 rounded-full text-xs ${
-                          log.status === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                        }`}>
-                          {log.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-sm">{log.items_found}</td>
-                      <td className="px-4 py-3 text-sm">{log.duration_ms}ms</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
             </div>
           </div>
         )}

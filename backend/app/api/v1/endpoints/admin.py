@@ -1735,4 +1735,87 @@ async def get_societies_detailed(
 
 
 
+@router.get("/recent-activity")
+async def get_recent_activity(
+    db: AsyncSession = Depends(get_db),
+    _: bool = Depends(verify_admin_key)
+):
+    """Get recent scraping activity and new events for the dashboard."""
+    from datetime import timezone
+    now = datetime.now(timezone.utc)
+    since_24h = now - timedelta(hours=24)
+
+    # Last 8 scrape attempts
+    logs_result = await db.execute(
+        select(ScrapingLog)
+        .where(ScrapingLog.scrape_type == 'post')
+        .order_by(desc(ScrapingLog.created_at))
+        .limit(8)
+    )
+    recent_logs = logs_result.scalars().all()
+
+    scrape_feed = []
+    for log in recent_logs:
+        society_result = await db.execute(select(Society).where(Society.id == log.society_id))
+        society = society_result.scalar_one_or_none()
+
+        # Count events created within 5 minutes of this scrape
+        window_end = log.created_at + timedelta(minutes=10)
+        events_result = await db.execute(
+            select(Event).where(
+                Event.created_at >= log.created_at,
+                Event.created_at <= window_end,
+                Event.society_id == log.society_id
+            )
+        )
+        events_from_scrape = events_result.scalars().all()
+
+        scrape_feed.append({
+            "time": log.created_at.isoformat(),
+            "society": society.name if society else "Unknown",
+            "handle": society.instagram_handle if society else "unknown",
+            "status": log.status,
+            "posts_found": log.items_found or 0,
+            "events_created": len(events_from_scrape),
+            "new_event_titles": [e.title for e in events_from_scrape],
+        })
+
+    # Events created in last 24h
+    new_events_result = await db.execute(
+        select(Event)
+        .where(Event.created_at >= since_24h, Event.is_active == True)
+        .order_by(desc(Event.created_at))
+    )
+    new_events = new_events_result.scalars().all()
+
+    new_events_data = []
+    for event in new_events:
+        society_result = await db.execute(select(Society).where(Society.id == event.society_id))
+        society = society_result.scalar_one_or_none()
+        new_events_data.append({
+            "title": event.title,
+            "society": society.name if society else "Unknown",
+            "location": event.location,
+            "start_time": event.start_time.isoformat() if event.start_time else None,
+            "created_at": event.created_at.isoformat() if event.created_at else None,
+            "notified": event.notified,
+        })
+
+    # Scrapes in last 24h
+    scrapes_24h_result = await db.execute(
+        select(ScrapingLog).where(
+            ScrapingLog.created_at >= since_24h,
+            ScrapingLog.scrape_type == 'post'
+        )
+    )
+    scrapes_24h = scrapes_24h_result.scalars().all()
+
+    return {
+        "scrapes_24h": len(scrapes_24h),
+        "new_events_24h": len(new_events),
+        "new_events": new_events_data,
+        "scrape_feed": scrape_feed,
+    }
+
+
 # Made with Bob
