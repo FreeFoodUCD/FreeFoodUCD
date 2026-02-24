@@ -1091,6 +1091,22 @@ async def get_upcoming_events(
     }
 
 
+@router.post("/event/{event_id}/notify")
+async def send_event_discovery_notification(
+    event_id: str,
+    db: AsyncSession = Depends(get_db),
+    _: bool = Depends(verify_admin_key)
+):
+    """Manually trigger discovery notification for an existing event."""
+    event = await db.get(Event, event_id)
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    from app.workers.notification_tasks import _notify_event_async
+    result = await _notify_event_async(event_id)
+    return {"message": f"Discovery notification sent for event: {event.title}", **result}
+
+
 @router.post("/event/{event_id}/send-reminder")
 async def send_event_reminder(
     event_id: str,
