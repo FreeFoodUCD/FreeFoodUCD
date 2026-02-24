@@ -56,6 +56,9 @@ export default function EventModal({ event, isOpen, onClose }: EventModalProps) 
     const date = new Date(dateString);
     const now = new Date();
     const diffMs = date.getTime() - now.getTime();
+
+    if (diffMs < 0) return 'ended';
+
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMins / 60);
     const diffDays = Math.floor(diffHours / 24);

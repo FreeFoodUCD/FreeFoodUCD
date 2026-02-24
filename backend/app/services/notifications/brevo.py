@@ -158,9 +158,6 @@ You'll get notified about free food events from UCD societies.
                 "to": [{"email": email, "name": first_name or email.split("@")[0]}],
                 "subject": "You're in 🍕",
                 "headers": {
-                    "X-Priority": "1",
-                    "Importance": "high",
-                    "X-Mailer": "FreeFood UCD",
                     "List-Unsubscribe": f"<https://freefooducd.vercel.app/unsubscribe?email={email}>",
                     "List-Unsubscribe-Post": "List-Unsubscribe=One-Click"
                 },
@@ -307,9 +304,6 @@ Unsubscribe: https://freefooducd.vercel.app/unsubscribe?email={email}
                 "to": [{"email": email, "name": email.split("@")[0]}],
                 "subject": f"Free Food: {society}",
                 "headers": {
-                    "X-Priority": "1",
-                    "Importance": "high",
-                    "X-Mailer": "FreeFood UCD",
                     "List-Unsubscribe": f"<https://freefooducd.vercel.app/unsubscribe?email={email}>",
                     "List-Unsubscribe-Post": "List-Unsubscribe=One-Click"
                 },
@@ -345,69 +339,54 @@ Unsubscribe: https://freefooducd.vercel.app/unsubscribe?email={email}
             title = event_data.get("title", "Free Food Event")
             location = event_data.get("location", "Location TBA")
             time = event_data.get("start_time", "Time TBA")
-            
+
+            maps_url = f"https://www.google.com/maps/search/?api=1&query={location.replace(' ', '+')}+UCD"
+
             html_content = f"""
             <!DOCTYPE html>
             <html>
-            <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 30px; border-radius: 12px; text-align: center; margin-bottom: 30px;">
-                    <h1 style="margin: 0; font-size: 28px;">⏰ Starting in 1 Hour!</h1>
+            <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #1A1A1A;">
+                <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 24px 30px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
+                    <p style="margin: 0; font-size: 20px; font-weight: 600;">Starting in 1 hour</p>
                 </div>
-                
-                <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; margin-bottom: 20px; border-radius: 8px;">
-                    <p style="margin: 0; font-size: 18px; font-weight: 600; color: #92400e;">Don't forget! Free food event starting soon:</p>
-                </div>
-                
+
                 <div style="background: #f9fafb; border-radius: 12px; padding: 25px; margin-bottom: 20px;">
-                    <h2 style="margin-top: 0; color: #111827; font-size: 22px;">{title}</h2>
-                    
+                    <h2 style="margin-top: 0; color: #111827; font-size: 20px;">{title}</h2>
+
                     <div style="margin: 20px 0;">
-                        <p style="margin: 10px 0; font-size: 16px;"><strong>🏛 Society:</strong> {society}</p>
-                        <p style="margin: 10px 0; font-size: 16px;"><strong>📍 Location:</strong> {location}</p>
-                        <p style="margin: 10px 0; font-size: 16px;"><strong>🕒 Time:</strong> {time}</p>
+                        <p style="margin: 10px 0; font-size: 15px;">🏛 <strong>Society:</strong> {society}</p>
+                        <p style="margin: 10px 0; font-size: 15px;">📍 <strong>Location:</strong> {location} &nbsp;<a href="{maps_url}" style="color: #059669; font-size: 13px; text-decoration: none;">Open in Google Maps ↗</a></p>
+                        <p style="margin: 10px 0; font-size: 15px;">🕒 <strong>Time:</strong> {time}</p>
                     </div>
                 </div>
-                
-                <div style="text-align: center; margin: 30px 0;">
-                    <p style="font-size: 18px; color: #d97706; font-weight: 600;">Head over now! 🏃‍♂️💨</p>
-                </div>
-                
-                <div style="text-align: center; padding: 20px; color: #9ca3af; font-size: 12px; border-top: 1px solid #e5e7eb; margin-top: 30px;">
-                    <p>FreeFood UCD - Never miss free food again!</p>
+
+                <div style="text-align: center; padding: 16px; color: #9ca3af; font-size: 12px; border-top: 1px solid #e5e7eb; margin-top: 24px;">
+                    FreeFoodUCD &middot; <a href="https://freefooducd.vercel.app/unsubscribe?email={email}" style="color: #9ca3af;">unsubscribe</a>
                 </div>
             </body>
             </html>
             """
-            
+
             plain_text = f"""
-Reminder: Event Starting in 1 Hour!
-
-Don't forget! Free food event starting soon:
-
 {title}
 
 Society: {society}
 Location: {location}
+Maps: {maps_url}
 Time: {time}
 
-Head over now!
-
 ---
-FreeFood UCD - Never miss free food again!
-Unsubscribe: https://freefooducd.vercel.app/unsubscribe?email={email}
+FreeFoodUCD · unsubscribe: https://freefooducd.vercel.app/unsubscribe?email={email}
             """
-            
+
             data = {
                 "sender": {
                     "name": self.from_name,
                     "email": self.from_email
                 },
                 "to": [{"email": email, "name": email.split("@")[0]}],
-                "subject": f"Reminder: {title} starts in 1 hour",
+                "subject": f"heads up: free food at {location}, {time}",
                 "headers": {
-                    "X-Priority": "1",
-                    "Importance": "high",
-                    "X-Mailer": "FreeFood UCD",
                     "List-Unsubscribe": f"<https://freefooducd.vercel.app/unsubscribe?email={email}>",
                     "List-Unsubscribe-Post": "List-Unsubscribe=One-Click"
                 },
