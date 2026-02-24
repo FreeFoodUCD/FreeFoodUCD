@@ -9,7 +9,7 @@ export function Header() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b-2 border-gray-100">
-      <div className="max-w-7xl mx-auto px-4 h-16 md:h-20 flex items-center justify-between relative">
+      <div className="max-w-5xl mx-auto px-4 h-16 md:h-20 flex items-center justify-between relative">
 
         {/* Logo — always left */}
         <Link href="/" className="flex items-center gap-2 md:gap-3 group shrink-0">
