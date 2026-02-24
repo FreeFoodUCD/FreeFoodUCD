@@ -196,12 +196,11 @@ def send_upcoming_event_notifications():
 async def _send_upcoming_event_notifications_async():
     """Async implementation of send_upcoming_event_notifications."""
     async with task_db_session() as session:
-        # Get current time and reminder window
+        # Get current time and 1-hour reminder window
         now = datetime.now(timezone.utc)
-        # Check events starting within the next 75 minutes that haven't been reminded yet.
-        # Using now as window_start (instead of now+45min) ensures we catch events that were
-        # scraped/detected close to their start time and would otherwise never get a reminder.
-        window_start = now
+        # Send reminders for events starting in 45–75 minutes (i.e. ~1 hour away).
+        # With 4x daily scraping events are detected well before this window.
+        window_start = now + timedelta(minutes=45)
         window_end = now + timedelta(minutes=75)
         
         # Find events that:

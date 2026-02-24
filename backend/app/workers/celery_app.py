@@ -65,10 +65,25 @@ def shutdown_worker(**kwargs):
 
 # Celery Beat schedule for periodic tasks
 celery_app.conf.beat_schedule = {
-    # Scrape posts once daily at 9 AM (when societies typically post)
-    'scrape-posts-daily': {
+    # Scrape posts 4x daily to catch posts close to event time
+    'scrape-posts-8am': {
         'task': 'app.workers.scraping_tasks.scrape_all_posts',
-        'schedule': crontab(hour=9, minute=0),
+        'schedule': crontab(hour=8, minute=0),
+        'options': {'queue': 'scraping'}
+    },
+    'scrape-posts-11am': {
+        'task': 'app.workers.scraping_tasks.scrape_all_posts',
+        'schedule': crontab(hour=11, minute=0),
+        'options': {'queue': 'scraping'}
+    },
+    'scrape-posts-3pm': {
+        'task': 'app.workers.scraping_tasks.scrape_all_posts',
+        'schedule': crontab(hour=15, minute=0),
+        'options': {'queue': 'scraping'}
+    },
+    'scrape-posts-7pm': {
+        'task': 'app.workers.scraping_tasks.scrape_all_posts',
+        'schedule': crontab(hour=19, minute=0),
         'options': {'queue': 'scraping'}
     },
     
