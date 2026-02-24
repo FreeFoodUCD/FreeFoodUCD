@@ -4,6 +4,7 @@ from app.db.models import Event, User, UserSocietyPreference, NotificationLog
 from app.services.notifications.whatsapp import WhatsAppService
 from app.services.notifications.brevo import BrevoEmailService
 from sqlalchemy import select, and_
+from sqlalchemy.orm import selectinload
 import logging
 import asyncio
 
@@ -207,7 +208,7 @@ async def _send_upcoming_event_notifications_async():
         # 1. Start in approximately 1 hour
         # 2. Haven't been reminded yet
         # 3. Are active
-        query = select(Event).where(
+        query = select(Event).options(selectinload(Event.society)).where(
             Event.start_time >= window_start,
             Event.start_time <= window_end,
             Event.is_active == True,
