@@ -44,31 +44,45 @@ async def _notify_event_async(event_id: str):
         
         logger.info(f"Notifying {len(users)} users about event {event_id}")
         
-        # Send WhatsApp notifications
-        whatsapp_notifier = WhatsAppService()
-        whatsapp_users = [u for u in users if u.notification_preferences.get('whatsapp', False)]
-        
-        if whatsapp_users:
-            whatsapp_results = await whatsapp_notifier.send_event_notification(event, whatsapp_users)
-            await _log_notifications(session, event_id, whatsapp_results, 'whatsapp')
-        
+        # Load society for event data
+        from app.db.models import Society
+        society = await session.get(Society, event.society_id)
+
+        event_data = {
+            "society_name": society.name if society else "Unknown Society",
+            "title": event.title or "Free Food Event",
+            "location": event.location or "Location TBA",
+            "start_time": event.start_time.strftime("%I:%M %p") if event.start_time else "Time TBA",
+            "date": event.start_time.strftime("%A, %B %d") if event.start_time else "Date TBA",
+            "source_type": event.source_type or "post",
+            "description": event.description or "",
+        }
+
         # Send email notifications
         email_notifier = BrevoEmailService()
         email_users = [u for u in users if u.notification_preferences.get('email', False)]
-        
-        if email_users:
-            email_results = await email_notifier.send_event_notification(event, email_users)
+
+        email_results = []
+        for user in email_users:
+            if user.email:
+                result = await email_notifier.send_event_notification(user.email, event_data)
+                email_results.append({
+                    'user_id': str(user.id),
+                    'status': 'sent' if result.get('success') else 'failed',
+                    'error': result.get('error')
+                })
+
+        if email_results:
             await _log_notifications(session, event_id, email_results, 'email')
-        
+
         # Mark event as notified
         event.notified = True
         event.notification_sent_at = datetime.now(timezone.utc)
         await session.commit()
-        
+
         return {
             "users_notified": len(users),
-            "whatsapp_sent": len(whatsapp_users),
-            "email_sent": len(email_users)
+            "email_sent": len(email_results)
         }
 
 
