@@ -10,7 +10,6 @@ export default function AboutPage() {
 
           {/* Hero */}
           <div className="mb-12">
-            <div className="text-7xl md:text-8xl mb-6">🍕</div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-text mb-5">
               never miss free food again
             </h1>
@@ -23,9 +22,17 @@ export default function AboutPage() {
           {/* Story */}
           <div className="mb-12 bg-gray-50 rounded-3xl p-8 border-2 border-gray-100 text-left">
             <p className="text-text-light font-medium text-base md:text-lg leading-relaxed">
-              built by two students who were tired of walking past empty pizza boxes.
-              turns out societies post about free food on instagram and it disappears before most people see it.
-              so we automated the whole thing. 🤷
+              didn't wanna miss free food around campus, so made this myself.{' '}
+              add me on linkedin:{' '}
+              <a
+                href="https://www.linkedin.com/in/adityasinha04/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary underline hover:text-primary-dark"
+              >
+                linkedin.com/in/adityasinha04
+              </a>
+              , feedback welcome :)
             </p>
           </div>
 
