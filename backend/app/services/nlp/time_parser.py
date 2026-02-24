@@ -19,6 +19,62 @@ class TimeParser:
             'noon': {'hour': 12, 'minute': 0},
             'midnight': {'hour': 0, 'minute': 0},
         }
+
+    @staticmethod
+    def _normalize(text: str) -> str:
+        """
+        Normalise common OCR artefacts and informal time spellings before parsing.
+
+        - "6 : 30 pm"  → "6:30pm"   (OCR spaces around colon/digits)
+        - "6 pm"       → "6pm"       (space before am/pm)
+        - "half five"  → "5:30"      (Irish English)
+        - "half past 5" → "5:30"
+        - "quarter past 5" → "5:15"
+        - "quarter to 6"   → "5:45"
+        - "5 o'clock" / "5 oclock" → "5:00"
+        - "till" / "until" already handled in patterns but normalise anyway
+        """
+        t = text
+
+        # OCR: collapse spaces around colons between digits  "6 : 30" → "6:30"
+        t = re.sub(r'(\d)\s*:\s*(\d)', r'\1:\2', t)
+
+        # OCR: collapse space between digit and am/pm  "6 pm" → "6pm"
+        t = re.sub(r'(\d)\s+(am|pm)\b', r'\1\2', t, flags=re.IGNORECASE)
+
+        # "o'clock" / "oclock" → ":00"
+        t = re.sub(r"(\d{1,2})\s+o'?clock\b", r'\1:00', t, flags=re.IGNORECASE)
+
+        # "half past N [am/pm]" → "N:30[am/pm]"
+        def _half_past(m):
+            h = int(m.group(1))
+            period = m.group(2) or ''
+            return f'{h}:30{period}'
+        t = re.sub(r'half\s+past\s+(\d{1,2})\s*(am|pm)?', _half_past, t, flags=re.IGNORECASE)
+
+        # "half N [am/pm]" (Irish English: "half five" = 5:30)
+        def _half_n(m):
+            h = int(m.group(1))
+            period = m.group(2) or ''
+            return f'{h}:30{period}'
+        t = re.sub(r'\bhalf\s+(\d{1,2})\s*(am|pm)?\b', _half_n, t, flags=re.IGNORECASE)
+
+        # "quarter past N [am/pm]" → "N:15[am/pm]"
+        def _quarter_past(m):
+            h = int(m.group(1))
+            period = m.group(2) or ''
+            return f'{h}:15{period}'
+        t = re.sub(r'quarter\s+past\s+(\d{1,2})\s*(am|pm)?', _quarter_past, t, flags=re.IGNORECASE)
+
+        # "quarter to N [am/pm]" → "(N-1):45[am/pm]"
+        def _quarter_to(m):
+            h = int(m.group(1))
+            period = m.group(2) or ''
+            h = h - 1 if h > 1 else 12
+            return f'{h}:45{period}'
+        t = re.sub(r'quarter\s+to\s+(\d{1,2})\s*(am|pm)?', _quarter_to, t, flags=re.IGNORECASE)
+
+        return t
     
     def parse_time(self, text: str) -> Optional[Dict[str, int]]:
         """
@@ -30,11 +86,11 @@ class TimeParser:
         Returns:
             Dict with 'hour' and 'minute' keys, or None if no valid time found
         """
-        text = text.lower().strip()
-        
+        text = self._normalize(text.lower().strip())
+
         # Collect all candidate times with confidence scores
         candidates: List[Tuple[str, Dict[str, int], float]] = []
-        
+
         # Pattern 1: Time ranges (extract start time)
         candidates.extend(self._parse_time_ranges(text))
         
@@ -68,10 +124,11 @@ class TimeParser:
     def _parse_time_ranges(self, text: str) -> List[Tuple[str, Dict[str, int], float]]:
         """Parse time ranges and extract start time."""
         candidates = []
-        
+        SEP = r'(?:to|till|until|-|–)'
+
         # Pattern 1: H:MM AM/PM to H:MM AM/PM (most specific)
         # Examples: "6:30pm to 7pm", "at 6:30pm to 7:30pm", "from 6:30-7:30 PM"
-        pattern = r'(?:at|from)?\s*(\d{1,2})\s*[:.](\d{2})\s*(am|pm)\s*(?:to|-|–)\s*\d{1,2}\s*[:.]?\d{0,2}\s*(?:am|pm)?'
+        pattern = rf'(?:at|from)?\s*(\d{{1,2}})\s*[:.](\d{{2}})\s*(am|pm)\s*{SEP}\s*\d{{1,2}}\s*[:.]?\d{{0,2}}\s*(?:am|pm)?'
         for match in re.finditer(pattern, text):
             hour = int(match.group(1))
             minute = int(match.group(2))
@@ -83,7 +140,7 @@ class TimeParser:
         
         # Pattern 2: H AM/PM to H AM/PM (no minutes on start time)
         # Examples: "6pm to 7pm", "at 6pm to 7pm", "from 6-7 PM"
-        pattern = r'(?:at|from)?\s*(\d{1,2})\s*(am|pm)\s*(?:to|-|–)\s*\d{1,2}\s*(?:am|pm)?'
+        pattern = rf'(?:at|from)?\s*(\d{{1,2}})\s*(am|pm)\s*{SEP}\s*\d{{1,2}}\s*(?:am|pm)?'
         for match in re.finditer(pattern, text):
             hour = int(match.group(1))
             period = match.group(2).upper()
@@ -94,7 +151,7 @@ class TimeParser:
         
         # Pattern 3: H:MM-H:MM AM/PM (single AM/PM at end)
         # Examples: "6:30-7:30 PM", "6:30-7 PM"
-        pattern = r'(\d{1,2})\s*[:.](\d{2})\s*(?:-|–)\s*\d{1,2}\s*[:.]?\d{0,2}\s*(am|pm)'
+        pattern = rf'(\d{{1,2}})\s*[:.](\d{{2}})\s*{SEP}\s*\d{{1,2}}\s*[:.]?\d{{0,2}}\s*(am|pm)'
         for match in re.finditer(pattern, text):
             hour = int(match.group(1))
             minute = int(match.group(2))
@@ -106,7 +163,7 @@ class TimeParser:
         
         # Pattern 4: H-H AM/PM (no minutes, single AM/PM at end)
         # Examples: "6-7 PM", "6-7pm"
-        pattern = r'(\d{1,2})\s*(?:-|–)\s*\d{1,2}\s*(am|pm)'
+        pattern = rf'(\d{{1,2}})\s*{SEP}\s*\d{{1,2}}\s*(am|pm)'
         for match in re.finditer(pattern, text):
             hour = int(match.group(1))
             period = match.group(2).upper()
@@ -182,10 +239,13 @@ class TimeParser:
             Returns {'start': time_dict, 'end': None} if only a single time found.
             Returns None if no time found at all.
         """
-        text = text.lower().strip()
+        text = self._normalize(text.lower().strip())
+
+        # Shared separator group used in all range patterns
+        SEP = r'(?:to|till|until|-|–)'
 
         # Pattern 1: H:MM AM/PM to H:MM AM/PM  (e.g. "6:30pm to 7pm", "from 6:30pm-7:30pm")
-        pattern = r'(?:at|from)?\s*(\d{1,2})\s*[:.](\d{2})\s*(am|pm)\s*(?:to|-|–)\s*(\d{1,2})\s*(?:[:.](\d{2}))?\s*(am|pm)?'
+        pattern = rf'(?:at|from)?\s*(\d{{1,2}})\s*[:.](\d{{2}})\s*(am|pm)\s*{SEP}\s*(\d{{1,2}})\s*(?:[:.](\d{{2}}))?\s*(am|pm)?'
         match = re.search(pattern, text)
         if match:
             s_hour, s_min = int(match.group(1)), int(match.group(2))
@@ -202,7 +262,7 @@ class TimeParser:
                         'end':   {'hour': e_h24, 'minute': e_min}}
 
         # Pattern 2: H AM/PM to H AM/PM  (e.g. "6pm to 7pm")
-        pattern = r'(?:at|from)?\s*(\d{1,2})\s*(am|pm)\s*(?:to|-|–)\s*(\d{1,2})\s*(am|pm)?'
+        pattern = rf'(?:at|from)?\s*(\d{{1,2}})\s*(am|pm)\s*{SEP}\s*(\d{{1,2}})\s*(am|pm)?'
         match = re.search(pattern, text)
         if match:
             s_hour = int(match.group(1))
@@ -218,7 +278,7 @@ class TimeParser:
                         'end':   {'hour': e_h24, 'minute': 0}}
 
         # Pattern 3: H:MM-H:MM AM/PM  (single period at end, e.g. "6:30-7:30 PM")
-        pattern = r'(\d{1,2})\s*[:.](\d{2})\s*(?:-|–)\s*(\d{1,2})\s*(?:[:.](\d{2}))?\s*(am|pm)'
+        pattern = rf'(\d{{1,2}})\s*[:.](\d{{2}})\s*{SEP}\s*(\d{{1,2}})\s*(?:[:.](\d{{2}}))?\s*(am|pm)'
         match = re.search(pattern, text)
         if match:
             s_hour, s_min = int(match.group(1)), int(match.group(2))
@@ -234,7 +294,7 @@ class TimeParser:
                         'end':   {'hour': e_h24, 'minute': e_min}}
 
         # Pattern 4: H-H AM/PM  (e.g. "6-7 PM")
-        pattern = r'(\d{1,2})\s*(?:-|–)\s*(\d{1,2})\s*(am|pm)'
+        pattern = rf'(\d{{1,2}})\s*{SEP}\s*(\d{{1,2}})\s*(am|pm)'
         match = re.search(pattern, text)
         if match:
             s_hour = int(match.group(1))

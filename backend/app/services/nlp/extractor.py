@@ -35,24 +35,21 @@ class EventExtractor:
         self.off_campus_venues = self.load_off_campus_venues()
         self.nightlife_keywords = self.load_nightlife_keywords()
         
-        # Explicit food keywords only (removed vague terms like "free", "join us", "study session")
-        self.explicit_food_keywords = [
-            # Explicit free food phrases
+        # Strong food indicators — sufficient on their own
+        self.strong_food_keywords = [
             'free food', 'free pizza', 'free lunch', 'free dinner',
             'free breakfast', 'free snacks', 'free snack',
-            
-            # Food types (include both singular and plural)
-            'pizza', 'refreshments', 'snacks', 'snack', 'food', 'drinks', 'drink',
-            'lunch', 'dinner', 'breakfast', 'catering', 'buffet',
-            'nibbles', 'tea', 'coffee', 'cookies', 'cookie', 'dessert',
-            'protein bar', 'protein bars', 'kombucha',
-            
-            # Cultural/special events
-            'potluck', 'iftar', 'break the fast', 'banquet',
-            
-            # Provision phrases
-            'food provided', 'refreshments provided',
-            'complimentary food', 'italian food'
+            'pizza', 'refreshments', 'catering', 'buffet', 'nibbles',
+            'cookies', 'cookie', 'dessert', 'protein bar', 'protein bars',
+            'kombucha', 'potluck', 'iftar', 'break the fast', 'banquet',
+            'food provided', 'refreshments provided', 'food will be provided',
+            'complimentary food', 'italian food', 'barbeque', 'bbq',
+        ]
+        # Weak food indicators — only count if "free", "provided", or "complimentary"
+        # also appears somewhere in the text
+        self.weak_food_keywords = [
+            'food', 'lunch', 'dinner', 'breakfast', 'drinks', 'drink',
+            'snacks', 'snack', 'tea', 'coffee',
         ]
         
     
@@ -248,26 +245,29 @@ class EventExtractor:
         ]
     
     def load_off_campus_venues(self) -> List[str]:
-        """Load list of off-campus venues to reject."""
+        """
+        Load list of off-campus venues to reject.
+        Keep entries specific — avoid generic words that appear in on-campus contexts.
+        Short words (bar, pub, grill) are matched with word boundaries in _is_off_campus.
+        """
         return [
-            # Pubs/Bars
-            'pub', 'bar', 'brewery', 'tavern',
-            'kennedys', 'doyles', 'sinnotts',
-            'johnnie foxs', 'blue light', 'taylors',
-            'three rock', 'pub crawl',
-            
-            # Restaurants/Cafes
-            'restaurant', 'cafe', 'bistro', 'grill', 'diner',
+            # Named pubs/bars (specific — safe to substring-match)
+            'kennedys', 'doyles', 'sinnotts', 'johnnie foxs',
+            'blue light', 'taylors three rock', 'pub crawl',
+            # Generic venue words — matched with word boundaries
+            'brewery', 'tavern', 'pub', 'bar', 'grill', 'diner',
+            # Named fast-food/restaurants
             'nandos', 'supermacs', 'eddie rockets',
-            
-            # Dublin Areas (off-campus)
-            'soho', 'temple bar', 'grafton street', 'oconnell street',
+            # Dublin off-campus areas
+            'temple bar', 'grafton street', 'oconnell street',
             'rathmines', 'ranelagh', 'dundrum', 'city centre',
             'dublin 2', 'dublin 4', 'dublin mountains',
-            
             # Social outings
-            'night out', 'mixer at', 'meet at', 'heading to'
+            'night out', 'pub crawl',
         ]
+
+    # Words in off_campus_venues that need word-boundary matching (too short/generic otherwise)
+    _BOUNDARY_VENUES = {'pub', 'bar', 'grill', 'diner', 'tavern', 'brewery'}
     
     def load_nightlife_keywords(self) -> List[str]:
         """Load list of nightlife event keywords to reject."""
@@ -367,23 +367,56 @@ class EventExtractor:
         
         return True
     
+    def _food_is_negated(self, text: str) -> bool:
+        """
+        Return True if food is explicitly negated in the text.
+        Catches: "no food", "food not provided", "bring your own food", etc.
+        """
+        negation_patterns = [
+            r'\bno\s+(?:free\s+)?(?:food|pizza|snacks?|refreshments?|lunch|dinner|breakfast|drinks?)\b',
+            r'\b(?:food|pizza|snacks?|refreshments?|lunch|dinner|breakfast|drinks?)\s+(?:is\s+|are\s+)?not\s+(?:provided|available|included|served)\b',
+            r'\bbring\s+your\s+own\s+(?:food|lunch|dinner)\b',
+            r'\bbyof?\b',
+            r'\bunfortunately\s+(?:\w+\s+){0,4}no\s+(?:food|pizza|snacks?|refreshments?)\b',
+            r'\bno\s+food\s+(?:this\s+time|available|today)\b',
+        ]
+        for pattern in negation_patterns:
+            if re.search(pattern, text, re.IGNORECASE):
+                logger.debug(f"Food negation matched: {pattern}")
+                return True
+        return False
+
     def _has_explicit_food(self, text: str) -> bool:
         """
-        Check for explicit food keywords.
-        
-        REJECT "free entry" without food mention.
+        Two-tier food detection with negation check.
+
+        Strong keywords: sufficient on their own (pizza, refreshments, etc.)
+        Weak keywords: only count if "free" / "provided" / "complimentary" is also in the text.
         """
-        # "free entry" alone is NOT enough
+        # Negation check first
+        if self._food_is_negated(text):
+            logger.debug("REJECT: food keyword is negated")
+            return False
+
+        # "free entry" alone is NOT enough — must also have a food keyword
         if 'free entry' in text:
-            has_food = any(
-                food in text for food in ['food', 'pizza', 'snacks', 'refreshments', 'lunch', 'dinner']
-            )
+            has_food = any(kw in text for kw in self.strong_food_keywords + self.weak_food_keywords)
             if not has_food:
                 logger.debug("REJECT: 'free entry' without food mention")
                 return False
-        
-        # Check for explicit food keywords
-        return any(keyword in text for keyword in self.explicit_food_keywords)
+
+        # Strong keywords are always sufficient
+        if any(kw in text for kw in self.strong_food_keywords):
+            return True
+
+        # Weak keywords only count when "free", "provided", or "complimentary" is present
+        has_free_context = (
+            'free' in text or 'provided' in text or 'complimentary' in text
+        )
+        if has_free_context and any(kw in text for kw in self.weak_food_keywords):
+            return True
+
+        return False
     
     def _is_other_college(self, text: str) -> bool:
         """Check if text mentions other Irish colleges."""
@@ -394,41 +427,67 @@ class EventExtractor:
         return False
     
     def _is_off_campus(self, text: str) -> bool:
-        """Check if text mentions off-campus venues."""
+        """
+        Check if text mentions off-campus venues.
+        Short/generic venue words use word boundaries to avoid false matches
+        (e.g. 'bar' in 'candy bar', 'pub' in 'publication').
+        Skip check if a known UCD building is already mentioned — on-campus wins.
+        """
+        if self._has_ucd_location(text):
+            return False
         for venue in self.off_campus_venues:
-            if venue in text:
-                logger.debug(f"Found off-campus venue: {venue}")
-                return True
+            if venue in self._BOUNDARY_VENUES:
+                if re.search(r'\b' + re.escape(venue) + r'\b', text):
+                    logger.debug(f"Found off-campus venue (boundary): {venue}")
+                    return True
+            else:
+                if venue in text:
+                    logger.debug(f"Found off-campus venue: {venue}")
+                    return True
         return False
     
     def _is_paid_event(self, text: str) -> bool:
         """
         Check if text indicates a paid event.
-        
-        Allow €2 membership only.
-        Reject ANY other price mention.
+
+        Allow €2 membership. Ignore price mentions that are explicitly negated.
+        Removed 'cost', 'price', 'pay' as standalone keywords — too many false
+        positives ("no cost", "you don't need to pay", "free of charge").
         """
+        # Explicit "it's free" overrides — check these first
+        free_overrides = [
+            r'\bfree\s+(?:of\s+)?(?:charge|cost|entry|admission)\b',
+            r'\bno\s+(?:entry\s+)?(?:fee|cost|charge)\b',
+            r'\bno\s+tickets?\s+(?:needed|required)\b',
+            r"(?:don'?t|do\s+not|doesn'?t|does\s+not)\s+(?:need\s+to\s+)?pay\b",
+            r'\bno\s+(?:need\s+to\s+)?pay\b',
+            r'\bno\s+charge\b',
+        ]
+        for pattern in free_overrides:
+            if re.search(pattern, text):
+                logger.debug(f"Free override matched: {pattern}")
+                return False
+
         # Allow €2 membership only
         if re.search(r'€2\b|\beuro\s+2\b|\b2\s*euro\b', text) or '€2' in text:
             if any(word in text for word in ['membership', 'ucard', 'sign up', 'member']):
-                # Check if there are OTHER prices mentioned
                 euro_matches = re.findall(r'€\d+|\beuro\s+\d+|\b\d+\s*euro', text)
                 if len(euro_matches) == 1:
                     logger.debug("Found €2 membership - allowed")
-                    return False  # Only €2 mentioned, it's membership
+                    return False
 
-        # Reject ANY other price mention
+        # Reject any other explicit € price
         if re.search(r'€\d+|\beuro\s+\d+|\b\d+\s*euro', text):
             logger.debug("Found price indicator")
             return True
-        
-        # Reject ticket/entry fee keywords
-        paid_keywords = ['ticket', 'tickets', 'entry fee', 'admission', 'cost', 'price', 'pay']
+
+        # Reject ticket/entry fee keywords (not 'cost'/'price'/'pay' — too broad)
+        paid_keywords = ['ticket', 'tickets', 'entry fee', 'admission']
         for keyword in paid_keywords:
             if keyword in text:
                 logger.debug(f"Found paid keyword: {keyword}")
                 return True
-        
+
         return False
     
     def _is_nightlife_event(self, text: str) -> bool:
@@ -439,9 +498,19 @@ class EventExtractor:
                 return True
         return False
     
+    def _alias_in_text(self, alias: str, text_lower: str) -> bool:
+        """
+        Check if an alias appears in text.
+        Aliases ≤ 4 chars use word boundaries to avoid false substring matches
+        (e.g. 'eng' in 'england', 'vet' in 'veteran', 'jj' in 'hajj').
+        """
+        if len(alias) <= 4:
+            return bool(re.search(r'\b' + re.escape(alias) + r'\b', text_lower))
+        return alias in text_lower
+
     def _has_ucd_location(self, text: str) -> bool:
         """Check if text mentions UCD campus location."""
-        return any(building in text for building in self.ucd_buildings)
+        return any(self._alias_in_text(alias, text) for alias in self.ucd_buildings)
 
     def get_rejection_reason(self, text: str) -> str:
         """
@@ -536,43 +605,65 @@ class EventExtractor:
         }
     
     def _extract_location(self, text: str) -> Optional[Dict]:
-        """Extract location from text."""
+        """
+        Extract location from text.
+
+        Improvements over original:
+        - Short aliases (≤4 chars) use word boundaries via _alias_in_text
+        - Room format expanded: handles E1.32, C204A, AD1.01, G01 etc.
+        - Global room scan: finds room even when it's in a separate sentence
+        """
         text_lower = text.lower()
+
+        # Room regex: optional letter prefix, digits, optional .subdiv, optional suffix
+        # Matches: 321, A5, G01, E1.32, C204A, AD1.01
+        ROOM_RE = r'[A-Za-z]{0,3}\d+(?:[.\-]\d+)?[A-Za-z]?'
 
         # Check against known UCD buildings (longest alias first for specificity)
         for alias in self.ucd_buildings:
-            if alias in text_lower:
-                official = self.building_aliases[alias]
-                # Try to extract room number
-                room_patterns = [
-                    rf'{re.escape(alias)}\s+([A-Z]?\d+)',         # e.g. "engineering 321"
-                    rf'{re.escape(alias)}\s+room\s+([A-Z]?\d+)',  # e.g. "engineering room 321"
-                    rf'room\s+([A-Z]?\d+)\s+{re.escape(alias)}',  # e.g. "room 321 engineering"
-                ]
+            if not self._alias_in_text(alias, text_lower):
+                continue
 
-                for pattern in room_patterns:
-                    match = re.search(pattern, text_lower, re.IGNORECASE)
-                    if match:
-                        room = match.group(1).upper()
-                        return {
-                            'building': official,
-                            'room': room,
-                            'full_location': f"{official}, Room {room}"
-                        }
+            official = self.building_aliases[alias]
 
+            # 1. Try room adjacent to building name
+            adjacent_patterns = [
+                rf'{re.escape(alias)}\s+(?:room\s+)?({ROOM_RE})',   # "engineering room 321" / "engineering E1.32"
+                rf'room\s+({ROOM_RE})\s+(?:in\s+)?{re.escape(alias)}',  # "room 321 in engineering"
+            ]
+            for pattern in adjacent_patterns:
+                match = re.search(pattern, text_lower)
+                if match:
+                    room = match.group(1).upper()
+                    return {
+                        'building': official,
+                        'room': room,
+                        'full_location': f"{official}, Room {room}"
+                    }
+
+            # 2. Global room scan — room in a separate sentence/clause
+            global_room = re.search(
+                rf'\b(?:room|rm\.?)\s*({ROOM_RE})', text_lower
+            )
+            if global_room:
+                room = global_room.group(1).upper()
                 return {
                     'building': official,
-                    'room': None,
-                    'full_location': official
+                    'room': room,
+                    'full_location': f"{official}, Room {room}"
                 }
-        
-        # Try to find any location-like text
-        location_patterns = [
+
+            return {
+                'building': official,
+                'room': None,
+                'full_location': official
+            }
+
+        # Fallback: generic location-like text
+        for pattern in [
             r'(?:at|in|@)\s+([A-Z][a-zA-Z\s]+(?:Building|Centre|Hall|Room))',
             r'(?:at|in|@)\s+([A-Z][a-zA-Z\s]+\d+)',
-        ]
-        
-        for pattern in location_patterns:
+        ]:
             match = re.search(pattern, text)
             if match:
                 return {
@@ -580,7 +671,7 @@ class EventExtractor:
                     'room': None,
                     'full_location': match.group(1).strip()
                 }
-        
+
         return None
     
     def _combine_datetime(self, date: Optional[datetime], time: Optional[Dict]) -> datetime:
