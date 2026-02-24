@@ -93,7 +93,7 @@ export default function Home() {
       
       {/* Hero Section with Email Signup */}
       <section className="pt-24 md:pt-32 pb-20 md:pb-24 px-4 relative z-10">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           {/* Headline with Logo - Left aligned */}
           <div className="flex items-center gap-3 md:gap-8 mb-8 md:mb-12">
             <h1 className="text-[2.5rem] md:text-7xl lg:text-8xl font-extrabold text-text leading-[1.1]">
