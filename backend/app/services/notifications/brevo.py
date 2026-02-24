@@ -240,69 +240,55 @@ Fun fact: There was once a "Fat Men's Club" in 18th century New York. Entry? 200
             location = event_data.get("location", "Location TBA")
             time = event_data.get("start_time", "Time TBA")
             date = event_data.get("date", "Date TBA")
-            source = event_data.get("source_type", "post")
-            description = event_data.get("description", "")
-            
+
+            maps_url = f"https://www.google.com/maps/search/?api=1&query={location.replace(' ', '+')}+UCD"
+
             html_content = f"""
             <!DOCTYPE html>
             <html>
-            <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 30px; border-radius: 12px; text-align: center; margin-bottom: 30px;">
-                    <h1 style="margin: 0; font-size: 28px;">🍕 Free Food Alert!</h1>
+            <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #1A1A1A;">
+                <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 24px 30px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
+                    <p style="margin: 0; font-size: 20px; font-weight: 600;">free food spotted</p>
                 </div>
-                
+
                 <div style="background: #f9fafb; border-radius: 12px; padding: 25px; margin-bottom: 20px;">
-                    <h2 style="margin-top: 0; color: #111827; font-size: 22px;">{title}</h2>
-                    
+                    <h2 style="margin-top: 0; color: #111827; font-size: 20px;">{title}</h2>
+
                     <div style="margin: 20px 0;">
-                        <p style="margin: 10px 0; font-size: 16px;"><strong>🏛 Society:</strong> {society}</p>
-                        <p style="margin: 10px 0; font-size: 16px;"><strong>📍 Location:</strong> {location}</p>
-                        <p style="margin: 10px 0; font-size: 16px;"><strong>🕒 Time:</strong> {time}</p>
-                        <p style="margin: 10px 0; font-size: 16px;"><strong>📅 Date:</strong> {date}</p>
-                        <p style="margin: 10px 0; font-size: 14px; color: #6b7280;"><strong>Source:</strong> Instagram {source.title()}</p>
+                        <p style="margin: 10px 0; font-size: 15px;">🏛 <strong>Society:</strong> {society}</p>
+                        <p style="margin: 10px 0; font-size: 15px;">📍 <strong>Location:</strong> {location} &nbsp;<a href="{maps_url}" style="color: #059669; font-size: 13px; text-decoration: none;">Open in Google Maps ↗</a></p>
+                        <p style="margin: 10px 0; font-size: 15px;">🕒 <strong>Time:</strong> {time}</p>
+                        <p style="margin: 10px 0; font-size: 15px;">📅 <strong>Date:</strong> {date}</p>
                     </div>
-                    
-                    {f'<p style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px; font-size: 14px; color: #4b5563;">{description}</p>' if description else ''}
                 </div>
-                
-                <div style="text-align: center; margin: 30px 0;">
-                    <p style="font-size: 18px; color: #059669; font-weight: 600;">Don't miss out! 🎉</p>
-                </div>
-                
-                <div style="text-align: center; padding: 20px; color: #9ca3af; font-size: 12px; border-top: 1px solid #e5e7eb; margin-top: 30px;">
-                    <p>You're receiving this because you signed up for FreeFood UCD alerts.</p>
+
+                <div style="text-align: center; padding: 16px; color: #9ca3af; font-size: 12px; border-top: 1px solid #e5e7eb; margin-top: 24px;">
+                    FreeFoodUCD &middot; <a href="https://freefooducd.vercel.app/unsubscribe?email={email}" style="color: #9ca3af;">unsubscribe</a>
                 </div>
             </body>
             </html>
             """
-            
-            plain_text = f"""
-Free Food Alert - {society}
 
+            plain_text = f"""
 {title}
 
 Society: {society}
 Location: {location}
+Maps: {maps_url}
 Time: {time}
 Date: {date}
-Source: Instagram {source.title()}
-
-{description if description else ''}
-
-Don't miss out!
 
 ---
-You're receiving this because you signed up for FreeFood UCD alerts.
-Unsubscribe: https://freefooducd.vercel.app/unsubscribe?email={email}
+FreeFoodUCD · unsubscribe: https://freefooducd.vercel.app/unsubscribe?email={email}
             """
-            
+
             data = {
                 "sender": {
                     "name": self.from_name,
                     "email": self.from_email
                 },
                 "to": [{"email": email, "name": email.split("@")[0]}],
-                "subject": f"Free Food: {society}",
+                "subject": f"free food at {location}, {date}",
                 "headers": {
                     "List-Unsubscribe": f"<https://freefooducd.vercel.app/unsubscribe?email={email}>",
                     "List-Unsubscribe-Post": "List-Unsubscribe=One-Click"
