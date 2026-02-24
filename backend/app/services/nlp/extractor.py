@@ -27,7 +27,10 @@ class EventExtractor:
         self.timezone = pytz.timezone('Europe/Dublin')
         self.date_parser = DateParser(self.timezone)
         self.time_parser = TimeParser()
-        self.ucd_buildings = sorted(self.load_ucd_buildings(), key=len, reverse=True)
+        # building_aliases: lowercase alias -> official display name
+        self.building_aliases = self.load_building_aliases()
+        # sorted longest-first so specific matches beat short ones (e.g. "engineering building" before "engineering")
+        self.ucd_buildings = sorted(self.building_aliases.keys(), key=len, reverse=True)
         self.other_colleges = self.load_other_colleges()
         self.off_campus_venues = self.load_off_campus_venues()
         self.nightlife_keywords = self.load_nightlife_keywords()
@@ -53,18 +56,189 @@ class EventExtractor:
         ]
         
     
-    def load_ucd_buildings(self) -> List[str]:
-        """Load list of UCD buildings and campus keywords."""
-        return [
-            'newman building', 'engineering building', 'arts building',
-            'agriculture building', 'science centre', 'student centre',
-            'james joyce library', 'health sciences', 'conway institute',
-            'quinn school', 'sutherland school', 'moore centre',
-            'lochlann quinn', 'roebuck castle', 'astra hall',
-            'obrien centre', 'eng building', 'science block', 'art block',
-            'newman', 'obrien', 'library', 'science', 'belfield',
-            'veterinary', 'smurfit', 'ucd', 'campus'
-        ]
+    def load_building_aliases(self) -> Dict[str, str]:
+        """
+        Map every known alias / abbreviation (lowercase) to the official building name.
+        Sorted longest-first in __init__ so specific matches win over short ones.
+        """
+        return {
+            # Newman Building
+            'newman building': 'Newman Building',
+            'arts building': 'Newman Building',
+            'the arts block': 'Newman Building',
+            'arts block': 'Newman Building',
+            'newman': 'Newman Building',
+
+            # O'Brien Centre for Science
+            "o'brien centre for science": "O'Brien Centre for Science",
+            'obrien centre for science': "O'Brien Centre for Science",
+            'obrien centre': "O'Brien Centre for Science",
+            'the science building': "O'Brien Centre for Science",
+            'science building': "O'Brien Centre for Science",
+            'science centre': "O'Brien Centre for Science",
+            "o'brien": "O'Brien Centre for Science",
+            'obrien': "O'Brien Centre for Science",
+            'science': "O'Brien Centre for Science",
+
+            # James Joyce Library
+            'james joyce library': 'James Joyce Library',
+            'the library': 'James Joyce Library',
+            'library': 'James Joyce Library',
+            'jj': 'James Joyce Library',
+
+            # Sutherland School of Law
+            'sutherland school of law': 'Sutherland School of Law',
+            'sutherland': 'Sutherland School of Law',
+            'law building': 'Sutherland School of Law',
+
+            # Lochlann Quinn School of Business
+            'lochlann quinn school of business': 'Lochlann Quinn School of Business',
+            'the business school': 'Lochlann Quinn School of Business',
+            'business school': 'Lochlann Quinn School of Business',
+            'lochlann quinn': 'Lochlann Quinn School of Business',
+            'quinn school': 'Lochlann Quinn School of Business',
+            'quinn': 'Lochlann Quinn School of Business',
+
+            # Engineering & Materials Science Centre
+            'engineering & materials science centre': 'Engineering & Materials Science Centre',
+            'engineering and materials science centre': 'Engineering & Materials Science Centre',
+            'engineering building': 'Engineering & Materials Science Centre',
+            'engineering': 'Engineering & Materials Science Centre',
+            'eng building': 'Engineering & Materials Science Centre',
+            'eng': 'Engineering & Materials Science Centre',
+
+            # Agriculture & Food Science Centre
+            'agriculture & food science centre': 'Agriculture & Food Science Centre',
+            'agriculture and food science centre': 'Agriculture & Food Science Centre',
+            'agriculture building': 'Agriculture & Food Science Centre',
+            'ag building': 'Agriculture & Food Science Centre',
+            'ag science': 'Agriculture & Food Science Centre',
+
+            # Health Sciences Centre
+            'health sciences centre': 'Health Sciences Centre',
+            'health sciences': 'Health Sciences Centre',
+            'health sci': 'Health Sciences Centre',
+
+            # Veterinary Sciences Centre
+            'veterinary sciences centre': 'Veterinary Sciences Centre',
+            'the vet school': 'Veterinary Sciences Centre',
+            'vet school': 'Veterinary Sciences Centre',
+            'veterinary': 'Veterinary Sciences Centre',
+            'vet': 'Veterinary Sciences Centre',
+
+            # Computer Science & Informatics Centre
+            'computer science & informatics centre': 'Computer Science & Informatics Centre',
+            'computer science and informatics centre': 'Computer Science & Informatics Centre',
+            'comp sci building': 'Computer Science & Informatics Centre',
+            'cs building': 'Computer Science & Informatics Centre',
+            'computer science': 'Computer Science & Informatics Centre',
+            'comp sci': 'Computer Science & Informatics Centre',
+
+            # Daedalus Building
+            'daedalus building': 'Daedalus Building',
+            'daedalus': 'Daedalus Building',
+
+            # Confucius Institute
+            'confucius institute': 'Confucius Institute',
+            'confucius': 'Confucius Institute',
+
+            # Hanna Sheehy-Skeffington Building
+            'hanna sheehy-skeffington building': 'Hanna Sheehy-Skeffington Building',
+            'skeffington': 'Hanna Sheehy-Skeffington Building',
+            'arts annexe': 'Hanna Sheehy-Skeffington Building',
+
+            # Agnes McGuire Social Work Building
+            'agnes mcguire social work building': 'Agnes McGuire Social Work Building',
+            'agnes mcguire': 'Agnes McGuire Social Work Building',
+
+            # Tierney Building
+            'tierney building': 'Tierney Building',
+            'tierney': 'Tierney Building',
+
+            # Gerard Manley Hopkins Centre
+            'gerard manley hopkins centre': 'Gerard Manley Hopkins Centre',
+            'international office': 'Gerard Manley Hopkins Centre',
+            'ucd global': 'Gerard Manley Hopkins Centre',
+            'gmh': 'Gerard Manley Hopkins Centre',
+
+            # Student Centre
+            'the student centre': 'Student Centre',
+            'student centre': 'Student Centre',
+
+            # UCD Village
+            'ucd village': 'UCD Village',
+            'the village': 'UCD Village',
+            'village': 'UCD Village',
+
+            # O'Reilly Hall
+            "o'reilly hall": "O'Reilly Hall",
+            'oreilly hall': "O'Reilly Hall",
+            "o'reilly": "O'Reilly Hall",
+            'oreilly': "O'Reilly Hall",
+
+            # The Main Restaurant
+            'the main restaurant': 'The Main Restaurant',
+            'main restaurant': 'The Main Restaurant',
+            'the main rest': 'The Main Restaurant',
+            'the rest': 'The Main Restaurant',
+
+            # UCD Sports Centre
+            'ucd sports centre': 'UCD Sports Centre',
+            'sports centre': 'UCD Sports Centre',
+            'the gym': 'UCD Sports Centre',
+
+            # The Pavilion
+            'the pavilion': 'The Pavilion',
+            'the pav': 'The Pavilion',
+            'pav': 'The Pavilion',
+
+            # Conway Institute
+            'conway institute': 'Conway Institute',
+            'conway': 'Conway Institute',
+
+            # Charles Institute of Dermatology
+            'charles institute of dermatology': 'Charles Institute of Dermatology',
+            'charles institute': 'Charles Institute of Dermatology',
+            'charles': 'Charles Institute of Dermatology',
+
+            # Geary Institute for Public Policy
+            'geary institute for public policy': 'Geary Institute for Public Policy',
+            'geary institute': 'Geary Institute for Public Policy',
+            'geary': 'Geary Institute for Public Policy',
+
+            # Clinton Institute
+            'clinton institute': 'Clinton Institute',
+            'belfield house': 'Clinton Institute',
+            'clinton': 'Clinton Institute',
+
+            # NovaUCD
+            'novaucd': 'NovaUCD',
+            'merville house': 'NovaUCD',
+            'nova': 'NovaUCD',
+
+            # Richview School of Architecture
+            'richview school of architecture': 'Richview School of Architecture',
+            'richview': 'Richview School of Architecture',
+            'architecture': 'Richview School of Architecture',
+
+            # Newstead Building
+            'newstead building': 'Newstead Building',
+            'newstead': 'Newstead Building',
+
+            # UCD Earth Institute
+            'ucd earth institute': 'UCD Earth Institute',
+            'earth institute': 'UCD Earth Institute',
+
+            # Roebuck Hall / Castle
+            'roebuck hall': 'Roebuck Hall',
+            'roebuck castle': 'Roebuck Hall',
+            'roebuck': 'Roebuck Hall',
+
+            # Generic campus keywords (no specific building)
+            'belfield': 'UCD Belfield',
+            'ucd': 'UCD Belfield',
+            'campus': 'UCD Belfield',
+        }
     
     def load_other_colleges(self) -> List[str]:
         """Load list of other Irish colleges to reject."""
@@ -364,30 +538,32 @@ class EventExtractor:
     def _extract_location(self, text: str) -> Optional[Dict]:
         """Extract location from text."""
         text_lower = text.lower()
-        
-        # Check against known UCD buildings
-        for building in self.ucd_buildings:
-            if building in text_lower:
+
+        # Check against known UCD buildings (longest alias first for specificity)
+        for alias in self.ucd_buildings:
+            if alias in text_lower:
+                official = self.building_aliases[alias]
                 # Try to extract room number
                 room_patterns = [
-                    rf'{building}\s+([A-Z]?\d+)',  # Newman A105
-                    rf'{building}\s+room\s+([A-Z]?\d+)',  # Newman room A105
-                    rf'room\s+([A-Z]?\d+)\s+{building}',  # room A105 Newman
+                    rf'{re.escape(alias)}\s+([A-Z]?\d+)',         # e.g. "engineering 321"
+                    rf'{re.escape(alias)}\s+room\s+([A-Z]?\d+)',  # e.g. "engineering room 321"
+                    rf'room\s+([A-Z]?\d+)\s+{re.escape(alias)}',  # e.g. "room 321 engineering"
                 ]
-                
+
                 for pattern in room_patterns:
-                    match = re.search(pattern, text, re.IGNORECASE)
+                    match = re.search(pattern, text_lower, re.IGNORECASE)
                     if match:
+                        room = match.group(1).upper()
                         return {
-                            'building': building.title(),
-                            'room': match.group(1),
-                            'full_location': f"{building.title()} {match.group(1)}"
+                            'building': official,
+                            'room': room,
+                            'full_location': f"{official}, Room {room}"
                         }
-                
+
                 return {
-                    'building': building.title(),
+                    'building': official,
                     'room': None,
-                    'full_location': building.title()
+                    'full_location': official
                 }
         
         # Try to find any location-like text

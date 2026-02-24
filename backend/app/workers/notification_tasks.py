@@ -196,11 +196,11 @@ def send_upcoming_event_notifications():
 async def _send_upcoming_event_notifications_async():
     """Async implementation of send_upcoming_event_notifications."""
     async with task_db_session() as session:
-        # Get current time and 1-hour reminder window
+        # Get current time and reminder window
         now = datetime.now(timezone.utc)
-        # Send reminders for events starting in 45–75 minutes (i.e. ~1 hour away).
-        # With 4x daily scraping events are detected well before this window.
-        window_start = now + timedelta(minutes=45)
+        # Send reminders for events starting within the next 75 minutes.
+        # Wide window (now → now+75min) ensures late-scraped events still get a reminder.
+        window_start = now
         window_end = now + timedelta(minutes=75)
         
         # Find events that:
@@ -239,23 +239,27 @@ async def _send_upcoming_event_notifications_async():
                 'date': event.start_time.strftime('%A, %B %d') if event.start_time else 'Date TBA',
             }
             
-            # Send WhatsApp reminders
-            whatsapp_notifier = WhatsAppService()
+            # Send WhatsApp reminders (only instantiate if users have WhatsApp enabled)
             whatsapp_users = [u for u in users if u.notification_preferences.get('whatsapp', False)]
-            
+
             whatsapp_results = []
-            for user in whatsapp_users:
-                if user.phone_number:
-                    result = await whatsapp_notifier.send_event_reminder(user.phone_number, event_data)
-                    whatsapp_results.append({
-                        'user_id': str(user.id),
-                        'status': 'success' if result.get('success') else 'failed',
-                        'error': result.get('error')
-                    })
-            
+            if whatsapp_users:
+                try:
+                    whatsapp_notifier = WhatsAppService()
+                    for user in whatsapp_users:
+                        if user.phone_number:
+                            result = await whatsapp_notifier.send_event_reminder(user.phone_number, event_data)
+                            whatsapp_results.append({
+                                'user_id': str(user.id),
+                                'status': 'success' if result.get('success') else 'failed',
+                                'error': result.get('error')
+                            })
+                except Exception as e:
+                    logger.error(f"WhatsApp notifier failed: {e}")
+
             if whatsapp_results:
                 await _log_notifications(session, str(event.id), whatsapp_results, 'whatsapp_reminder')
-            
+
             # Send email reminders
             email_notifier = BrevoEmailService()
             email_users = [u for u in users if u.notification_preferences.get('email', False)]
