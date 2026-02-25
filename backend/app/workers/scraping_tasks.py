@@ -137,7 +137,14 @@ def scrape_all_posts(self):
 
 
 async def _scrape_all_posts_async():
-    """Async implementation of scrape_all_posts."""
+    """
+    Async implementation of scrape_all_posts.
+
+    Issues ONE Apify actor run for all active societies instead of N separate
+    runs, reducing overhead from O(N) actor startups to O(1).
+    """
+    start_time = datetime.now()
+
     async with task_db_session() as session:
         query = select(Society).where(
             Society.is_active == True,
@@ -145,16 +152,107 @@ async def _scrape_all_posts_async():
         )
         result = await session.execute(query)
         societies = result.scalars().all()
-        
-        logger.info(f"Scraping posts for {len(societies)} societies")
-        
-        job = group(
-            scrape_society_posts.s(str(society.id))
-            for society in societies
+
+        if not societies:
+            logger.info("No active societies to scrape")
+            return {"societies_scraped": 0, "total_new_posts": 0}
+
+        handles = [s.instagram_handle for s in societies]
+        society_by_handle = {s.instagram_handle.lower(): s for s in societies}
+
+        logger.info(f"Batch scraping {len(handles)} societies in one Apify run")
+
+        scraper = get_scraper()
+        batch_results = await scraper.scrape_posts_batch(handles, max_posts_per_user=3)
+
+        logger.info(f"Batch returned results for {len(batch_results)}/{len(handles)} societies")
+
+        total_new_posts = 0
+
+        for handle_lower, posts_data in batch_results.items():
+            society = society_by_handle.get(handle_lower)
+            if not society:
+                logger.warning(f"Got results for unknown handle @{handle_lower}, skipping")
+                continue
+
+            posts_found = 0
+            new_posts = 0
+
+            for post_data in posts_data:
+                post_id = post_data["url"].split("/p/")[-1].rstrip("/")
+
+                # Skip posts older than 7 days
+                post_age = datetime.now() - post_data["timestamp"]
+                if post_age.days > 7:
+                    logger.info(f"Skipping old post from @{handle_lower}: {post_age.days} days old")
+                    continue
+
+                # Skip already-saved posts
+                existing = await session.execute(
+                    select(Post).where(
+                        Post.society_id == society.id,
+                        Post.instagram_post_id == post_id
+                    )
+                )
+                if existing.scalar_one_or_none():
+                    continue
+
+                post = Post(
+                    society_id=society.id,
+                    instagram_post_id=post_id,
+                    caption=post_data["caption"],
+                    media_urls=[post_data["image_url"]] if post_data.get("image_url") else [],
+                    source_url=post_data["url"],
+                    detected_at=post_data["timestamp"],
+                    processed=False,
+                )
+                session.add(post)
+                await session.flush()
+
+                new_posts += 1
+                posts_found += 1
+                total_new_posts += 1
+
+                try:
+                    await _process_scraped_content_async("post", str(post.id))
+                except Exception as nlp_error:
+                    logger.error(f"NLP processing failed for post {post.id}: {nlp_error}")
+
+                logger.info(f"New post from @{handle_lower}: {post_data['url']}")
+
+            society.last_post_check = datetime.now()
+            session.add(ScrapingLog(
+                society_id=society.id,
+                scrape_type="post",
+                status="success",
+                items_found=posts_found,
+                duration_ms=int((datetime.now() - start_time).total_seconds() * 1000),
+            ))
+
+        # Log societies that returned no results (private / no posts)
+        for handle_lower, society in society_by_handle.items():
+            if handle_lower not in batch_results:
+                society.last_post_check = datetime.now()
+                session.add(ScrapingLog(
+                    society_id=society.id,
+                    scrape_type="post",
+                    status="success",
+                    items_found=0,
+                    duration_ms=0,
+                ))
+
+        await session.commit()
+
+        logger.info(
+            f"Batch scrape complete: {total_new_posts} new posts "
+            f"from {len(batch_results)} societies "
+            f"in {(datetime.now() - start_time).seconds}s"
         )
-        
-        result = job.apply_async()
-        return {"societies_queued": len(societies)}
+        return {
+            "societies_scraped": len(societies),
+            "societies_with_results": len(batch_results),
+            "total_new_posts": total_new_posts,
+        }
 
 
 @celery_app.task(bind=True, max_retries=3)

@@ -142,6 +142,79 @@ class ApifyInstagramScraper:
             logger.error(f"Error parsing Apify post: {e}")
             return None
     
+    async def scrape_posts_batch(self, usernames: List[str], max_posts_per_user: int = 3) -> Dict[str, List[Dict]]:
+        """
+        Scrape recent posts for multiple profiles in a single Apify actor run.
+
+        Much more efficient than calling scrape_posts() N times — one run startup
+        cost instead of N.
+
+        Args:
+            usernames: List of Instagram usernames (without @)
+            max_posts_per_user: Max posts to collect per profile
+
+        Returns:
+            Dict mapping username (lowercase) -> list of post dicts
+        """
+        if not usernames:
+            return {}
+
+        try:
+            logger.info(f"Starting batch Apify scrape for {len(usernames)} handles")
+
+            run_input = {
+                "usernames": usernames,
+                "resultsLimit": max_posts_per_user,
+                "resultsType": "posts",
+                "searchType": "user",
+                "addParentData": False,
+            }
+
+            run = self.client.actor(self.actor_id).call(run_input=run_input)
+            logger.info(f"Batch run completed. ID: {run.get('id')}, status: {run.get('status')}")
+
+            results: Dict[str, List[Dict]] = {}
+
+            for item in self.client.dataset(run["defaultDatasetId"]).iterate_items():
+                try:
+                    if "latestPosts" in item and isinstance(item["latestPosts"], list):
+                        # Profile-level item — username is on the item itself
+                        uname = (item.get("username") or "").lower()
+                        if not uname:
+                            continue
+                        posts = []
+                        for post_item in item["latestPosts"][:max_posts_per_user]:
+                            parsed = self._parse_apify_post(post_item)
+                            if parsed:
+                                posts.append(parsed)
+                        results.setdefault(uname, [])
+                        results[uname].extend(posts)
+                    else:
+                        # Individual post item — derive username from owner fields
+                        uname = (
+                            item.get("ownerUsername")
+                            or item.get("username")
+                            or (item.get("owner") or {}).get("username")
+                            or ""
+                        ).lower()
+                        if not uname:
+                            continue
+                        results.setdefault(uname, [])
+                        if len(results[uname]) < max_posts_per_user:
+                            parsed = self._parse_apify_post(item)
+                            if parsed:
+                                results[uname].append(parsed)
+                except Exception as e:
+                    logger.error(f"Error parsing batch item: {e}", exc_info=True)
+                    continue
+
+            logger.info(f"Batch scrape returned results for {len(results)}/{len(usernames)} profiles")
+            return results
+
+        except Exception as e:
+            logger.error(f"Apify batch scraping failed: {e}")
+            return {}
+
     async def scrape_stories(self, username: str) -> List[Dict]:
         """
         Scrape active stories from an Instagram profile.
