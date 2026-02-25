@@ -156,11 +156,7 @@ You'll get notified about free food events from UCD societies.
                     "email": self.from_email
                 },
                 "to": [{"email": email, "name": first_name or email.split("@")[0]}],
-                "subject": "You're in 🍕",
-                "headers": {
-                    "List-Unsubscribe": f"<https://freefooducd.com/unsubscribe?email={email}>",
-                    "List-Unsubscribe-Post": "List-Unsubscribe=One-Click"
-                },
+                "subject": "you're on the list",
                 "tags": ["transactional", "welcome"],
                 "htmlContent": f"""
                 <!DOCTYPE html>
@@ -175,22 +171,18 @@ You'll get notified about free food events from UCD societies.
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
                             You got us early — we're still fine tuning our bots. We'll notify you when we launch. :)
                         </p>
-                        
-                        <p style="font-size: 14px; color: #6b7280; margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb; text-align: center;">
-                            — FreeFood UCD
-                        </p>
+
+                        <p style="font-size: 14px; color: #6b7280; margin-top: 40px;">-FreeFoodUCD</p>
                     </div>
                 </body>
                 </html>
                 """,
                 "textContent": f"""
-Welcome to FreeFood UCD
-
 Hi{f" {first_name}" if first_name else ""},
 
 You got us early — we're still fine tuning our bots. We'll notify you when we launch. :)
 
-— FreeFood UCD
+-FreeFoodUCD
                 """
             }
             
