@@ -166,11 +166,9 @@ You'll get notified about free food events from UCD societies.
                 <!DOCTYPE html>
                 <html>
                 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #1A1A1A;">
-                    <div style="background: linear-gradient(135deg, #F78620 0%, #6FC266 100%); border-radius: 16px; padding: 40px; text-align: center; color: white; margin-bottom: 30px;">
-                        <div style="font-size: 64px; margin-bottom: 20px;">🍕</div>
-                        <div style="font-size: 28px; font-weight: bold; margin-bottom: 10px;">Welcome to FreeFood UCD</div>
+                    <div style="background: linear-gradient(135deg, #F78620 0%, #6FC266 100%); border-radius: 16px; padding: 32px 40px; text-align: center; color: white; margin-bottom: 30px;">
+                        <div style="font-size: 24px; font-weight: bold;">Welcome to FreeFood UCD</div>
                     </div>
-                    
                     <div style="padding: 0 20px;">
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Hi{f" {first_name}" if first_name else ""},</p>
 
