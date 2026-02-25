@@ -161,6 +161,8 @@ class EventExtractor:
             # Student Centre
             'the student centre': 'Student Centre',
             'student centre': 'Student Centre',
+            'harmony studio': 'Student Centre',
+            'harmony': 'Student Centre',
 
             # UCD Village
             'ucd village': 'UCD Village',
