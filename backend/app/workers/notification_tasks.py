@@ -3,6 +3,7 @@ from app.db.base import task_db_session
 from app.db.models import Event, User, UserSocietyPreference, NotificationLog
 from app.services.notifications.whatsapp import WhatsAppService
 from app.services.notifications.brevo import BrevoEmailService
+from app.core.config import settings
 from sqlalchemy import select, and_
 from sqlalchemy.orm import selectinload
 import logging
@@ -61,6 +62,10 @@ async def _notify_event_async(event_id: str):
         # Send email notifications
         email_notifier = BrevoEmailService()
         email_users = [u for u in users if u.notification_preferences.get('email', False)]
+
+        if settings.NOTIFICATION_TEST_EMAILS:
+            allowlist = {e.strip().lower() for e in settings.NOTIFICATION_TEST_EMAILS.split(",")}
+            email_users = [u for u in email_users if u.email and u.email.lower() in allowlist]
 
         email_results = []
         for user in email_users:

@@ -158,7 +158,7 @@ You'll get notified about free food events from UCD societies.
                 "to": [{"email": email, "name": first_name or email.split("@")[0]}],
                 "subject": "You're in 🍕",
                 "headers": {
-                    "List-Unsubscribe": f"<https://freefooducd.vercel.app/unsubscribe?email={email}>",
+                    "List-Unsubscribe": f"<https://freefooducd.com/unsubscribe?email={email}>",
                     "List-Unsubscribe-Post": "List-Unsubscribe=One-Click"
                 },
                 "tags": ["transactional", "welcome"],
@@ -263,7 +263,7 @@ Fun fact: There was once a "Fat Men's Club" in 18th century New York. Entry? 200
                 </div>
 
                 <div style="text-align: center; padding: 16px; color: #9ca3af; font-size: 12px; border-top: 1px solid #e5e7eb; margin-top: 24px;">
-                    FreeFoodUCD &middot; <a href="https://freefooducd.vercel.app/unsubscribe?email={email}" style="color: #9ca3af;">unsubscribe</a>
+                    FreeFoodUCD &middot; <a href="https://freefooducd.com/unsubscribe?email={email}" style="color: #9ca3af;">unsubscribe</a>
                 </div>
             </body>
             </html>
@@ -279,7 +279,7 @@ Time: {time}
 Date: {date}
 
 ---
-FreeFoodUCD · unsubscribe: https://freefooducd.vercel.app/unsubscribe?email={email}
+FreeFoodUCD · unsubscribe: https://freefooducd.com/unsubscribe?email={email}
             """
 
             data = {
@@ -290,7 +290,7 @@ FreeFoodUCD · unsubscribe: https://freefooducd.vercel.app/unsubscribe?email={em
                 "to": [{"email": email, "name": email.split("@")[0]}],
                 "subject": f"free food at {location}, {date}",
                 "headers": {
-                    "List-Unsubscribe": f"<https://freefooducd.vercel.app/unsubscribe?email={email}>",
+                    "List-Unsubscribe": f"<https://freefooducd.com/unsubscribe?email={email}>",
                     "List-Unsubscribe-Post": "List-Unsubscribe=One-Click"
                 },
                 "tags": ["transactional", "event-notification"],
@@ -347,7 +347,7 @@ FreeFoodUCD · unsubscribe: https://freefooducd.vercel.app/unsubscribe?email={em
                 </div>
 
                 <div style="text-align: center; padding: 16px; color: #9ca3af; font-size: 12px; border-top: 1px solid #e5e7eb; margin-top: 24px;">
-                    FreeFoodUCD &middot; <a href="https://freefooducd.vercel.app/unsubscribe?email={email}" style="color: #9ca3af;">unsubscribe</a>
+                    FreeFoodUCD &middot; <a href="https://freefooducd.com/unsubscribe?email={email}" style="color: #9ca3af;">unsubscribe</a>
                 </div>
             </body>
             </html>
@@ -362,7 +362,7 @@ Maps: {maps_url}
 Time: {time}
 
 ---
-FreeFoodUCD · unsubscribe: https://freefooducd.vercel.app/unsubscribe?email={email}
+FreeFoodUCD · unsubscribe: https://freefooducd.com/unsubscribe?email={email}
             """
 
             data = {
@@ -373,7 +373,7 @@ FreeFoodUCD · unsubscribe: https://freefooducd.vercel.app/unsubscribe?email={em
                 "to": [{"email": email, "name": email.split("@")[0]}],
                 "subject": f"heads up: free food at {location}, {time}",
                 "headers": {
-                    "List-Unsubscribe": f"<https://freefooducd.vercel.app/unsubscribe?email={email}>",
+                    "List-Unsubscribe": f"<https://freefooducd.com/unsubscribe?email={email}>",
                     "List-Unsubscribe-Post": "List-Unsubscribe=One-Click"
                 },
                 "tags": ["transactional", "event-reminder"],

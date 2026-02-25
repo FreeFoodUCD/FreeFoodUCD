@@ -5,7 +5,7 @@ from app.db.models import Society, Post, Story, Event, ScrapingLog
 from app.services.nlp.extractor import EventExtractor
 from app.services.scraper.apify_scraper import ApifyInstagramScraper
 from sqlalchemy import select
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import logging
 import asyncio
 import hashlib
@@ -182,7 +182,7 @@ async def _scrape_all_posts_async():
                 post_id = post_data["url"].split("/p/")[-1].rstrip("/")
 
                 # Skip posts older than 7 days
-                post_age = datetime.now() - post_data["timestamp"]
+                post_age = datetime.now(timezone.utc) - post_data["timestamp"]
                 if post_age.days > 7:
                     logger.info(f"Skipping old post from @{handle_lower}: {post_age.days} days old")
                     continue
@@ -307,7 +307,7 @@ async def _scrape_society_posts_async(society_id: str):
                 
                 # Filter out old posts (>7 days old)
                 post_timestamp = post_data['timestamp']
-                post_age = datetime.now() - post_timestamp
+                post_age = datetime.now(timezone.utc) - post_timestamp
                 if post_age.days > 7:
                     logger.info(f"Skipping old post from @{society.instagram_handle}: {post_age.days} days old")
                     continue

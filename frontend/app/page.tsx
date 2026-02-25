@@ -137,7 +137,7 @@ export default function Home() {
                   disabled={isSubmitting || submitStatus === 'success'}
                   className="px-10 md:px-12 py-5 md:py-6 rounded-2xl bg-accent text-white text-lg md:text-xl font-bold hover:bg-accent-dark transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap shadow-md hover:shadow-lg"
                 >
-                  {isSubmitting ? 'Sending...' : submitStatus === 'success' ? 'Sent ✓' : 'Sign Up'}
+                  {isSubmitting ? 'Sending...' : submitStatus === 'success' ? 'Sent ✓' : 'Join Waitlist'}
                 </button>
               </div>
 

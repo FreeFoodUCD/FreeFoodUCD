@@ -48,6 +48,9 @@ class Settings(BaseSettings):
     
     # CORS
     ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:8000"
+
+    # Email allowlist (comma-separated; if set, only these addresses receive event emails)
+    NOTIFICATION_TEST_EMAILS: str = ""
     
     @property
     def allowed_origins_list(self) -> List[str]:
