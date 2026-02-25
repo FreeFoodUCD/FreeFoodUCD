@@ -10,6 +10,11 @@ export const metadata: Metadata = {
   description: "Get instant notifications when UCD societies post about free food events. Never miss free pizza again!",
   keywords: ["UCD", "free food", "university", "students", "events", "pizza"],
   authors: [{ name: "FreeFood UCD" }],
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/apple-icon.png",
+  },
   openGraph: {
     title: "FreeFood UCD",
     description: "Never miss free food on campus",
