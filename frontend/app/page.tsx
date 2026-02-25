@@ -184,8 +184,7 @@ export default function Home() {
 
           {error && (
             <div className="text-center py-16 bg-white rounded-3xl shadow-soft">
-              <div className="text-6xl mb-4">😕</div>
-              <p className="text-lg text-text-light font-semibold">couldn't load events</p>
+              <p className="text-lg text-text-light font-semibold">we're working on it :)</p>
             </div>
           )}
 
