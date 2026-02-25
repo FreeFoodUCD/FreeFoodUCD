@@ -784,13 +784,117 @@ async def trigger_scrape(
             "status": "completed"
         }
     else:
-        # Scrape all societies using the same batch logic as the Celery scheduler
-        from app.workers.scraping_tasks import _scrape_all_posts_async
-        scrape_result = await _scrape_all_posts_async()
+        # Scrape all societies via a single batch Apify run
+        from app.services.scraper.apify_scraper import ApifyInstagramScraper
+        from app.services.nlp.extractor import EventExtractor
+        from app.db.models import Post, Event, ScrapingLog
+        from app.core.config import settings
+        from datetime import datetime
+
+        query = select(Society).where(Society.is_active == True, Society.scrape_posts == True)
+        result = await db.execute(query)
+        societies = result.scalars().all()
+
+        if not societies:
+            return {"message": "No active societies to scrape", "status": "completed"}
+
+        handles = [s.instagram_handle for s in societies]
+        society_by_handle = {s.instagram_handle.lower(): s for s in societies}
+
+        scraper = ApifyInstagramScraper(api_token=settings.APIFY_API_TOKEN)
+        batch_results = await scraper.scrape_posts_batch(handles, max_posts_per_user=3)
+
+        extractor = EventExtractor()
+        total_new_posts = 0
+        total_new_events = 0
+        start_time = datetime.now()
+
+        for handle_lower, posts_data in batch_results.items():
+            society = society_by_handle.get(handle_lower)
+            if not society:
+                continue
+
+            posts_found = 0
+
+            for post_data in posts_data:
+                post_id = post_data["url"].split("/p/")[-1].rstrip("/")
+
+                post_age = datetime.now() - post_data["timestamp"]
+                if post_age.days > 7:
+                    continue
+
+                existing_result = await db.execute(
+                    select(Post).where(Post.instagram_post_id == post_id)
+                )
+                if existing_result.scalar_one_or_none():
+                    continue
+
+                combined_text = post_data["caption"]
+                if post_data.get("image_url"):
+                    try:
+                        from app.services.ocr.image_text_extractor import ImageTextExtractor
+                        ocr = ImageTextExtractor()
+                        ocr_text = ocr.extract_text_from_urls([post_data["image_url"]])
+                        if ocr_text:
+                            combined_text = f"{combined_text}\n\n[Image Text]\n{ocr_text}"
+                    except Exception:
+                        pass
+
+                post = Post(
+                    society_id=society.id,
+                    instagram_post_id=post_id,
+                    caption=post_data["caption"],
+                    media_urls=[post_data["image_url"]] if post_data.get("image_url") else [],
+                    source_url=post_data["url"],
+                    detected_at=post_data["timestamp"],
+                    processed=True,
+                )
+                db.add(post)
+                await db.flush()
+
+                total_new_posts += 1
+                posts_found += 1
+
+                event_data = extractor.extract_event(combined_text)
+                if event_data and event_data.get("confidence_score", 0) >= 0.3:
+                    event = Event(
+                        society_id=society.id,
+                        title=event_data.get("title", f"Free Food from {society.name}"),
+                        description=post_data["caption"][:500],
+                        location=event_data.get("location"),
+                        start_time=event_data.get("start_time"),
+                        end_time=event_data.get("end_time"),
+                        source_type="post",
+                        source_id=post.id,
+                        confidence_score=event_data.get("confidence_score"),
+                        raw_text=post_data["caption"],
+                        is_active=True,
+                    )
+                    db.add(event)
+                    await db.flush()
+                    total_new_events += 1
+                    post.is_free_food = True
+
+            society.last_post_check = datetime.now()
+            db.add(ScrapingLog(
+                society_id=society.id,
+                scrape_type="post",
+                status="success",
+                items_found=posts_found,
+                duration_ms=int((datetime.now() - start_time).total_seconds() * 1000),
+            ))
+
+        await db.commit()
+
         return {
-            "message": f"Scraping completed for {scrape_result.get('societies_scraped', 0)} societies",
-            "results": scrape_result,
-            "status": "completed"
+            "message": f"Scraping completed for {len(societies)} societies",
+            "results": {
+                "societies_scraped": len(societies),
+                "societies_with_results": len(batch_results),
+                "total_new_posts": total_new_posts,
+                "total_new_events": total_new_events,
+            },
+            "status": "completed",
         }
 
 
