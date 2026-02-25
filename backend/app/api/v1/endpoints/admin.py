@@ -784,22 +784,12 @@ async def trigger_scrape(
             "status": "completed"
         }
     else:
-        # Scrape all societies synchronously
-        query = select(Society).where(Society.is_active == True, Society.scrape_posts == True)
-        result = await db.execute(query)
-        societies = result.scalars().all()
-        
-        results = []
-        for society in societies:
-            try:
-                scrape_result = await _scrape_society_posts_async(str(society.id))
-                results.append(scrape_result)
-            except Exception as e:
-                results.append({"society": society.instagram_handle, "error": str(e)})
-        
+        # Scrape all societies using the same batch logic as the Celery scheduler
+        from app.workers.scraping_tasks import _scrape_all_posts_async
+        scrape_result = await _scrape_all_posts_async()
         return {
-            "message": f"Scraping completed for {len(societies)} societies",
-            "results": results,
+            "message": f"Scraping completed for {scrape_result.get('societies_scraped', 0)} societies",
+            "results": scrape_result,
             "status": "completed"
         }
 
