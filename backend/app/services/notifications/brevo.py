@@ -173,17 +173,10 @@ You'll get notified about free food events from UCD societies.
                     
                     <div style="padding: 0 20px;">
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Hi{f" {first_name}" if first_name else ""},</p>
-                        
+
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-                            You're all set. We'll ping you when there's free food on campus.
+                            You got us early — we're still fine tuning our bots. We'll notify you when we launch. :)
                         </p>
-                        
-                        <div style="background: #f3f4f6; border-left: 4px solid #F78620; border-radius: 8px; padding: 20px; margin: 30px 0;">
-                            <p style="font-size: 14px; font-weight: 600; margin-bottom: 10px; color: #F78620;">Fun fact:</p>
-                            <p style="font-size: 14px; line-height: 1.6; margin: 0; color: #4b5563;">
-                                There was once a "Fat Men's Club" in 18th century New York. Entry? 200lbs minimum. With our alerts, you'll qualify by finals.
-                            </p>
-                        </div>
                         
                         <p style="font-size: 14px; color: #6b7280; margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb; text-align: center;">
                             — FreeFood UCD
@@ -197,9 +190,7 @@ Welcome to FreeFood UCD
 
 Hi{f" {first_name}" if first_name else ""},
 
-You're all set. We'll ping you when there's free food on campus.
-
-Fun fact: There was once a "Fat Men's Club" in 18th century New York. Entry? 200lbs minimum. With our alerts, you'll qualify by finals.
+You got us early — we're still fine tuning our bots. We'll notify you when we launch. :)
 
 — FreeFood UCD
                 """
