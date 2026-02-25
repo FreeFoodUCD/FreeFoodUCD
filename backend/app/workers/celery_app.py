@@ -81,6 +81,12 @@ celery_app.conf.beat_schedule = {
         'schedule': crontab(hour=15, minute=0),
         'options': {'queue': 'scraping'}
     },
+    # TEMP TEST — remove after verifying auto-scrape works
+    'scrape-posts-345pm': {
+        'task': 'app.workers.scraping_tasks.scrape_all_posts',
+        'schedule': crontab(hour=15, minute=45),
+        'options': {'queue': 'scraping'}
+    },
     'scrape-posts-7pm': {
         'task': 'app.workers.scraping_tasks.scrape_all_posts',
         'schedule': crontab(hour=19, minute=0),
