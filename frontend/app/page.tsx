@@ -66,11 +66,16 @@ export default function Home() {
       <section className="pt-24 md:pt-32 pb-20 md:pb-24 px-4 relative z-10">
         <div className="max-w-5xl mx-auto">
           {/* Headline with Logo - Left aligned */}
-          <div className="flex items-center gap-3 md:gap-8 mb-4 md:mb-6">
-            <h1 className="text-[2.5rem] md:text-7xl lg:text-8xl font-extrabold text-text leading-[1.1]">
-              yes, it is<br />
-              that serious
-            </h1>
+          <div className="flex items-center gap-3 md:gap-8 mb-8 md:mb-12">
+            <div className="flex flex-col">
+              <h1 className="text-[2.5rem] md:text-7xl lg:text-8xl font-extrabold text-text leading-[1.1]">
+                yes, it is<br />
+                that serious
+              </h1>
+              <p className="text-sm md:text-base text-text-lighter font-semibold mt-2 md:mt-3">
+                tracking 78 UCD societies
+              </p>
+            </div>
             <div className="relative w-24 h-24 md:w-[336px] md:h-[336px] lg:w-[392px] lg:h-[392px] animate-bounce-slow flex-shrink-0">
               <Image
                 src="/FreeFoodUCDLogo_nobg.png"
@@ -82,20 +87,12 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Tagline - left-aligned, under h1 */}
-          <p className="text-lg md:text-2xl font-semibold text-text-light mb-8 md:mb-12">
-            get email alerts when free food drops on campus
-          </p>
-
           {/* Email Signup Form */}
           <div className="max-w-2xl mx-auto">
-            {/* Social proof pill badge */}
-            <div className="flex justify-center mb-6">
-              <span className="bg-primary/10 text-primary text-xs md:text-sm font-semibold px-4 py-1.5 rounded-full">
-                tracking 78 UCD societies
-              </span>
-            </div>
-            
+            <p className="text-sm md:text-2xl text-text-light mb-3 font-medium text-center">
+              get email alerts when free food drops on campus
+            </p>
+
             <form onSubmit={handleEmailSubmit} className="space-y-5">
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex-1 relative">
