@@ -80,6 +80,10 @@ class EventExtractor:
             'kombucha', 'potluck', 'iftar', 'break the fast', 'banquet',
             'food provided', 'refreshments provided', 'food will be provided',
             'complimentary food', 'italian food', 'barbeque', 'bbq',
+            'popcorn', 'nachos', 'crisps', 'chips', 'chocolate', 'cake', 'waffles',
+            'biscuits', 'donuts', 'doughnuts', 'sweets', 'cupcakes',
+            'sandwich', 'sandwiches', 'wrap', 'wraps', 'sushi', 'curry',
+            'soup', 'pasta', 'tacos', 'burger', 'burgers',
         ]
         # Weak food indicators — only count if "free", "provided", or "complimentary"
         # also appears somewhere in the text
@@ -553,6 +557,14 @@ class EventExtractor:
                 return True
         return False
     
+    def _is_members_only(self, text: str) -> bool:
+        patterns = [
+            r'\bfor\s+members\b',
+            r'\bmembers\s+only\b',
+            r'\bonly\s+for\s+members\b',
+        ]
+        return any(re.search(p, text, re.IGNORECASE) for p in patterns)
+
     def _alias_in_text(self, alias: str, text_lower: str) -> bool:
         """
         Check if an alias appears in text.
@@ -656,6 +668,7 @@ class EventExtractor:
                 'time_found': time is not None,
                 'date_found': date is not None,
                 'location_found': location is not None,
+                'members_only': self._is_members_only(text),
             }
         }
     

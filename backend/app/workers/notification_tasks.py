@@ -57,6 +57,7 @@ async def _notify_event_async(event_id: str):
             "date": event.start_time.strftime("%A, %B %d") if event.start_time else "Date TBA",
             "source_type": event.source_type or "post",
             "description": event.description or "",
+            "members_only": (event.extracted_data or {}).get('members_only', False),
         }
 
         # Send email notifications
@@ -256,6 +257,7 @@ async def _send_upcoming_event_notifications_async():
                 'location': event.location or 'Location TBA',
                 'start_time': event.start_time.strftime('%I:%M %p') if event.start_time else 'Time TBA',
                 'date': event.start_time.strftime('%A, %B %d') if event.start_time else 'Date TBA',
+                'members_only': (event.extracted_data or {}).get('members_only', False),
             }
             
             # Send WhatsApp reminders (only instantiate if users have WhatsApp enabled)

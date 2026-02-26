@@ -224,6 +224,16 @@ You got us early — we're still fine tuning our bots. We'll notify you when we 
             time = event_data.get("start_time", "Time TBA")
             date = event_data.get("date", "Date TBA")
 
+            members_tag = ""
+            if event_data.get("members_only"):
+                members_tag = """
+                    <p style="margin: 0 0 16px 0;">
+                      <span style="background: #fef3c7; color: #92400e; padding: 4px 10px;
+                                   border-radius: 20px; font-size: 12px; font-weight: 600;">
+                        &#128101; for members only
+                      </span>
+                    </p>"""
+
             maps_url = f"https://www.google.com/maps/search/?api=1&query={location.replace(' ', '+')}+UCD"
 
             html_content = f"""
@@ -236,7 +246,7 @@ You got us early — we're still fine tuning our bots. We'll notify you when we 
 
                 <div style="background: #f9fafb; border-radius: 12px; padding: 25px; margin-bottom: 20px;">
                     <h2 style="margin-top: 0; color: #111827; font-size: 20px;">{title}</h2>
-
+                    {members_tag}
                     <div style="margin: 20px 0;">
                         <p style="margin: 10px 0; font-size: 15px;">🏛 <strong>Society:</strong> {society}</p>
                         <p style="margin: 10px 0; font-size: 15px;">📍 <strong>Location:</strong> {location} &nbsp;<a href="{maps_url}" style="color: #059669; font-size: 13px; text-decoration: none;">Open in Google Maps ↗</a></p>
@@ -309,6 +319,16 @@ FreeFoodUCD · unsubscribe: https://freefooducd.com/unsubscribe?email={email}
             location = event_data.get("location", "Location TBA")
             time = event_data.get("start_time", "Time TBA")
 
+            members_tag = ""
+            if event_data.get("members_only"):
+                members_tag = """
+                    <p style="margin: 0 0 16px 0;">
+                      <span style="background: #fef3c7; color: #92400e; padding: 4px 10px;
+                                   border-radius: 20px; font-size: 12px; font-weight: 600;">
+                        &#128101; for members only
+                      </span>
+                    </p>"""
+
             maps_url = f"https://www.google.com/maps/search/?api=1&query={location.replace(' ', '+')}+UCD"
 
             html_content = f"""
@@ -316,12 +336,12 @@ FreeFoodUCD · unsubscribe: https://freefooducd.com/unsubscribe?email={email}
             <html>
             <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #1A1A1A;">
                 <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 24px 30px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
-                    <p style="margin: 0; font-size: 20px; font-weight: 600;">⏰ starting in 1 hour</p>
+                    <p style="margin: 0; font-size: 20px; font-weight: 600;">&#9200; starting in 1 hour</p>
                 </div>
 
                 <div style="background: #f9fafb; border-radius: 12px; padding: 25px; margin-bottom: 20px;">
                     <h2 style="margin-top: 0; color: #111827; font-size: 20px;">{title}</h2>
-
+                    {members_tag}
                     <div style="margin: 20px 0;">
                         <p style="margin: 10px 0; font-size: 15px;">🏛 <strong>Society:</strong> {society}</p>
                         <p style="margin: 10px 0; font-size: 15px;">📍 <strong>Location:</strong> {location} &nbsp;<a href="{maps_url}" style="color: #059669; font-size: 13px; text-decoration: none;">Open in Google Maps ↗</a></p>
