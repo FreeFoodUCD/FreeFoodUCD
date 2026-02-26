@@ -11,35 +11,9 @@ import { Mail, Check, AlertCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
-// Mock data for development
-const MOCK_EVENTS: Event[] = [
-  {
-    id: '1',
-    title: 'Pizza Night & Movie Screening',
-    location: 'Newman Building A105',
-    start_time: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
-    end_time: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(),
-    society_id: '1',
-    source_type: 'story',
-    is_free_food: true,
-    society: {
-      id: '1',
-      name: 'UCD Law Society',
-      instagram_handle: 'ucdlawsoc',
-      is_active: true,
-      scrape_posts: true,
-      scrape_stories: true,
-      created_at: new Date().toISOString(),
-    },
-    notified: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-];
 
 export default function Home() {
   const router = useRouter();
-  const [useMockData] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [email, setEmail] = useState('');
@@ -50,12 +24,9 @@ export default function Home() {
   const { data, isLoading, error } = useQuery({
     queryKey: ['events', '24h'],
     queryFn: () => api.getEvents({ date_filter: '24h' }),
-    enabled: !useMockData,
   });
 
-  const events = useMockData || (!isLoading && !error && data?.items && data.items.length === 0)
-    ? MOCK_EVENTS
-    : (data?.items || []);
+  const events = data?.items || [];
 
   const handleEventClick = (event: Event) => {
     setSelectedEvent(event);
@@ -190,13 +161,7 @@ export default function Home() {
 
           {!isLoading && !error && events.length === 0 && (
             <div className="text-center py-16 bg-white rounded-3xl shadow-soft">
-              <div className="text-7xl mb-6">🔍</div>
-              <h3 className="text-2xl font-bold text-text mb-3">
-                no events right now
-              </h3>
-              <p className="text-lg text-text-light font-medium">
-                be the first to know when they drop
-              </p>
+              <p className="text-lg text-text-light font-semibold">we're working on it :)</p>
             </div>
           )}
 
