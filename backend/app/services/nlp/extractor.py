@@ -77,7 +77,7 @@ class EventExtractor:
             'free breakfast', 'free snacks', 'free snack',
             'pizza', 'refreshments', 'catering', 'buffet', 'nibbles',
             'cookies', 'cookie', 'dessert', 'protein bar', 'protein bars',
-            'kombucha', 'potluck', 'iftar', 'break the fast', 'banquet',
+            'kombucha', 'potluck', 'banquet',
             'food provided', 'refreshments provided', 'food will be provided',
             'complimentary food', 'italian food', 'barbeque', 'bbq',
             'refreshers', 'brunch', 'coffee morning',
