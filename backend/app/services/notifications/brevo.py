@@ -128,6 +128,9 @@ You'll get notified about free food events from UCD societies.
             logger.info(f"Verification code sent to {email}")
             return {"success": True, "status": "sent"}
             
+        except httpx.HTTPStatusError as e:
+            logger.error(f"Error sending verification code: {str(e)} — body: {e.response.text}")
+            return {"success": False, "error": str(e)}
         except Exception as e:
             logger.error(f"Error sending verification code: {str(e)}")
             return {"success": False, "error": str(e)}
