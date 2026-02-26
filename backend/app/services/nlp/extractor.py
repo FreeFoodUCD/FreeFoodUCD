@@ -35,6 +35,33 @@ class EventExtractor:
         self.off_campus_venues = self.load_off_campus_venues()
         self.nightlife_keywords = self.load_nightlife_keywords()
         
+        # Named rooms within Student Centre: lowercase alias -> canonical display name
+        # Checked first in _extract_location so "Blue Room" → "Blue Room, Student Centre"
+        self.student_centre_rooms = {
+            'blue room': 'Blue Room',
+            'red room': 'Red Room',
+            'fitzgerald chamber': 'FitzGerald Chamber',
+            'fitzgerald': 'FitzGerald Chamber',
+            'meeting room 5': 'Meeting Room 5',
+            'meeting room 6': 'Meeting Room 6',
+            'meeting room 7': 'Meeting Room 7',
+            'harmony studio': 'Harmony Studio',
+            'harmony': 'Harmony Studio',
+            'astra hall': 'Astra Hall',
+            'ucd cinema': 'UCD Cinema',
+            'brava lounge': 'Brava Lounge',
+            'atrium': 'Atrium',
+            'main foyer': 'Main Foyer',
+            'clubhouse bar': 'Clubhouse Bar',
+            'clubhouse': 'Clubhouse Bar',
+            "o'neill lounge": "O'Neill Lounge",
+            'oneill lounge': "O'Neill Lounge",
+        }
+        # Sorted longest-first so "clubhouse bar" matches before "clubhouse", etc.
+        self.student_centre_rooms_sorted = sorted(
+            self.student_centre_rooms.keys(), key=len, reverse=True
+        )
+
         # Strong food indicators — sufficient on their own
         self.strong_food_keywords = [
             'free food', 'free pizza', 'free lunch', 'free dinner',
@@ -161,8 +188,25 @@ class EventExtractor:
             # Student Centre
             'the student centre': 'Student Centre',
             'student centre': 'Student Centre',
+            # Named rooms — also listed so _has_ucd_location fires on room-only mentions
             'harmony studio': 'Student Centre',
             'harmony': 'Student Centre',
+            'blue room': 'Student Centre',
+            'red room': 'Student Centre',
+            'fitzgerald chamber': 'Student Centre',
+            'fitzgerald': 'Student Centre',
+            'meeting room 5': 'Student Centre',
+            'meeting room 6': 'Student Centre',
+            'meeting room 7': 'Student Centre',
+            'astra hall': 'Student Centre',
+            'ucd cinema': 'Student Centre',
+            'brava lounge': 'Student Centre',
+            'atrium': 'Student Centre',
+            'main foyer': 'Student Centre',
+            'clubhouse bar': 'Student Centre',
+            'clubhouse': 'Student Centre',
+            "o'neill lounge": 'Student Centre',
+            'oneill lounge': 'Student Centre',
 
             # UCD Village
             'ucd village': 'UCD Village',
@@ -616,6 +660,17 @@ class EventExtractor:
         - Global room scan: finds room even when it's in a separate sentence
         """
         text_lower = text.lower()
+
+        # Named Student Centre rooms — check before generic building scan so
+        # "Blue Room" → "Blue Room, Student Centre" rather than just "Student Centre"
+        for alias in self.student_centre_rooms_sorted:
+            if self._alias_in_text(alias, text_lower):
+                room_name = self.student_centre_rooms[alias]
+                return {
+                    'building': 'Student Centre',
+                    'room': room_name,
+                    'full_location': f'{room_name}, Student Centre',
+                }
 
         # Room regex: optional letter prefix, digits, optional .subdiv, optional suffix
         # Matches: 321, A5, G01, E1.32, C204A, AD1.01
