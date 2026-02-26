@@ -85,8 +85,11 @@ export default function Home() {
           {/* Email Signup Form */}
           <div className="max-w-2xl mx-auto">
             {/* Tagline above form */}
-            <p className="text-sm md:text-2xl text-text-light mb-6 font-medium text-center">
+            <p className="text-sm md:text-2xl text-text-light mb-3 font-medium text-center">
               get email alerts when free food drops on campus
+            </p>
+            <p className="text-xs md:text-base text-text-lighter mb-6 font-medium text-center">
+              tracking 78 UCD societies
             </p>
             
             <form onSubmit={handleEmailSubmit} className="space-y-5">
@@ -176,6 +179,26 @@ export default function Home() {
               ))}
             </div>
           )}
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section className="px-4 pb-16 pt-4">
+        <div className="max-w-2xl mx-auto text-center">
+          <p className="text-sm md:text-base text-text-lighter font-medium">
+            we watch UCD society instagrams and email you when free food events are happening.
+          </p>
+          <p className="text-sm md:text-base text-text-lighter font-medium mt-1">
+            <a
+              href="https://www.linkedin.com/in/adityasinha04/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-text-light transition-colors"
+            >
+              linkedin
+            </a>{' '}
+            if you want to say hi or give feedback :)
+          </p>
         </div>
       </section>
 

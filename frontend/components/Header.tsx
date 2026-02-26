@@ -32,12 +32,6 @@ export function Header() {
           <Link href="/" className="px-4 py-2 text-sm font-semibold text-text-light hover:text-primary hover:bg-primary/5 rounded-xl transition-all">
             Events
           </Link>
-          <Link href="/societies" className="px-4 py-2 text-sm font-semibold text-text-light hover:text-primary hover:bg-primary/5 rounded-xl transition-all">
-            Societies
-          </Link>
-          <Link href="/about" className="px-4 py-2 text-sm font-semibold text-text-light hover:text-primary hover:bg-primary/5 rounded-xl transition-all">
-            About
-          </Link>
         </nav>
 
         {/* Hamburger — mobile only */}
@@ -62,12 +56,6 @@ export function Header() {
           <nav className="px-4 py-4 space-y-1">
             <Link href="/" className="block px-4 py-3 text-base font-semibold text-text hover:bg-primary/5 hover:text-primary rounded-xl transition-all" onClick={() => setIsMenuOpen(false)}>
               Events
-            </Link>
-            <Link href="/societies" className="block px-4 py-3 text-base font-semibold text-text hover:bg-primary/5 hover:text-primary rounded-xl transition-all" onClick={() => setIsMenuOpen(false)}>
-              Societies
-            </Link>
-            <Link href="/about" className="block px-4 py-3 text-base font-semibold text-text hover:bg-primary/5 hover:text-primary rounded-xl transition-all" onClick={() => setIsMenuOpen(false)}>
-              About
             </Link>
           </nav>
         </div>
