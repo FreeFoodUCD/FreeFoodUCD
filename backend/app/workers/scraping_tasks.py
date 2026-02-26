@@ -468,6 +468,26 @@ async def _process_scraped_content_async(content_type: str, content_id: str):
                         logger.info(f"Duplicate event detected (by title): {existing.title}")
                         break
             
+            # Fallback: society-level same-day dedup (catches reminder posts that
+            # extract a slightly different time, bypassing the ±1 hour window)
+            if not is_duplicate:
+                today_start = start_time.replace(hour=0, minute=0, second=0, microsecond=0)
+                today_end = today_start + timedelta(days=1)
+                same_day_query = select(Event).where(
+                    Event.society_id == content.society_id,
+                    Event.start_time >= today_start,
+                    Event.start_time < today_end,
+                    Event.is_active == True
+                )
+                same_day_result = await session.execute(same_day_query)
+                same_day_events = same_day_result.scalars().all()
+                if same_day_events:
+                    is_duplicate = True
+                    logger.info(
+                        f"Same-day society dedup triggered: society {content.society_id} "
+                        f"already has event on {today_start.date()} — skipping '{event_data['title']}'"
+                    )
+
             if is_duplicate:
                 # Mark content as processed but don't create duplicate event
                 content.processed = True
@@ -479,7 +499,7 @@ async def _process_scraped_content_async(content_type: str, content_id: str):
                     "reason": "duplicate",
                     "title": event_data['title']
                 }
-            
+
             # Create event (no duplicate found)
             event = Event(
                 society_id=content.society_id,
