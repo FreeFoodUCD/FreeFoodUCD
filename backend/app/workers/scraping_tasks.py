@@ -1,9 +1,10 @@
 from celery import group
 from app.workers.celery_app import celery_app
+from app.core.config import settings
 from app.db.base import task_db_session
 from app.db.models import Society, Post, Story, Event, ScrapingLog
 from app.services.nlp.extractor import EventExtractor
-from app.services.scraper.instaloader_scraper import InstaLoaderScraper
+from app.services.scraper.apify_scraper import ApifyInstagramScraper
 from sqlalchemy import select
 from datetime import datetime, timedelta, timezone
 import logging
@@ -13,8 +14,8 @@ import hashlib
 logger = logging.getLogger(__name__)
 
 def get_scraper():
-    """Create a fresh InstaLoader scraper instance."""
-    return InstaLoaderScraper()
+    """Create a fresh Apify scraper instance."""
+    return ApifyInstagramScraper(api_token=settings.APIFY_API_TOKEN)
 
 
 @celery_app.task(bind=True, max_retries=3)

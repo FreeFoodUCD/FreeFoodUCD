@@ -12,7 +12,10 @@ class Settings(BaseSettings):
     # Redis
     REDIS_URL: str
     
-    # Instagram (scraping uses Instaloader — no credentials needed for public profiles)
+    # Apify (Instagram scraping)
+    APIFY_API_TOKEN: str
+
+    # Instagram credentials (unused — kept for reference)
     INSTAGRAM_USERNAME: Optional[str] = None
     INSTAGRAM_PASSWORD: Optional[str] = None
 

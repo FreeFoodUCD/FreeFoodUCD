@@ -634,7 +634,7 @@ async def trigger_scrape(
     Trigger immediate scraping with database saving and NLP processing.
     Set force_reprocess=true to reprocess existing posts with NLP.
     """
-    from app.services.scraper.instaloader_scraper import InstaLoaderScraper
+    from app.services.scraper.apify_scraper import ApifyInstagramScraper
     from app.services.nlp.extractor import EventExtractor
     from app.db.models import Post, Event
     from datetime import datetime
@@ -650,7 +650,7 @@ async def trigger_scrape(
             raise HTTPException(status_code=404, detail=f"Society @{society_handle} not found")
 
         # Scrape posts using working logic
-        scraper = InstaLoaderScraper()
+        scraper = ApifyInstagramScraper(api_token=settings.APIFY_API_TOKEN)
         posts_data = await scraper.scrape_posts(society_handle, max_posts=3)
         
         new_posts = 0
@@ -807,10 +807,10 @@ async def test_scrape(
     Test scraping without saving to database.
     Returns raw scraped data for inspection.
     """
-    from app.services.scraper.instaloader_scraper import InstaLoaderScraper
+    from app.services.scraper.apify_scraper import ApifyInstagramScraper
 
     try:
-        scraper = InstaLoaderScraper()
+        scraper = ApifyInstagramScraper(api_token=settings.APIFY_API_TOKEN)
         posts = await scraper.scrape_posts(society_handle, max_posts=3)
         
         return {
@@ -1604,7 +1604,7 @@ async def get_system_health(
         health_status["beat_error"] = str(e)
     
     # Service status (basic checks)
-    health_status["services"]["instaloader"] = "active"
+    health_status["services"]["apify"] = "configured" if settings.APIFY_API_TOKEN else "not_configured"
     health_status["services"]["twilio"] = "configured" if settings.TWILIO_ACCOUNT_SID else "not_configured"
     health_status["services"]["resend"] = "configured" if settings.RESEND_API_KEY else "not_configured"
     

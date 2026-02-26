@@ -65,7 +65,7 @@ def shutdown_worker(**kwargs):
 
 # Celery Beat schedule for periodic tasks
 celery_app.conf.beat_schedule = {
-    # Scrape posts 4x daily to catch posts close to event time
+    # Scrape posts 3x daily (8am, 11am, 3pm) — ~$4.30/month on Apify free tier
     'scrape-posts-8am': {
         'task': 'app.workers.scraping_tasks.scrape_all_posts',
         'schedule': crontab(hour=8, minute=0),
@@ -79,11 +79,6 @@ celery_app.conf.beat_schedule = {
     'scrape-posts-3pm': {
         'task': 'app.workers.scraping_tasks.scrape_all_posts',
         'schedule': crontab(hour=15, minute=0),
-        'options': {'queue': 'scraping'}
-    },
-    'scrape-posts-7pm': {
-        'task': 'app.workers.scraping_tasks.scrape_all_posts',
-        'schedule': crontab(hour=19, minute=0),
         'options': {'queue': 'scraping'}
     },
     
