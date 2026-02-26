@@ -62,6 +62,15 @@ class EventExtractor:
             self.student_centre_rooms.keys(), key=len, reverse=True
         )
 
+        # Named rooms within UCD Village
+        self.village_rooms = {
+            'village auditorium': 'Auditorium',
+            'auditorium': 'Auditorium',
+        }
+        self.village_rooms_sorted = sorted(
+            self.village_rooms.keys(), key=len, reverse=True
+        )
+
         # Strong food indicators — sufficient on their own
         self.strong_food_keywords = [
             'free food', 'free pizza', 'free lunch', 'free dinner',
@@ -670,6 +679,16 @@ class EventExtractor:
                     'building': 'Student Centre',
                     'room': room_name,
                     'full_location': f'{room_name}, Student Centre',
+                }
+
+        # Named UCD Village rooms — e.g. "auditorium" → "Auditorium, UCD Village"
+        for alias in self.village_rooms_sorted:
+            if self._alias_in_text(alias, text_lower):
+                room_name = self.village_rooms[alias]
+                return {
+                    'building': 'UCD Village',
+                    'room': room_name,
+                    'full_location': f'{room_name}, UCD Village',
                 }
 
         # Room regex: optional letter prefix, digits, optional .subdiv, optional suffix
