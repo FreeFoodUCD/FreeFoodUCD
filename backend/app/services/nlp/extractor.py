@@ -80,6 +80,7 @@ class EventExtractor:
             'kombucha', 'potluck', 'iftar', 'break the fast', 'banquet',
             'food provided', 'refreshments provided', 'food will be provided',
             'complimentary food', 'italian food', 'barbeque', 'bbq',
+            'refreshers',
             'popcorn', 'nachos', 'crisps', 'chips', 'chocolate', 'cake', 'waffles',
             'biscuits', 'donuts', 'doughnuts', 'sweets', 'cupcakes',
             'sandwich', 'sandwiches', 'wrap', 'wraps', 'sushi', 'curry',
@@ -478,11 +479,19 @@ class EventExtractor:
         return False
     
     def _is_other_college(self, text: str) -> bool:
-        """Check if text mentions other Irish colleges."""
+        """Check if text mentions other Irish colleges.
+        Short abbreviations (<=4 chars) use word boundaries to avoid false matches
+        (e.g. 'ul' in 'full', 'mu' in 'music', 'dcu' in 'educational').
+        """
         for college in self.other_colleges:
-            if college in text:
-                logger.debug(f"Found other college: {college}")
-                return True
+            if len(college) <= 4:
+                if re.search(r'\b' + re.escape(college) + r'\b', text):
+                    logger.debug(f"Found other college: {college}")
+                    return True
+            else:
+                if college in text:
+                    logger.debug(f"Found other college: {college}")
+                    return True
         return False
     
     def _is_off_campus(self, text: str) -> bool:
