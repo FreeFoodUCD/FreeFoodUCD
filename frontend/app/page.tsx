@@ -72,8 +72,8 @@ export default function Home() {
                 yes, it is<br />
                 that serious
               </h1>
-              <p className="text-sm md:text-base text-text-lighter font-semibold mt-2 md:mt-3">
-                tracking 78 UCD societies
+              <p className="text-sm md:text-lg text-text-lighter font-semibold mt-2 md:mt-3 ml-1 md:ml-3">
+                — tracking 78 UCD societies
               </p>
             </div>
             <div className="relative w-24 h-24 md:w-[336px] md:h-[336px] lg:w-[392px] lg:h-[392px] animate-bounce-slow flex-shrink-0">
@@ -88,7 +88,7 @@ export default function Home() {
           </div>
 
           {/* Email Signup Form */}
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-2xl mx-auto mt-8 md:mt-0">
             <p className="text-sm md:text-2xl text-text-light mb-3 font-medium text-center">
               get email alerts when free food drops on campus
             </p>
