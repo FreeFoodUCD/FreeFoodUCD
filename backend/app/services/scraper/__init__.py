@@ -1,6 +1,6 @@
 """Instagram scraper module for FreeFoodUCD"""
-from .apify_scraper import ApifyInstagramScraper
+from .instaloader_scraper import InstaLoaderScraper
 
-__all__ = ['ApifyInstagramScraper']
+__all__ = ['InstaLoaderScraper']
 
 # Made with Bob

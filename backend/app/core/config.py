@@ -12,13 +12,10 @@ class Settings(BaseSettings):
     # Redis
     REDIS_URL: str
     
-    # Instagram (Legacy - not used with Apify)
+    # Instagram (scraping uses Instaloader — no credentials needed for public profiles)
     INSTAGRAM_USERNAME: Optional[str] = None
     INSTAGRAM_PASSWORD: Optional[str] = None
-    
-    # Apify
-    APIFY_API_TOKEN: str
-    
+
     # Twilio (WhatsApp) - Optional, not used anymore
     TWILIO_ACCOUNT_SID: Optional[str] = None
     TWILIO_AUTH_TOKEN: Optional[str] = None
