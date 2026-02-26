@@ -3,7 +3,7 @@ from app.workers.celery_app import celery_app
 from app.db.base import task_db_session
 from app.db.models import Society, Post, Story, Event, ScrapingLog
 from app.services.nlp.extractor import EventExtractor
-from app.services.scraper.apify_scraper import ApifyInstagramScraper
+from app.services.scraper.instaloader_scraper import InstaLoaderScraper
 from sqlalchemy import select
 from datetime import datetime, timedelta, timezone
 import logging
@@ -13,9 +13,8 @@ import hashlib
 logger = logging.getLogger(__name__)
 
 def get_scraper():
-    """Create a fresh Apify scraper instance (no caching to avoid stale state)."""
-    from app.core.config import settings
-    return ApifyInstagramScraper(api_token=settings.APIFY_API_TOKEN)
+    """Create a fresh InstaLoader scraper instance."""
+    return InstaLoaderScraper()
 
 
 @celery_app.task(bind=True, max_retries=3)
@@ -140,8 +139,7 @@ async def _scrape_all_posts_async():
     """
     Async implementation of scrape_all_posts.
 
-    Issues ONE Apify actor run for all active societies instead of N separate
-    runs, reducing overhead from O(N) actor startups to O(1).
+    Scrapes all active societies in a single batch call.
     """
     start_time = datetime.now()
 
@@ -160,7 +158,7 @@ async def _scrape_all_posts_async():
         handles = [s.instagram_handle for s in societies]
         society_by_handle = {s.instagram_handle.lower(): s for s in societies}
 
-        logger.info(f"Batch scraping {len(handles)} societies in one Apify run")
+        logger.info(f"Batch scraping {len(handles)} societies")
 
         scraper = get_scraper()
         batch_results = await scraper.scrape_posts_batch(handles, max_posts_per_user=3)
@@ -283,20 +281,18 @@ async def _scrape_society_posts_async(society_id: str):
             print(f"[DEBUG] About to scrape posts for @{society.instagram_handle}")
             logger.info(f"Scraping posts for @{society.instagram_handle}")
             
-            # Get Apify scraper instance
             print(f"[DEBUG] Getting scraper instance...")
             scraper = get_scraper()
             print(f"[DEBUG] Scraper instance created: {type(scraper)}")
             
             # Scrape last 3 posts (societies post 2-3 times/week)
-            # Apify handles authentication automatically
             print(f"[DEBUG] Calling scraper.scrape_posts for @{society.instagram_handle}")
             posts_data = await scraper.scrape_posts(society.instagram_handle, max_posts=3)
             print(f"[DEBUG] scraper.scrape_posts returned {len(posts_data)} posts")
             
-            logger.info(f"Apify returned {len(posts_data)} posts for @{society.instagram_handle}")
+            logger.info(f"Scraper returned {len(posts_data)} posts for @{society.instagram_handle}")
             if len(posts_data) == 0:
-                logger.warning(f"No posts returned by Apify for @{society.instagram_handle}")
+                logger.warning(f"No posts returned for @{society.instagram_handle}")
             
             posts_found = 0
             new_posts = 0
