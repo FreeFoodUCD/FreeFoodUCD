@@ -80,7 +80,7 @@ class EventExtractor:
             'kombucha', 'potluck', 'iftar', 'break the fast', 'banquet',
             'food provided', 'refreshments provided', 'food will be provided',
             'complimentary food', 'italian food', 'barbeque', 'bbq',
-            'refreshers',
+            'refreshers', 'brunch', 'coffee morning',
             'popcorn', 'nachos', 'crisps', 'chips', 'chocolate', 'cake', 'waffles',
             'biscuits', 'donuts', 'doughnuts', 'sweets', 'cupcakes',
             'sandwich', 'sandwiches', 'wrap', 'wraps', 'sushi', 'curry',
