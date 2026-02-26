@@ -315,8 +315,8 @@ FreeFoodUCD · unsubscribe: https://freefooducd.com/unsubscribe?email={email}
             <!DOCTYPE html>
             <html>
             <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #1A1A1A;">
-                <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 24px 30px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
-                    <p style="margin: 0; font-size: 20px; font-weight: 600;">Starting in 1 hour</p>
+                <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 10px 18px; border-radius: 8px; text-align: center; margin-bottom: 20px;">
+                    <p style="margin: 0; font-size: 13px; font-weight: 500;">⏰ Starting in 1 hour</p>
                 </div>
 
                 <div style="background: #f9fafb; border-radius: 12px; padding: 25px; margin-bottom: 20px;">
