@@ -503,18 +503,19 @@ export default function AdminDashboard() {
     setMessage('Scraping in progress...');
     try {
       const url = societyHandle
-        ? `${BASE_URL}/api/v1/admin/scrape-now?society_handle=${societyHandle}`
-        : `${BASE_URL}/api/v1/admin/scrape-now`;
-      
+        ? `${BASE_URL}/api/v1/admin/scrape-now?society_handle=${societyHandle}&force_reprocess=true`
+        : `${BASE_URL}/api/v1/admin/scrape-now?force_reprocess=true`;
+
       const response = await fetch(url, {
         method: 'POST',
         headers: { 'X-Admin-Key': adminKey }
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         setMessage(`✅ ${data.message}`);
         loadDashboardData(adminKey);
+        loadRecentPosts();
       } else {
         setMessage('❌ Scraping failed');
       }
