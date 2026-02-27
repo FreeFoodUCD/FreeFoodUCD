@@ -6,7 +6,7 @@ Uses pytesseract for text extraction.
 import logging
 from typing import Optional
 import requests
-from PIL import Image
+from PIL import Image, ImageFilter
 from io import BytesIO
 import pytesseract
 
@@ -38,20 +38,27 @@ class ImageTextExtractor:
             
             # Open image
             image = Image.open(BytesIO(response.content))
-            
+
+            # Preprocess for better tesseract accuracy on colourful/stylised images
+            w, h = image.size
+            image = image.resize((w * 2, h * 2), Image.LANCZOS)  # 2× upscale
+            image = image.convert('L')                             # grayscale
+            image = image.filter(ImageFilter.SHARPEN)              # sharpen edges
+
             # Extract text using pytesseract
-            text = pytesseract.image_to_string(image)
-            
+            text = pytesseract.image_to_string(image, config='--psm 11')
+
             # Clean up text
             text = text.strip()
-            
-            if text:
-                logger.info(f"Extracted {len(text)} characters from image")
-                logger.debug(f"OCR text: {text[:200]}...")
-                return text
-            else:
+
+            # Discard short noise (stray letters/punctuation from OCR artefacts)
+            if len(text) < 8:
                 logger.warning("No text extracted from image")
                 return None
+
+            logger.info(f"Extracted {len(text)} characters from image")
+            logger.debug(f"OCR text: {text[:200]}...")
+            return text
                 
         except requests.RequestException as e:
             logger.error(f"Failed to download image: {e}")
