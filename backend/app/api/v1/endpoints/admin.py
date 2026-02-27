@@ -714,9 +714,9 @@ async def trigger_scrape(
                     ocr_text = ocr.extract_text_from_urls([post_data['image_url']])
                     if ocr_text:
                         combined_text = f"{combined_text}\n\n[Image Text]\n{ocr_text}"
-                        logger.debug(f"Added OCR text ({len(ocr_text)} chars)")
+                        logger.info(f"OCR: added {len(ocr_text)} chars from image")
                 except Exception as ocr_error:
-                    logger.debug(f"OCR failed: {ocr_error}")
+                    logger.info(f"OCR failed: {ocr_error}")
 
             logger.debug(f"Caption preview: {combined_text[:100]}...")
             logger.debug(f"Full text length: {len(combined_text)} chars")
