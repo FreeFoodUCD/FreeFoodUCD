@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from app.db.base import get_db
 from app.db.models import User, Society, Event, Post, ScrapingLog, NotificationLog, PostFeedback
 from app.core.config import settings
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import hmac
 import logging
 
@@ -264,6 +264,7 @@ async def get_recent_posts(
             "society_handle": society.instagram_handle,
             "caption": post.caption,
             "source_url": post.source_url,
+            "media_urls": post.media_urls or [],
             "detected_at": post.detected_at.isoformat(),
             "is_free_food": post.is_free_food,
             "processed": post.processed,
@@ -694,7 +695,7 @@ async def trigger_scrape(
                     caption=post_data['caption'],
                     media_urls=[post_data.get('image_url')] if post_data.get('image_url') else [],
                     source_url=post_data['url'],
-                    detected_at=post_data['timestamp'],
+                    detected_at=datetime.now(timezone.utc),
                     processed=True
                 )
                 db.add(post)

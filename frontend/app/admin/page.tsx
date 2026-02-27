@@ -66,6 +66,7 @@ interface Post {
   society_handle: string;
   caption: string;
   source_url: string;
+  media_urls: string[];
   detected_at: string;
   is_free_food: boolean;
   processed: boolean;
@@ -1299,6 +1300,15 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                   
+                  {post.media_urls?.length > 0 && (
+                    <img
+                      src={post.media_urls[0]}
+                      alt="Instagram post"
+                      className="w-full max-h-64 object-cover rounded-lg mb-3"
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                    />
+                  )}
+
                   <p className="text-sm text-gray-700 mb-3 line-clamp-3">{post.caption}</p>
                   
                   {post.event && (
