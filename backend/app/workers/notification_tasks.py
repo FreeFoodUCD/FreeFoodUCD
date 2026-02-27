@@ -284,7 +284,11 @@ async def _send_upcoming_event_notifications_async():
             # Send email reminders
             email_notifier = BrevoEmailService()
             email_users = [u for u in users if u.notification_preferences.get('email', False)]
-            
+
+            if settings.NOTIFICATION_TEST_EMAILS:
+                allowlist = {e.strip().lower() for e in settings.NOTIFICATION_TEST_EMAILS.split(",")}
+                email_users = [u for u in email_users if u.email and u.email.lower() in allowlist]
+
             email_results = []
             for user in email_users:
                 if user.email:
