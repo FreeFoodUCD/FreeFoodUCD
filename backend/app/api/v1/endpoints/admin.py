@@ -687,6 +687,7 @@ async def trigger_scrape(
             # If force_reprocess and post exists, use existing post
             if existing_post and force_reprocess:
                 post = existing_post
+                post.detected_at = datetime.now(timezone.utc)  # bump to now so it appears in recent panel
             elif not existing_post:
                 # Save new post only if it doesn't exist
                 post = Post(
