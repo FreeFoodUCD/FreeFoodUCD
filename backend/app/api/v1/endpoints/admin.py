@@ -274,6 +274,14 @@ async def get_recent_posts(
 
         # Add event data if exists
         if event:
+            notif_count_result = await db.execute(
+                select(NotificationLog).where(
+                    NotificationLog.event_id == event.id,
+                    NotificationLog.status == 'sent'
+                )
+            )
+            users_notified = len(notif_count_result.scalars().all())
+
             post_data["event"] = {
                 "id": str(event.id),
                 "title": event.title,
@@ -281,7 +289,7 @@ async def get_recent_posts(
                 "location": event.location,
                 "confidence_score": event.confidence_score,
                 "notified": event.notified,
-                "users_notified": 0  # TODO: Count from notification_logs
+                "users_notified": users_notified
             }
 
         # Add feedback if exists
@@ -1286,49 +1294,6 @@ async def delete_event(
     await db.commit()
     
     return {"message": f"Event '{event.title}' deleted successfully"}
-
-
-@router.post("/societies")
-async def create_society(
-    name: str,
-    instagram_handle: str,
-    is_active: bool = True,
-    scrape_posts: bool = True,
-    scrape_stories: bool = False,
-    db: AsyncSession = Depends(get_db),
-    _: bool = Depends(verify_admin_key)
-):
-    """Create a new society."""
-    # Check if handle already exists
-    existing_result = await db.execute(
-        select(Society).where(Society.instagram_handle == instagram_handle)
-    )
-    existing = existing_result.scalar_one_or_none()
-    
-    if existing:
-        raise HTTPException(status_code=400, detail=f"Society with handle @{instagram_handle} already exists")
-    
-    society = Society(
-        name=name,
-        instagram_handle=instagram_handle,
-        is_active=is_active,
-        scrape_posts=scrape_posts,
-        scrape_stories=scrape_stories
-    )
-    
-    db.add(society)
-    await db.commit()
-    await db.refresh(society)
-    
-    return {
-        "message": "Society created successfully",
-        "society": {
-            "id": str(society.id),
-            "name": society.name,
-            "instagram_handle": society.instagram_handle,
-            "is_active": society.is_active
-        }
-    }
 
 
 @router.delete("/societies/{society_id}")

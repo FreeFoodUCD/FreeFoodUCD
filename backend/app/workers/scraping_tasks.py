@@ -266,31 +266,21 @@ def scrape_society_posts(self, society_id: str):
 
 async def _scrape_society_posts_async(society_id: str):
     """Async implementation of scrape_society_posts."""
-    print(f"[DEBUG] _scrape_society_posts_async called with society_id: {society_id}")
-    logger.info(f"[DEBUG] _scrape_society_posts_async called with society_id: {society_id}")
     start_time = datetime.now()
-    
+
     async with task_db_session() as session:
         society = await session.get(Society, society_id)
         if not society:
-            print(f"[DEBUG] Society not found: {society_id}")
             return {"error": "Society not found"}
-        
-        print(f"[DEBUG] Found society: {society.name} (@{society.instagram_handle})")
-        
+
         try:
-            print(f"[DEBUG] About to scrape posts for @{society.instagram_handle}")
             logger.info(f"Scraping posts for @{society.instagram_handle}")
-            
-            print(f"[DEBUG] Getting scraper instance...")
+
             scraper = get_scraper()
-            print(f"[DEBUG] Scraper instance created: {type(scraper)}")
-            
+
             # Scrape last 3 posts (societies post 2-3 times/week)
-            print(f"[DEBUG] Calling scraper.scrape_posts for @{society.instagram_handle}")
             posts_data = await scraper.scrape_posts(society.instagram_handle, max_posts=3)
-            print(f"[DEBUG] scraper.scrape_posts returned {len(posts_data)} posts")
-            
+
             logger.info(f"Scraper returned {len(posts_data)} posts for @{society.instagram_handle}")
             if len(posts_data) == 0:
                 logger.warning(f"No posts returned for @{society.instagram_handle}")
