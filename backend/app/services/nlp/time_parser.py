@@ -336,6 +336,11 @@ class TimeParser:
         Returns:
             Hour in 24-hour format (0-23), or None if invalid
         """
+        # Guard against minutes being passed as hour (common regex group mixup).
+        # Return None silently — the caller already discards this candidate.
+        if hour == 0 or hour > 12:
+            return None
+
         if not (1 <= hour <= 12):
             logger.warning(f"Invalid 12-hour format hour: {hour}")
             return None

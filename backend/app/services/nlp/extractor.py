@@ -56,6 +56,9 @@ class EventExtractor:
             'clubhouse': 'Clubhouse Bar',
             "o'neill lounge": "O'Neill Lounge",
             'oneill lounge': "O'Neill Lounge",
+            'global lounge': 'Global Lounge',
+            'newman basement': 'Newman Basement',
+            'newstead atrium': 'Newstead Atrium',
         }
         # Sorted longest-first so "clubhouse bar" matches before "clubhouse", etc.
         self.student_centre_rooms_sorted = sorted(
@@ -80,17 +83,28 @@ class EventExtractor:
             'kombucha', 'potluck', 'banquet',
             'food provided', 'refreshments provided', 'food will be provided',
             'complimentary food', 'italian food', 'barbeque', 'bbq',
-            'refreshers', 'brunch', 'coffee morning',
+            'brunch', 'coffee morning',
             'popcorn', 'nachos', 'crisps', 'chips', 'chocolate', 'cake', 'waffles',
             'biscuits', 'donuts', 'doughnuts', 'sweets', 'cupcakes',
             'sandwich', 'sandwiches', 'wrap', 'wraps', 'sushi', 'curry',
             'soup', 'pasta', 'tacos', 'burger', 'burgers',
+            # Hot drinks & morning events
+            'hot chocolate', 'tea morning', 'tea afternoon', 'coffee afternoon',
+            'fika',
+            # Baked goods & pastries
+            'croissant', 'croissants', 'pastries', 'pastry', 'baked goods',
+            'gingerbread', 'pancakes',
+            # General treats
+            'treats', 'sweet treats', 'ice cream',
+            # Snacks (unambiguous in society context)
+            'snacks',
         ]
         # Weak food indicators — only count if "free", "provided", or "complimentary"
         # also appears somewhere in the text
         self.weak_food_keywords = [
             'food', 'lunch', 'dinner', 'breakfast', 'drinks', 'drink',
-            'snacks', 'snack', 'tea', 'coffee',
+            'snack', 'tea', 'coffee',
+            'refreshers',   # demoted: "Refreshers Week" posts have no food mention
         ]
         
     
@@ -388,7 +402,13 @@ class EventExtractor:
         clean_text = self._preprocess_text(text)
         
         logger.debug(f"Classifying text: {clean_text[:100]}...")
-        
+
+        # Iftar block: exclude regardless of other food keywords
+        _iftar_kw = ['iftar', 'iftaar', 'break the fast']
+        if any(kw in clean_text for kw in _iftar_kw):
+            logger.debug("REJECT: Iftar/religious event")
+            return False
+
         # Rule 1: MUST have explicit food keyword
         if not self._has_explicit_food(clean_text):
             logger.debug("REJECT: No explicit food keyword")
@@ -594,6 +614,10 @@ class EventExtractor:
         Runs the same checks as classify_event but surfaces which rule fired.
         """
         clean_text = self._preprocess_text(text)
+
+        _iftar_kw = ['iftar', 'iftaar', 'break the fast']
+        if any(kw in clean_text for kw in _iftar_kw):
+            return "Iftar/religious event"
 
         if not self._has_explicit_food(clean_text):
             return "No explicit food keyword found"
