@@ -4,12 +4,17 @@ from app.core.config import settings
 from app.api.v1.api import api_router
 
 # Create FastAPI application
+_is_prod = True  # overridden to False in dev via ENVIRONMENT env var below
+# We evaluate this after settings is imported (settings.ENVIRONMENT is "production" in Railway)
+from app.core.config import settings as _settings
+_is_prod = _settings.ENVIRONMENT == "production"
+
 app = FastAPI(
     title="FreeFood UCD API",
     description="API for FreeFood UCD - Never miss free food on campus",
     version="1.0.0",
-    docs_url="/docs",
-    redoc_url="/redoc",
+    docs_url=None if _is_prod else "/docs",
+    redoc_url=None if _is_prod else "/redoc",
 )
 
 # Configure CORS
@@ -20,7 +25,6 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["*"],
 )
 
 # Include API router

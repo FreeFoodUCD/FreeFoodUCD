@@ -1,4 +1,5 @@
 from pydantic_settings import BaseSettings
+from pydantic import model_validator
 from typing import List, Optional
 
 
@@ -52,6 +53,12 @@ class Settings(BaseSettings):
     # Email allowlist (comma-separated; if set, only these addresses receive event emails)
     NOTIFICATION_TEST_EMAILS: str = ""
     
+    @model_validator(mode='after')
+    def check_admin_key(self):
+        if self.ADMIN_API_KEY == "change-this-in-production":
+            raise ValueError("ADMIN_API_KEY must be set to a strong secret — do not use the default value")
+        return self
+
     @property
     def allowed_origins_list(self) -> List[str]:
         """Parse ALLOWED_ORIGINS string into list."""

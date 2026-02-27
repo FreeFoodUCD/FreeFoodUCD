@@ -7,6 +7,7 @@ from app.db.base import get_db
 from app.db.models import User, Society, Event, Post, ScrapingLog, NotificationLog, PostFeedback
 from app.core.config import settings
 from datetime import datetime, timedelta
+import hmac
 import logging
 
 logger = logging.getLogger(__name__)
@@ -15,8 +16,8 @@ router = APIRouter()
 
 
 def verify_admin_key(x_admin_key: str = Header(...)):
-    """Verify admin API key from header."""
-    if x_admin_key != settings.ADMIN_API_KEY:
+    """Verify admin API key from header using constant-time comparison."""
+    if not hmac.compare_digest(x_admin_key, settings.ADMIN_API_KEY):
         raise HTTPException(status_code=403, detail="Invalid admin key")
     return True
 
@@ -333,13 +334,13 @@ async def submit_post_feedback(
         existing_feedback.correct_location = feedback_data.correct_location
         existing_feedback.extraction_notes = feedback_data.extraction_notes
         existing_feedback.notes = feedback_data.notes
-        existing_feedback.admin_email = x_admin_key[:50]
+        existing_feedback.admin_email = "admin"
         feedback_id = str(existing_feedback.id)
         message = "Feedback updated successfully"
     else:
         new_feedback = PostFeedback(
             post_id=post_id,
-            admin_email=x_admin_key[:50],
+            admin_email="admin",
             is_correct=feedback_data.is_correct,
             correct_classification=feedback_data.correct_classification,
             classification_notes=feedback_data.classification_notes,
@@ -694,8 +695,8 @@ async def trigger_scrape(
                 continue
             
             # NLP processing (runs for new or force-reprocessed posts)
-            print(f"[DEBUG] Running NLP on post: {post_data['url']}")
-            
+            logger.debug(f"Running NLP on post: {post_data['url']}")
+
             # Combine caption with OCR text from images
             combined_text = post_data['caption']
             if post_data.get('image_url'):
@@ -705,17 +706,17 @@ async def trigger_scrape(
                     ocr_text = ocr.extract_text_from_urls([post_data['image_url']])
                     if ocr_text:
                         combined_text = f"{combined_text}\n\n[Image Text]\n{ocr_text}"
-                        print(f"[DEBUG] Added OCR text ({len(ocr_text)} chars)")
+                        logger.debug(f"Added OCR text ({len(ocr_text)} chars)")
                 except Exception as ocr_error:
-                    print(f"[DEBUG] OCR failed: {ocr_error}")
-            
-            print(f"[DEBUG] Caption preview: {combined_text[:100]}...")
-            print(f"[DEBUG] Full text length: {len(combined_text)} chars")
+                    logger.debug(f"OCR failed: {ocr_error}")
+
+            logger.debug(f"Caption preview: {combined_text[:100]}...")
+            logger.debug(f"Full text length: {len(combined_text)} chars")
             event_data = extractor.extract_event(combined_text)
-            print(f"[DEBUG] NLP result: {event_data}")
-            
+            logger.debug(f"NLP result: {event_data}")
+
             if event_data and event_data.get('confidence_score', 0) >= 0.3:
-                print(f"[DEBUG] Creating event with confidence {event_data.get('confidence_score')}")
+                logger.debug(f"Creating event with confidence {event_data.get('confidence_score')}")
 
                 # Check if an event already exists for this post
                 existing_event_result = await db.execute(
@@ -756,7 +757,7 @@ async def trigger_scrape(
                 post.is_free_food = True
                 post.processed = True
             else:
-                print(f"[DEBUG] Event rejected - confidence too low or None")
+                logger.debug("Event rejected - confidence too low or None")
                 post.processed = True
         
         await db.commit()
