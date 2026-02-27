@@ -9,6 +9,80 @@ from app.services.nlp.time_parser import TimeParser
 
 logger = logging.getLogger(__name__)
 
+# Map food/drink emojis to the text keyword they represent.
+# Applied in _preprocess_text before ASCII stripping so that a caption like
+# "🍕🍕 provided tonight" becomes "pizza pizza provided tonight" and is caught
+# by the strong-keyword classifier.
+_FOOD_EMOJI_MAP: Dict[str, str] = {
+    # Pizza / burgers / handheld
+    '🍕': 'pizza',
+    '🍔': 'burger',
+    '🌭': 'burger',
+    '🌮': 'tacos',
+    '🌯': 'wrap',
+    '🥙': 'wrap',
+    '🥪': 'sandwich',
+    # Mains
+    '🍜': 'food',
+    '🍛': 'curry',
+    '🍝': 'pasta',
+    '🍲': 'soup',
+    '🍣': 'sushi',
+    '🍱': 'food',
+    '🍟': 'food',
+    '🍖': 'food',
+    '🍗': 'food',
+    '🥘': 'food',
+    '🥗': 'food',
+    '🥩': 'food',
+    '🥓': 'food',
+    '🧆': 'food',
+    # Bread / pastries
+    '🍞': 'food',
+    '🥖': 'food',
+    '🥐': 'croissant',
+    '🥯': 'food',
+    '🥨': 'snacks',
+    # Breakfast
+    '🧇': 'waffles',
+    '🥞': 'pancakes',
+    '🥚': 'food',
+    '🧀': 'food',
+    # Sweet / dessert
+    '🍰': 'cake',
+    '🎂': 'cake',
+    '🧁': 'cupcakes',
+    '🍩': 'donuts',
+    '🍪': 'cookies',
+    '🍫': 'chocolate',
+    '🍿': 'popcorn',
+    '🍭': 'sweets',
+    '🍬': 'sweets',
+    '🍦': 'ice cream',
+    '🍨': 'ice cream',
+    '🍧': 'ice cream',
+    '🍮': 'food',
+    # Snacks
+    '🥜': 'snacks',
+    '🧂': 'food',
+    # Hot drinks
+    '☕': 'coffee',
+    '🫖': 'tea',
+    '🍵': 'tea',
+    # Cold drinks
+    '🧋': 'drinks',
+    '🥛': 'drinks',
+    '🥤': 'drinks',
+    '🧃': 'drinks',
+    # Alcoholic (maps to drinks so weak-keyword + "free"/"provided" still fires)
+    '🍷': 'drinks',
+    '🍸': 'drinks',
+    '🍹': 'drinks',
+    '🍺': 'drinks',
+    '🍻': 'drinks',
+    '🥂': 'drinks',
+}
+
 
 class EventExtractor:
     """
@@ -364,10 +438,15 @@ class EventExtractor:
         """
         # Remove URLs
         text = re.sub(r'http\S+|www\.\S+', '', text)
-        
+
         # Remove @mentions
         text = re.sub(r'@\w+', '', text)
-        
+
+        # Replace food/drink emojis with their text equivalents BEFORE ASCII
+        # stripping so "🍕 provided" → "pizza provided" (caught by classifier)
+        for emoji, keyword in _FOOD_EMOJI_MAP.items():
+            text = text.replace(emoji, f' {keyword} ')
+
         # Normalize unicode (é → e, ñ → n)
         text = unicodedata.normalize('NFKD', text)
         
