@@ -636,12 +636,14 @@ async def seed_societies(
 async def trigger_scrape(
     society_handle: Optional[str] = None,
     force_reprocess: bool = False,
+    max_posts: int = 3,
     db: AsyncSession = Depends(get_db),
     _: bool = Depends(verify_admin_key)
 ):
     """
     Trigger immediate scraping with database saving and NLP processing.
     Set force_reprocess=true to reprocess existing posts with NLP.
+    Set max_posts to fetch further back (default 3).
     """
     from app.services.scraper.apify_scraper import ApifyInstagramScraper
     from app.services.nlp.extractor import EventExtractor
@@ -660,7 +662,7 @@ async def trigger_scrape(
 
         # Scrape posts using working logic
         scraper = ApifyInstagramScraper(api_token=settings.APIFY_API_TOKEN)
-        posts_data = await scraper.scrape_posts(society_handle, max_posts=3)
+        posts_data = await scraper.scrape_posts(society_handle, max_posts=max_posts)
         
         new_posts = 0
         new_events = 0
