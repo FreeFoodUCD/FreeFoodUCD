@@ -288,6 +288,135 @@ test_cases = [
         True,
         "Members-2: 'members welcome' + sandwiches → ACCEPT"
     ),
+
+    # ── Screenshot-inspired real-world posts ───────────────────────────────────
+
+    # SCREENSHOT POST A: "Free Cookies" — NAMSOC (namsocucd)
+    # All-caps caption with typo "FEBUARY" — preprocessing must normalise correctly
+    (
+        "COME JOIN US FOR FREE COOKIES ON THE 4TH OF FEBUARY IN HARMONY",
+        True,
+        "SC-A1: all-caps + typo 'FEBUARY' — 'free cookies' still recognised"
+    ),
+    # Cookie emoji → mapped to 'cookies' strong keyword; image text "free sweet treat"
+    (
+        "🍪 Free sweet treat? Come grab cookies in Harmony Lounge! 4th Feb 11-11:30am.",
+        True,
+        "SC-A2: cookie emoji + 'free sweet treat' → ACCEPT"
+    ),
+
+    # SCREENSHOT POST B: "Week 24" — NAMSOC weekly schedule
+    # Pancake Tuesday: 'pancakes' is a strong keyword — no 'free' word needed
+    (
+        "Pancake Tuesday — come join us for some pancakes and fun on Tuesday morning! Harmony Studio 11am.",
+        True,
+        "SC-B1: 'pancakes' strong keyword without explicit 'free' → ACCEPT"
+    ),
+    # Coffee Morning: 'coffee morning' is an exact strong keyword phrase
+    (
+        "Coffee Morning ☕ Pop in for a coffee and chat to catch up and chill! Meeting rooms 8:30-9:30am.",
+        True,
+        "SC-B2: 'coffee morning' exact strong-keyword phrase → ACCEPT"
+    ),
+    # Coppers Night Out: "free entry" is nightlife, NOT free food — should REJECT
+    (
+        "Coppers Night Out 🎉 Free entry every Thursday before 23:30! See you there.",
+        False,
+        "SC-B3: 'free entry' nightclub (Coppers) — no food keyword → REJECT"
+    ),
+    # Full caption for Post B: mentions pancakes + coffee morning in combined text → ACCEPT
+    (
+        "Come along to our amazing events this week — Pancake Tuesday to celebrate one of the best days of the year, a coffee morning to wake you up before your lecture 🤣 and a healthcare debate! Student Centre.",
+        True,
+        "SC-B4: multi-event caption — 'pancakes' + 'coffee morning' in combined caption → ACCEPT"
+    ),
+
+    # ── Missing emoji tests ─────────────────────────────────────────────────────
+
+    # Pizza emoji maps to 'pizza' (strong keyword) via emoji preprocessing
+    (
+        "🍕 provided tonight — come join us! Newman Building 7pm.",
+        True,
+        "EMO-1: pizza emoji → 'pizza' strong keyword after emoji map → ACCEPT"
+    ),
+
+    # ── Missing context modifiers (A2) ─────────────────────────────────────────
+
+    # 'complimentary' is a context modifier that upgrades weak keyword 'tea'/'coffee'
+    (
+        "Complimentary tea and coffee after the talk. Newman Building Thursday 5pm.",
+        True,
+        "A2-5: 'complimentary' context modifier + tea/coffee → ACCEPT"
+    ),
+    # 'at no cost' context modifier
+    (
+        "Coffee and snacks at no cost. Science Building Thursday 4pm.",
+        True,
+        "A2-6: 'at no cost' context modifier + coffee/snacks → ACCEPT"
+    ),
+    # 'brought to you by' context modifier
+    (
+        "Refreshments brought to you by our sponsors. Student Centre Wednesday 6pm.",
+        True,
+        "A2-7: 'brought to you by' context modifier + refreshments → ACCEPT"
+    ),
+
+    # ── Missing staff-only patterns (A5) ───────────────────────────────────────
+
+    # 'exec meeting' triggers _is_staff_only (exec meeting/training/session pattern)
+    (
+        "Exec meeting Thursday evening — pizza for all exec members! Engineering Building.",
+        False,
+        "A5-5: 'exec meeting' → staff filter fires even with pizza → REJECT"
+    ),
+    # 'board meeting' triggers _is_staff_only
+    (
+        "Board meeting this Friday — lunch provided. Newman Building 1pm.",
+        False,
+        "A5-6: 'board meeting' → staff filter fires → REJECT"
+    ),
+
+    # ── Missing weak-keyword edge cases ────────────────────────────────────────
+
+    # 'refreshers' is a weak keyword — no context modifier → REJECT
+    (
+        "Refreshers Week info session Tuesday 3pm. Come meet the committee!",
+        False,
+        "WK-1: 'refreshers' weak keyword, no context modifier → REJECT"
+    ),
+
+    # ── Missing BYOF / potluck ─────────────────────────────────────────────────
+
+    # 'potluck' is a strong keyword — no 'free' needed
+    (
+        "Potluck this Friday! Bring a dish and meet the society. Engineering Building 6pm.",
+        True,
+        "BYOF-1: 'potluck' strong keyword → ACCEPT"
+    ),
+
+    # ── Missing food-sale with small price (A6) ────────────────────────────────
+
+    # food-sale keyword 'bake sale' hard-blocks even with €2
+    (
+        "€2 charity bake sale for club funds! All welcome. Student Centre Wednesday.",
+        False,
+        "A6-7: 'bake sale' food-sale keyword overrides small €2 price → REJECT"
+    ),
+
+    # ── Missing location / context edge cases ──────────────────────────────────
+
+    # "food festival" in off-campus area (Ranelagh) → off-campus location → REJECT
+    (
+        "Food festival in Ranelagh this weekend — loads of amazing food stalls!",
+        False,
+        "LOC-1: food festival off-campus ('Ranelagh') → REJECT"
+    ),
+    # Food mentioned as pre-event activity (not provision), no context modifier
+    (
+        "Grab some food before you come to our social! Newman Building 8pm.",
+        False,
+        "CTX-1: 'food' weak keyword + no provision context → REJECT"
+    ),
 ]
 
 passed = 0
