@@ -6,6 +6,7 @@ import pytz
 import logging
 from app.services.nlp.date_parser import DateParser
 from app.services.nlp.time_parser import TimeParser
+from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -635,7 +636,63 @@ class EventExtractor:
             return True
 
         return False
-    
+
+    def _has_weak_food_only(self, text: str) -> bool:
+        """
+        True when text has a weak food keyword but NO strong keyword and NO free context.
+        Identifies grey-zone posts for LLM fallback (Phase B).
+        text must already be preprocessed (lowercased, emoji-mapped).
+        """
+        if self._food_is_negated(text):
+            return False
+        if any(kw in text for kw in self.strong_food_keywords):
+            return False
+        has_free_context = (
+            'free' in text
+            or any(mod in text for mod in self.context_modifiers)
+            or bool(re.search(
+                r"\bwe.(?:ll|will)\s+(?:be\s+)?(?:bring(?:ing)?|have|provide|serve|supply)\b", text
+            ))
+        )
+        if has_free_context:
+            return False
+        return any(kw in text for kw in self.weak_food_keywords)
+
+    def _try_llm_fallback(self, text: str) -> Optional[dict]:
+        """
+        Called when classify_event() returns False. Runs grey-zone check + hard filters,
+        then calls LLM for classification + extraction hints.
+        Returns hint dict {food, location, time} if LLM accepts, else None.
+        """
+        if not (settings.USE_SCORING_PIPELINE and settings.OPENAI_API_KEY):
+            return None
+
+        clean = self._preprocess_text(text)
+
+        if not self._has_weak_food_only(clean):
+            return None  # not even borderline — hard reject
+
+        # Hard filters still run before LLM — no bypassing safety checks
+        if (self._is_food_activity(clean)
+                or self._is_staff_only(clean)
+                or self._is_other_college(clean)
+                or self._is_off_campus(clean)
+                or (self._is_online_event(clean) and not self._has_ucd_location(clean))
+                or self._is_paid_event(clean)
+                or self._is_nightlife_event(clean)):
+            return None
+
+        from app.services.nlp.llm_classifier import get_llm_classifier
+        llm = get_llm_classifier()
+        if llm is None:
+            return None
+
+        hints = llm.classify_and_extract(clean)
+        if not hints or not hints.get('food'):
+            return None
+
+        return hints
+
     def _is_other_college(self, text: str) -> bool:
         """Check if text mentions other Irish colleges.
         Short abbreviations (<=4 chars) use word boundaries to avoid false matches
@@ -921,9 +978,13 @@ class EventExtractor:
             Dictionary with event details or None if classification fails
         """
         # First, classify the event
+        llm_hints = None
         if not self.classify_event(text):
-            return None
-        
+            llm_hints = self._try_llm_fallback(text)
+            if llm_hints is None:
+                return None
+            logger.info("ACCEPT: LLM fallback approved borderline post")
+
         # Extract event details
         local_post_ts = None
         if post_timestamp:
@@ -935,6 +996,22 @@ class EventExtractor:
         end_time_dict = time_range['end'] if time_range else None
         date = self.date_parser.parse_date(text.lower(), post_timestamp)
         location = self._extract_location(text)
+
+        # Fill time gap with LLM hint if rule-based found nothing
+        if time is None and llm_hints and llm_hints.get('time'):
+            try:
+                from datetime import time as dt_time
+                h, m = map(int, llm_hints['time'].split(':'))
+                time = dt_time(h, m)
+                time_range = {'start': time, 'end': None}
+            except Exception:
+                pass
+
+        # Fill location gap with LLM hint if rule-based found nothing
+        if location is None and llm_hints and llm_hints.get('location'):
+            loc_str = llm_hints['location']
+            location = {'building': loc_str, 'room': None, 'full_location': loc_str}
+            logger.debug(f"Location filled by LLM hint: {loc_str}")
 
         # Validate date is not in the past
         if date:
@@ -950,8 +1027,11 @@ class EventExtractor:
         # Generate title
         title = self._generate_title(text, location)
 
-        # Calculate confidence (simplified - just for compatibility)
-        confidence = 1.0 if (time and location) else 0.8
+        # Calculate confidence
+        if llm_hints:
+            confidence = 0.7 if (time and location) else 0.5
+        else:
+            confidence = 1.0 if (time and location) else 0.8
 
         return {
             'title': title,
@@ -968,6 +1048,7 @@ class EventExtractor:
                 'date_found': date is not None,
                 'location_found': location is not None,
                 'members_only': self._is_members_only(text),
+                'llm_assisted': llm_hints is not None,
             }
         }
     
