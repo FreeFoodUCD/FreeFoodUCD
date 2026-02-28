@@ -6,6 +6,7 @@ from app.db.models import Society, Post, Story, Event, ScrapingLog
 from app.services.nlp.extractor import EventExtractor
 from app.services.scraper.apify_scraper import ApifyInstagramScraper
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from datetime import datetime, timedelta, timezone
 import logging
 import asyncio
@@ -131,6 +132,10 @@ def scrape_all_posts(self):
     """Scrape posts from all active societies."""
     try:
         return asyncio.run(_scrape_all_posts_async())
+    except IntegrityError as e:
+        # DB constraint violation — don't retry, it won't help and wastes Apify credits
+        logger.error(f"IntegrityError in scrape_all_posts (not retrying): {e}")
+        raise
     except Exception as e:
         logger.error(f"Error in scrape_all_posts: {e}")
         raise self.retry(exc=e, countdown=60 * (2 ** self.request.retries))
@@ -186,12 +191,9 @@ async def _scrape_all_posts_async():
                     logger.info(f"Skipping old post from @{handle_lower}: {post_age.days} days old")
                     continue
 
-                # Skip already-saved posts
+                # Skip already-saved posts (check globally — unique constraint is on instagram_post_id alone)
                 existing = await session.execute(
-                    select(Post).where(
-                        Post.society_id == society.id,
-                        Post.instagram_post_id == post_id
-                    )
+                    select(Post).where(Post.instagram_post_id == post_id)
                 )
                 if existing.scalar_one_or_none():
                     continue
@@ -208,7 +210,12 @@ async def _scrape_all_posts_async():
                     processed=False,
                 )
                 session.add(post)
-                await session.flush()
+                try:
+                    await session.flush()
+                except IntegrityError:
+                    await session.rollback()
+                    logger.warning(f"Skipping duplicate post {post_id} (race condition)")
+                    continue
 
                 new_posts += 1
                 posts_found += 1
