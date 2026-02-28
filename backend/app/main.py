@@ -51,12 +51,6 @@ async def root():
     }
 
 
-@app.get("/sentry-test")
-async def sentry_test():
-    """Temporary endpoint to verify Sentry integration. Remove after testing."""
-    raise ValueError("Sentry test error — delete this endpoint after confirming")
-
-
 @app.get("/health")
 async def health_check():
     """Health check endpoint."""
