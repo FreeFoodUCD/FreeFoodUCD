@@ -184,52 +184,55 @@ async def _scrape_all_posts_async():
             new_posts = 0
 
             for post_data in posts_data:
-                post_id = post_data["url"].split("/p/")[-1].rstrip("/")
-
-                # Skip posts older than 7 days
-                post_age = datetime.now(timezone.utc) - post_data["timestamp"]
-                if post_age.days > 7:
-                    logger.info(f"Skipping old post from @{handle_lower}: {post_age.days} days old")
-                    continue
-
-                # Skip already-saved posts (check globally — unique constraint is on instagram_post_id alone)
-                existing = await session.execute(
-                    select(Post).where(Post.instagram_post_id == post_id)
-                )
-                if existing.scalar_one_or_none():
-                    continue
-
-                post = Post(
-                    society_id=society.id,
-                    instagram_post_id=post_id,
-                    caption=post_data["caption"],
-                    media_urls=post_data.get("image_urls") or (
-                        [post_data["image_url"]] if post_data.get("image_url") else []
-                    ),
-                    source_url=post_data["url"],
-                    detected_at=post_data["timestamp"],
-                    processed=False,
-                )
-                session.add(post)
                 try:
-                    await session.flush()
-                except IntegrityError:
-                    await session.rollback()
-                    logger.warning(f"Skipping duplicate post {post_id} (race condition)")
-                    continue
+                    post_id = post_data["url"].split("/p/")[-1].rstrip("/")
 
-                new_posts += 1
-                posts_found += 1
-                total_new_posts += 1
+                    # Skip posts older than 7 days
+                    post_age = datetime.now(timezone.utc) - post_data["timestamp"]
+                    if post_age.days > 7:
+                        logger.info(f"Skipping old post from @{handle_lower}: {post_age.days} days old")
+                        continue
 
-                try:
-                    nlp_result = await _process_scraped_content_async("post", str(post.id))
-                    if nlp_result.get('event_created') and nlp_result.get('event_id'):
-                        batch_event_ids.append(nlp_result['event_id'])
-                except Exception as nlp_error:
-                    logger.error(f"NLP processing failed for post {post.id}: {nlp_error}")
+                    # Skip already-saved posts (check globally — unique constraint is on instagram_post_id alone)
+                    existing = await session.execute(
+                        select(Post).where(Post.instagram_post_id == post_id)
+                    )
+                    if existing.scalar_one_or_none():
+                        continue
 
-                logger.info(f"New post from @{handle_lower}: {post_data['url']}")
+                    post = Post(
+                        society_id=society.id,
+                        instagram_post_id=post_id,
+                        caption=post_data["caption"],
+                        media_urls=post_data.get("image_urls") or (
+                            [post_data["image_url"]] if post_data.get("image_url") else []
+                        ),
+                        source_url=post_data["url"],
+                        detected_at=post_data["timestamp"],
+                        processed=False,
+                    )
+                    session.add(post)
+                    try:
+                        await session.flush()
+                    except IntegrityError:
+                        await session.rollback()
+                        logger.warning(f"Skipping duplicate post {post_id} (race condition)")
+                        continue
+
+                    new_posts += 1
+                    posts_found += 1
+                    total_new_posts += 1
+
+                    try:
+                        nlp_result = await _process_scraped_content_async("post", str(post.id))
+                        if nlp_result.get('event_created') and nlp_result.get('event_id'):
+                            batch_event_ids.append(nlp_result['event_id'])
+                    except Exception as nlp_error:
+                        logger.error(f"NLP processing failed for post {post.id}: {nlp_error}")
+
+                    logger.info(f"New post from @{handle_lower}: {post_data['url']}")
+                except Exception as post_error:
+                    logger.error(f"Skipping malformed post from @{handle_lower}: {post_error}")
 
             society.last_post_check = datetime.now()
             session.add(ScrapingLog(
@@ -310,56 +313,59 @@ async def _scrape_society_posts_async(society_id: str):
             society_event_ids = []
 
             for post_data in posts_data:
-                # Extract post ID from URL (e.g., https://instagram.com/p/ABC123/)
-                post_id = post_data['url'].split('/p/')[-1].rstrip('/')
-
-                # Filter out old posts (>7 days old)
-                post_timestamp = post_data['timestamp']
-                post_age = datetime.now(timezone.utc) - post_timestamp
-                if post_age.days > 7:
-                    logger.info(f"Skipping old post from @{society.instagram_handle}: {post_age.days} days old")
-                    continue
-
-                # Check if post already exists
-                existing_query = select(Post).where(
-                    Post.society_id == society.id,
-                    Post.instagram_post_id == post_id
-                )
-                result = await session.execute(existing_query)
-                existing_post = result.scalar_one_or_none()
-
-                if existing_post:
-                    logger.debug(f"Post already exists: {post_data['url']}")
-                    continue
-
-                # Create new post
-                post = Post(
-                    society_id=society.id,
-                    instagram_post_id=post_id,
-                    caption=post_data['caption'],
-                    media_urls=post_data.get('image_urls') or (
-                        [post_data['image_url']] if post_data.get('image_url') else []
-                    ),
-                    source_url=post_data['url'],
-                    detected_at=post_data['timestamp'],
-                    processed=False
-                )
-
-                session.add(post)
-                await session.flush()  # Get post ID
-
-                new_posts += 1
-                posts_found += 1
-
-                # Process NLP synchronously (no Celery on Railway)
                 try:
-                    nlp_result = await _process_scraped_content_async('post', str(post.id))
-                    if nlp_result.get('event_created') and nlp_result.get('event_id'):
-                        society_event_ids.append(nlp_result['event_id'])
-                except Exception as nlp_error:
-                    logger.error(f"NLP processing failed for post {post.id}: {nlp_error}")
+                    # Extract post ID from URL (e.g., https://instagram.com/p/ABC123/)
+                    post_id = post_data['url'].split('/p/')[-1].rstrip('/')
 
-                logger.info(f"New post from @{society.instagram_handle}: {post_data['url']}")
+                    # Filter out old posts (>7 days old)
+                    post_timestamp = post_data['timestamp']
+                    post_age = datetime.now(timezone.utc) - post_timestamp
+                    if post_age.days > 7:
+                        logger.info(f"Skipping old post from @{society.instagram_handle}: {post_age.days} days old")
+                        continue
+
+                    # Check if post already exists
+                    existing_query = select(Post).where(
+                        Post.society_id == society.id,
+                        Post.instagram_post_id == post_id
+                    )
+                    result = await session.execute(existing_query)
+                    existing_post = result.scalar_one_or_none()
+
+                    if existing_post:
+                        logger.debug(f"Post already exists: {post_data['url']}")
+                        continue
+
+                    # Create new post
+                    post = Post(
+                        society_id=society.id,
+                        instagram_post_id=post_id,
+                        caption=post_data['caption'],
+                        media_urls=post_data.get('image_urls') or (
+                            [post_data['image_url']] if post_data.get('image_url') else []
+                        ),
+                        source_url=post_data['url'],
+                        detected_at=post_data['timestamp'],
+                        processed=False
+                    )
+
+                    session.add(post)
+                    await session.flush()  # Get post ID
+
+                    new_posts += 1
+                    posts_found += 1
+
+                    # Process NLP synchronously (no Celery on Railway)
+                    try:
+                        nlp_result = await _process_scraped_content_async('post', str(post.id))
+                        if nlp_result.get('event_created') and nlp_result.get('event_id'):
+                            society_event_ids.append(nlp_result['event_id'])
+                    except Exception as nlp_error:
+                        logger.error(f"NLP processing failed for post {post.id}: {nlp_error}")
+
+                    logger.info(f"New post from @{society.instagram_handle}: {post_data['url']}")
+                except Exception as post_error:
+                    logger.error(f"Skipping malformed post from @{society.instagram_handle}: {post_error}")
 
             # Update last check time
             society.last_post_check = datetime.now()
