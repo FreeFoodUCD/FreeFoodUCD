@@ -58,6 +58,13 @@ class Settings(BaseSettings):
 
     # Email allowlist (comma-separated; if set, only these addresses receive event emails)
     NOTIFICATION_TEST_EMAILS: str = ""
+
+    # NLP / Classification
+    # Set USE_SCORING_PIPELINE=false in Railway env vars to revert to pure rule-based
+    # without redeploying (emergency rollback switch).
+    USE_SCORING_PIPELINE: bool = True
+    # OpenAI key for Phase B LLM fallback (optional; Phase A does not require it)
+    OPENAI_API_KEY: Optional[str] = None
     
     @model_validator(mode='after')
     def check_admin_key(self):

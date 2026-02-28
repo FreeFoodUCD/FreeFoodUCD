@@ -1,0 +1,2640 @@
+Fetching 10 posts each from 77 accounts via Apify...
+Apify returned 77 dataset items
+
+Running LLM audit on 707 posts (this takes a few minutes)...
+  LLM judging post 1/707...
+  LLM judging post 100/707...
+  LLM judging post 200/707...
+  LLM judging post 300/707...
+  LLM judging post 400/707...
+  LLM judging post 500/707...
+  LLM judging post 600/707...
+  LLM judging post 700/707...
+  Done — 707 posts judged.
+
+======================================================================
+CLASSIFIER AUDIT REPORT  —  707 posts analysed
+======================================================================
+
+✅ ACCEPTED (114 posts)
+
+  @ucdafricasociety  [16 Feb]
+  Caption: 'Brunch & Vibes is callingggg 🥞☕️\nA well deserved treat from us to you come down and bring a friend too 🤍\n📅 17th Feb (Tue'
+  https://www.instagram.com/p/DU0eTwniFov/
+
+  @ucdafricasociety  [09 Feb]
+  Caption: 'Snacks & Support ✨🫶🏾\nA safe space. Real conversations. Good vibes.\nIf you’re part of an ethnic minority community, this'
+  https://www.instagram.com/p/DUi0GxHCPvh/
+
+  @ucd.aclsoc  [11 Feb]
+  Caption: 'Not everyone in the room is who they claim to be.👀👀\nThink you can read the room?\nProve it.\n\nGuess the Imposter — an even'
+  https://www.instagram.com/p/DUorSNcDDPc/
+
+  @ucd.aclsoc  [07 Feb]
+  Caption: 'This Thursday EES is teaming up with @ucd.aclsoc and we couldn’t be more excited.\n\nExpect delicious desserts, cozy vibes'
+  https://www.instagram.com/p/DUdKk04jOX-/
+
+  @ucd.aclsoc  [31 Jan]
+  Caption: 'Join us this Wednesday evening for games night! Take part in a competitive Seen Jeem and Stop the Bus or enjoy a more re'
+  https://www.instagram.com/p/DUMPqCMDRxT/
+
+  @ucdarcsoc  [25 Jan]
+  Caption: '🪩 REFRESHERS WEEK EVENTS🪩\n\nWelcome back everyone! Get ready to be refreshed this week with delightful coffee morning in'
+  https://www.instagram.com/p/DT8K2DOjLhz/
+
+  @artssocucd  [21 Sep]
+  Caption: "TUESDAY COFFEE MORNING! AGAIN! And this time it's final; our coffee mornings for this term will be held in Newman Baseme"
+  https://www.instagram.com/p/DO3oEXRCLRR/
+
+  @artssocucd  [25 Feb]
+  Caption: 'ATTENTION FILM GOERS... 🎥\n\nThe Arts Society is hosting a screening of "Apocalypse Now", a Vietnam War film in honour of'
+  https://www.instagram.com/p/DVLY9ymCAd_/
+
+  @ucdbiosoc  [03 Nov]
+  Caption: '☕Hot Chocolate Morning ☕️\nJoin us in Meeting Room 5 at 10am on Wednesday, November 5th for a cozy catch-up, sweet treats'
+  https://www.instagram.com/p/DQmgN55jF_g/
+
+  @ucdbiosoc  [13 Oct]
+  Caption: '☕️ UCD BioSoc Coffee Morning ☕️\n\nTake a break from midterms and assignments and join us for a relaxed morning of chats,'
+  https://www.instagram.com/p/DPwD3lIDCCR/
+
+  @chinesesoc.ucd  [24 Feb]
+  Caption: 'UCD Irish Institute for Chinese Studies\xa0Public\xa0Lecture\xa0Series\nThe 60th UCD CSSA PhD Forum\n\xa0\nDoes your grammar have an ac'
+  → Title:    UCD Irish Institute for Chinese Studies Public Lecture Series
+  → Location: Confucius Institute
+  → Time:     06:00 PM
+  → Date:     Thursday 05 Mar
+  → Members:  False
+  https://www.instagram.com/p/DVKL5f1iPyA/
+
+  @ucdcu  [15 Feb]
+  Caption: 'what’s up guys! hope you are all resting up after the weekend away! we would love to see all of you guys at CU this week'
+  https://www.instagram.com/p/DUzCPoNCPQq/
+
+  @ucdcu  [24 Jan]
+  Caption: 'so so excited for events week!! 🥳 we have SO many events and can’t wait to see you at them. as always, everyone is welco'
+  https://www.instagram.com/p/DT35iNsCKU9/
+
+  @ucd_civil_structural  [23 Feb]
+  Caption: 'Please join us for a lunchtime talk from our sponsor company Fehily Timoney, this Wednesday at 1pm in G87!\n\nThey will be'
+  https://www.instagram.com/p/DVGOwMyDDxe/
+
+  @ucd_civil_structural  [26 Jan]
+  Caption: 'Haven’t signed up to Civil Soc yet? Come to our refreshers pizza 1pm in the Newstead Atrium. All Civilsoc members welcom'
+  https://www.instagram.com/p/DT-YF-VDGwv/
+
+  @ucdcesoc  [03 Feb]
+  Caption: 'Dreaming of starting your own business? Want to hear from the best on how they did it? 🚀\n\nOur entrepreneurship panel has'
+  https://www.instagram.com/p/DUS13HqDdFd/
+
+  @ucdees  [24 Feb]
+  Caption: '☕ Join the UCD Eastern European Society for a relaxed Coffee Morning!\n\nCome by Harmony Studio on Thursday, 26th February'
+  https://www.instagram.com/p/DVIuMVmDLwI/
+
+  @ucdees  [16 Feb]
+  Caption: '🌍 Join us for the International Market! 🌍\n\nCelebrate the amazing diversity on campus as we bring you a taste of Eastern'
+  https://www.instagram.com/p/DU1Rn1IDmEG/
+
+  @ucdees  [15 Feb]
+  Caption: '🇱🇹✨ Join us for Lithuanian Independence Day Snacks! ✨🇱🇹\n\nCelebrate with us as we share a taste of Lithuanian culture — e'
+  https://www.instagram.com/p/DUyHJWZjGP8/
+
+  @ucdees  [07 Feb]
+  Caption: 'This Thursday EES is teaming up with @ucd.aclsoc and we couldn’t be more excited.\n\nExpect delicious desserts, cozy vibes'
+  https://www.instagram.com/p/DUdKk04jOX-/
+
+  @ucdees  [03 Feb]
+  Caption: 'Take a break and join the UCD Eastern European Society for a relaxed Coffee Morning at Brava Lounge. Whether you’re stop'
+  https://www.instagram.com/p/DUTMvs9jA4T/
+
+  @ucdees  [26 Jan]
+  Caption: '💿✨ **CUTE, CHAOTIC & A LITTLE EMBARRASSING** ✨💿\n\nIt’s giving low-rise jeans, shiny lip gloss, eurodance on repeat, and a'
+  https://www.instagram.com/p/DT_XWwFjDrL/
+
+  @ucd.elecsoc  [18 Feb]
+  Caption: '❗Announcing Makerthon (ElecSoc x Patch)\n\nWe’re bringing a 2½ hour Makerthon sprint to UCD and you’re invited.\n\nHere’s wh'
+  https://www.instagram.com/p/DU6xqBwiLFf/
+
+  @ucd.elecsoc  [16 Feb]
+  Caption: 'Course selection stressing you out? ⚡\nElecSoc Stream Talks are here to help!!\n\n1st years: Come to learn more about EEE.'
+  → Title:    Course selection stressing you out? ⚡
+  → Location: Not found
+  → Time:     06:00 PM
+  → Date:     Sunday 01 Mar
+  → Members:  False
+  https://www.instagram.com/p/DU008w6DBeR/
+
+  @ucd.elecsoc  [25 Jan]
+  Caption: 'Trivia Night Is back! Do you have what it takes to win?\nPut your knowledge to the test this Tuesday at 7.30pm in Rm 321.'
+  https://www.instagram.com/p/DT8lEWcjNdl/
+
+  @ucd.elecsoc  [02 Nov]
+  Caption: '🤖 Brains vs Bytes: Can you outsmart the Clankers?\n\nJoin us for Trivia Night this Thursday at 6PM in Rm 321. There will b'
+  https://www.instagram.com/p/DQksYwHCGp9/
+
+  @ucd.elecsoc  [02 Nov]
+  Caption: '⚡‼️EIRGRID GUEST SPEAKER & CLEANERGRID COMPETITION‼️⚡\n\nJoin us Thursday, 6th November at 5PM in ENG 326 for an exciting'
+  https://www.instagram.com/p/DQkrpXLCFtS/
+
+  @esnucd  [25 Jan]
+  Caption: '☘️Coffee Morning with an Irish Twist!☘️\n\nFirst week back to college (first week in UCD for some) can be overwhelming. We'
+  https://www.instagram.com/p/DT7xQoLCEiP/
+
+  @ucdfilmsoc  [09 Feb]
+  Caption: '🍿 OCM’s 🍿\n\nOur Wonderful OCM’s who keep everything running behind the scenes.\n\n#film #ucdfilmsoc #ucdcinema'
+  https://www.instagram.com/p/DUiNNTPCMsW/
+
+  @ucdfilmsoc  [08 Feb]
+  Caption: '📀 ENTS 📀\n\nHaven’t been to a coffee morning yet? Whats up with that, huh?\n\n#ucdfilmsoc #ucdsocieties #film'
+  https://www.instagram.com/p/DUg1qj0CDhz/
+
+  @ucdfoodsoc  [25 Oct]
+  Caption: 'as halloween approaches, the scariest thing around are mid terms. therefore, you should join @ucdfoodsoc and @ucdnutriti'
+  https://www.instagram.com/p/DQPaIrXDTM2/
+
+  @ucdfoodsoc  [18 Oct]
+  Caption: '🍝 Roman Banquet Incoming! 🇮🇹\n\nJoin us this Monday for an afternoon packed with Italian food, flavour, and fun!\n\n🗓️ Monda'
+  https://www.instagram.com/p/DP9WT34iLqE/
+
+  @ucdfoodsoc  [23 Sep]
+  Caption: 'a morning pick me up post commute? freezing cold while walking to class? look no further, come join us at the brava loun'
+  https://www.instagram.com/p/DO9MEElDduO/
+
+  @ucdfrenchsoc  [23 Feb]
+  Caption: '(Tuesday, Feb 24) Come to our weekly meet up tomorrow over some croissants and coffee! \nHarmony Studio, Student Centre\n1'
+  https://www.instagram.com/p/DVHd4m1CPKN/
+
+  @ucdfrenchsoc  [15 Feb]
+  Caption: "Join us next Tuesday (17/02) for our weekly 🥐 hit!\n\n⏱️1pm to 2pm -📍Harmony Studio\n\nWe're looking forward to seeing you ♥"
+  https://www.instagram.com/p/DUyinsUCA-j/
+
+  @ucdfrenchsoc  [03 Feb]
+  Caption: 'Like we say in French "On change pas une équipe qui gagne !" Join us for our usual free coffee and croissants :).\n\n📍Red'
+  https://www.instagram.com/p/DUTrH4siKui/
+
+  @ucdgamesociety  [22 Feb]
+  Caption: '💗WEEK 6💗\n\n🍬BOARD GAMES\n- Ready. Set. BOARD GAMES!\nThis week our board games are all about SPEED. We will be playing fast'
+  https://www.instagram.com/p/DVEJEvnDFUJ/
+
+  @ucdgospelchoir  [20 Feb]
+  Caption: 'Come and join us on Monday for a relaxing session and snacks. Excited to see you all theree💜!!'
+  https://www.instagram.com/p/DU_JwgZDA9u/
+
+  @ucd_hortsoc  [23 Feb]
+  Caption: "we've reached the halfway mark! hope midterms aren't getting you down \n\n- wednesday we shall be gardening from 11 to 1!"
+  https://www.instagram.com/p/DVGTmYgjOMf/
+
+  @ucdindsoc  [23 Feb]
+  Caption: 'Join us for a relaxing evening of film and fun! 🍿\n📍 Village Auditorium\n📅 26 Feb 2026\n⏰ 18:00 – 21:00\nSee you there!'
+  https://www.instagram.com/p/DVHGtCtglDg/
+
+  @ucditaliansoc  [17 Feb]
+  Caption: 'Ciao! 🇮🇹✨\n\nThis Wednesday we’re bringing a taste of Italy to the International Market! Come support Società Italiana and'
+  https://www.instagram.com/p/DU29YL1jQ10/
+
+  @ucditaliansoc  [17 Feb]
+  Caption: 'Ciao! \n\nJoin us for a cozy Coffee Morning with Società Italiana ☕✨\nCome along for a cup, a chat, and a relaxed start to'
+  https://www.instagram.com/p/DU28xz0jSM1/
+
+  @ucditaliansoc  [11 Feb]
+  Caption: 'Ciao! 💌\nJoin us for a cosy Valentine’s Day morning of card making and pastries at Brava Lounge 🥐✨\nCome along to get crea'
+  https://www.instagram.com/p/DUoNCXGDSd9/
+
+  @ucditaliansoc  [05 Feb]
+  Caption: 'Buongiorno✨‼️\nCome by tomorrow for a Coffee & Snack lunch break with @ucditaliansoc and @psychsocietyucd \nWe will have a'
+  https://www.instagram.com/p/DUXvslNCFfj/
+
+  @ucdjsoc  [25 Feb]
+  Caption: 'You know the drill, come over again for your regular dose of snacks and prepare your kahoot skills!\n#ucdjsoc #ucdjapanes'
+  https://www.instagram.com/p/DVL397ACJtF/
+
+  @ucdjsoc  [22 Feb]
+  Caption: "This week's event lineup, our weekly language class is up first followed by then out tea afternoon and kahoot (prizes fo"
+  https://www.instagram.com/p/DVEfKk_CBG2/
+
+  @ucdjsoc  [19 Feb]
+  Caption: "For Friday's tea afternoon we will also be hosting Some of you may have played this with us before but Essentially one m"
+  https://www.instagram.com/p/DU9AboWiJ7N/
+
+  @ucdjsoc  [18 Feb]
+  Caption: 'Tomorrow is another Language class and we will be going over how to count things. Like in english, we have *sheets* of p'
+  https://www.instagram.com/p/DU6XrUlCJuO/
+
+  @ucdjsoc  [17 Feb]
+  Caption: 'We will be having a table at the International Festival Stalls in the Atrium! We will be selling matcha cheesecake and m'
+  https://www.instagram.com/p/DU2t1eCiJZK/
+
+  @ucdjuggling  [08 Feb]
+  Caption: "Missed Midlands' convention but still want to hear all about it? Then our post convention pizza will be perfect for you!"
+  https://www.instagram.com/p/DUhAtUCCIic/
+
+  @ucdlawsoc  [25 Feb]
+  Caption: 'Matheson is proud to partner with @universitycollegedublin for our inaugural Matheson UCD Governance Hackathon.\n\nAre you'
+  → Title:    Free Food at Student Centre
+  → Location: Astra Hall, Student Centre
+  → Time:     08:26 PM
+  → Date:     Wednesday 15 Apr
+  → Members:  False
+  https://www.instagram.com/p/DVMjmMtDdXg/
+
+  @ucdlawsoc  [23 Feb]
+  Caption: 'FLOAT EU DEBATE TUESDAY 24TH IN THE FITZGERALD CHAMBER!! \n\nWith guests:\nCllr. Michael Clark\nDean of Law Imelda Maher\nBar'
+  https://www.instagram.com/p/DVHOEIlDZ55/
+
+  @ucdlawsoc  [18 Feb]
+  Caption: 'Join us for an insightful career panel discussion regarding careers in Law which differ from the usual\n\nWe will be joine'
+  https://www.instagram.com/p/DU53U9WjQda/
+
+  @ucd_lgbtqplus  [01 Feb]
+  Caption: 'Howdy, my friends 🫡\nAre we feeling creative yet? \nAre we avant-garding?\nAre we arting?\n\nWell, you will be this week, for'
+  https://www.instagram.com/p/DUO11-uiOzX/
+
+  @ucdlnh  [22 Feb]
+  Caption: 'THB WOMEN’S CONTRIBUTIONS TO HISTORY HAVE BEEN ERASED 🖋️💪\n\nThey say “Behind every great man is a great woman” but what h'
+  https://www.instagram.com/p/DVE0ERHjX2M/
+
+  @ucdlnh  [26 Feb]
+  Caption: 'LnH Coffee Morning today! ☕️\n\nMake sure to join us today outside Theatre L in the Newman Building from 11:45am for some'
+  https://www.instagram.com/p/DVN42ckjXXk/
+
+  @ucdlnh  [25 Feb]
+  Caption: "This week we were on campus asking students what they think about women's place in history with @ucdlnhfinlay ! 💜\n\nTomor"
+  https://www.instagram.com/p/DVMhfJyDS27/
+
+  @ucdlitsoc  [23 Feb]
+  Caption: '𝚆𝚎𝚎𝚔 𝟼 𝚠𝚒𝚝𝚑 𝙻𝚒𝚝𝚂𝚘𝚌! 📚✨ \u200b\n\n𝙷𝚎𝚛𝚎 𝚒𝚜 𝚎𝚟𝚎𝚛𝚢𝚝𝚑𝚒𝚗𝚐 𝚑𝚊𝚙𝚙𝚎𝚗𝚒𝚗𝚐 𝚘𝚟𝚎𝚛 𝚝𝚑𝚎 𝚗𝚎𝚡𝚝 𝚏𝚎𝚠 𝚍𝚊𝚢𝚜: \u200b\n\n• 𝙼𝚘𝚗𝚍𝚊𝚢: 𝙲𝚘𝚏𝚏𝚎𝚎 𝙼𝚘𝚛𝚗𝚒𝚗𝚐! ☕️ | 𝙼𝚎𝚎𝚝𝚒𝚗𝚐'
+  https://www.instagram.com/p/DVF8VLICLDj/
+
+  @ucdlitsoc  [17 Feb]
+  Caption: '𝚆𝚎𝚎𝚔 𝟻 𝚠𝚒𝚝𝚑 𝙻𝚒𝚝𝚂𝚘𝚌! 📚✨ \n\n𝙷𝚎𝚛𝚎 𝚒𝚜 𝚎𝚟𝚎𝚛𝚢𝚝𝚑𝚒𝚗𝚐 𝚑𝚊𝚙𝚙𝚎𝚗𝚒𝚗𝚐 𝚘𝚟𝚎𝚛 𝚝𝚑𝚎 𝚗𝚎𝚡𝚝 𝚏𝚎𝚠 𝚍𝚊𝚢𝚜:\xa0 \u200b \n\n• 𝙼𝚘𝚗𝚍𝚊𝚢: 𝙲𝚘𝚏𝚏𝚎𝚎 𝙼𝚘𝚛𝚗𝚒𝚗𝚐! ☕ | 𝙱𝚕𝚞𝚎 𝚁𝚘'
+  https://www.instagram.com/p/DU2z6EoCCrE/
+
+  @ucdlitsoc  [16 Feb]
+  Caption: '‼️ WE’RE HIRING ‼️\n\nWe’re looking for a Graphic Designer to join our team. You’ll be creating engaging Instagram content'
+  https://www.instagram.com/p/DU0bWefDO2c/
+
+  @ucdlitsoc  [09 Feb]
+  Caption: '𝚆𝚎𝚎𝚔 𝟺 𝚠𝚒𝚝𝚑 𝙻𝚒𝚝𝚜𝚘𝚌 🎞️📔\n\n☕️ 𝙼𝚘𝚗𝚍𝚊𝚢 — 𝙹𝚘𝚒𝚗 𝚞𝚜 𝚏𝚘𝚛 𝚊 𝚌𝚘𝚏𝚏𝚎𝚎 𝚖𝚘𝚛𝚗𝚒𝚗𝚐 𝚝𝚘 𝚜𝚝𝚊𝚛𝚝 𝚘𝚏𝚏 𝚝𝚑𝚎 𝚠𝚎𝚎𝚔. 𝙷𝚊𝚛𝚖𝚘𝚗𝚢 𝚂𝚝𝚞𝚍𝚒𝚘, 𝟷𝟶𝚊𝚖. \u200b\n\n🖋️ 𝚃𝚑𝚞𝚛'
+  → Title:    𝚆𝚎𝚎𝚔 𝟺 𝚠𝚒𝚝𝚑 𝙻𝚒𝚝𝚜𝚘𝚌 🎞️📔
+  → Location: UCD Belfield
+  → Time:     06:00 PM
+  → Date:     Monday 04 May
+  → Members:  False
+  https://www.instagram.com/p/DUhEULsiI-M/
+
+  @ucdlitsoc  [19 Jan]
+  Caption: '🗞️ 𝚆𝙴𝙴𝙺 𝟷 𝚆𝙸𝚃𝙷 𝙻𝙸𝚃𝚂𝙾𝙲\n\n 🗞️ 𝚆𝚎𝚕𝚌𝚘𝚖𝚎 𝚋𝚊𝚌𝚔!! 📚\n\n✨ 𝚆𝚎’𝚛𝚎 𝚜𝚝𝚊𝚛𝚝𝚒𝚗𝚐 𝚝𝚑𝚎 𝚜𝚎𝚖𝚎𝚜𝚝𝚎𝚛 𝚠𝚒𝚝𝚑 𝚝𝚠𝚘 𝚟𝚎𝚛𝚢 𝚒𝚖𝚙𝚘𝚛𝚝𝚊𝚗𝚝 𝚎𝚟𝚎𝚗𝚝𝚜: \n\n𝙼𝙾𝙽𝙳𝙰𝚈 🍕 𝙰𝚛'
+  https://www.instagram.com/p/DTrz4DgiKKz/
+
+  @ucdlitsoc  [18 Jan]
+  Caption: '🗞️ 𝙱𝚁𝙴𝙰𝙺𝙸𝙽𝙶 𝙽𝙴𝚆𝚂 🗞️ 𝙸𝚝’𝚜 𝙼𝙸𝚇𝙴𝚁 𝚃𝙸𝙼𝙴! \n\n🍕 𝚃𝚑𝚎 𝚂𝚄 𝚒𝚜 𝚑𝚘𝚜𝚝𝚒𝚗𝚐 𝚊𝚗 𝙰𝚛𝚝𝚜 & 𝙷𝚞𝚖𝚊𝚗𝚒𝚝𝚒𝚎𝚜 𝙼𝚒𝚡𝚎𝚛 𝚝𝚑𝚒𝚜 𝙼𝚘𝚗𝚍𝚊𝚢! \n\n𝙰𝚛𝚝𝚜 & 𝙷𝚞𝚖𝚊𝚗𝚒𝚝𝚒𝚎𝚜 𝚜'
+  https://www.instagram.com/p/DTql9-djsmR/
+
+  @ucdlivingstones  [23 Feb]
+  Caption: '✨ This Week at Livingstones ✨\nHello everyone, welcome back to a new week! We’ve got some exciting events coming up and w'
+  https://www.instagram.com/p/DVGdU-mDDcK/
+
+  @ucdlivingstones  [19 Feb]
+  Caption: 'For the ladies.. 💐💐\nFebruary may be known as the month of love…\nBut God’s love doesn’t fade when the calendar turns.\n\nJo'
+  → Title:    For the ladies.. 💐💐
+  → Location: Harmony Studio, Student Centre
+  → Time:     07:00 PM
+  → Date:     Friday 27 Feb
+  → Members:  False
+  https://www.instagram.com/p/DU8BicujALr/
+
+  @ucdlivingstones  [08 Feb]
+  Caption: "Join us for a special Valentine's Day event this Wednesday at 6:15 pm in  Room FS-G01 in the Agriculture Building. We'll"
+  https://www.instagram.com/p/DUg649JjAYO/
+
+  @ucdmechsoc  [13 Feb]
+  Caption: 'Dear 3rd Years!!\nChoosing your Masters? 🤔🎓\n\nJoin Mech Soc for our Masters Stream Information Night - hear from current m'
+  https://www.instagram.com/p/DUtJauqDNN3/
+
+  @ucdmechsoc  [09 Feb]
+  Caption: '💻CAD Workshop this Thursday!\n\nJoin Master’s student Luke Dunne for a Fusion 360 masterclass! Whether you’re new to CAD o'
+  https://www.instagram.com/p/DUjfda-DEYw/
+
+  @ucdmechsoc  [18 Nov]
+  Caption: '🚀 Careers Talk Alert!\nWe’re excited to welcome Tritech and IPS to UCD MechSoc for a special careers session! 🤝\n\nThey’ll'
+  https://www.instagram.com/p/DRMoBGKDCEh/
+
+  @ucdmedsoc  [18 Feb]
+  Caption: '🚨Rescheduled🚨\nMedSoc is excited to announce that Ireland’s Chief State Pathologist, Professor Linda Mulligan will be joi'
+  https://www.instagram.com/p/DU6H0uADZjo/
+
+  @ucdmusicsoc  [07 Feb]
+  Caption: "We can't wait to see you all again at our coffee afternoon. All are welcome to the event. Looking forward to seeing you"
+  https://www.instagram.com/p/DUeZLVtDNbY/
+
+  @ucdmusicsoc  [07 Feb]
+  Caption: 'Week 4 here we come! 🎸🎶🔥\nJoin us this week for some of our amazing events we have planned!\n\nThis Tuesday the 10th of Feb'
+  https://www.instagram.com/p/DUePZgODLLS/
+
+  @ucdnetsoc  [16 Feb]
+  Caption: '⚡ Netsoc Weekly Event Summary - Another stacked week ahead:\n\n🗓 Tuesday 17 Feb | 18:00–20:00 | Farmer Brown’s\n🍻 AI Pub Qu'
+  https://www.instagram.com/p/DU1FhdtCHHK/
+
+  @ucdnetsoc  [09 Feb]
+  Caption: '⚡️Netsoc Weekly Round-Up — here’s what we’re up to this week!\n\n🗓 Tuesday 10 Feb | 17:00–19:00 | L2.15, O’Connor\n💼 Interv'
+  https://www.instagram.com/p/DUjZHjUCPZk/
+
+  @ucdnetsoc  [05 Feb]
+  Caption: 'An afternoon of games and great fun for UCD students!\nUCD Innovation Academy and NetSoc invite you to The Great Game Gat'
+  https://www.instagram.com/p/DUYNHSjjbQW/
+
+  @ucdnetsoc  [03 Feb]
+  Caption: '🎮✨ Program Better & Jam ✨🎮\n📅 Friday 6 Feb\n⏰ 16:00–18:00\n📍 Innovation Academy – Shackleton\n\nBring your team or make one a'
+  https://www.instagram.com/p/DUUF57xiOZD/
+
+  @ucdnewmansoc  [24 Feb]
+  Caption: 'prayer, fasting and almsgiving?!? i thought i just had to give up sweets :( \n\nFollowing on from last weeks talk, we seem'
+  https://www.instagram.com/p/DVIoF64iFzl/
+
+  @nordicsocietyucd  [10 Feb]
+  Caption: 'We’re back!!! Come watch a nordic movie with free popcorn😉 Afterwards we might head to clubhouse😝 We will update on our'
+  https://www.instagram.com/p/DUkxbcAjV7g/
+
+  @nordicsocietyucd  [19 Jan]
+  Caption: 'Welcome back everyone! We have some very exciting events lined up for you this semester… starting if with bringing back'
+  https://www.instagram.com/p/DTsySVjDaYE/
+
+  @nordicsocietyucd  [24 Nov]
+  Caption: 'Last event of the semester!\nThank you guys all for a great semester and your dedicated participation, it means a lot to'
+  https://www.instagram.com/p/DRbjd9OjWC9/
+
+  @nordicsocietyucd  [18 Nov]
+  Caption: 'Week 11 schedule! \nNext Monday at 3-5pm we will be hosting a gingerbread house competition! please rsvp using the form i'
+  https://www.instagram.com/p/DRMUp1rDSX7/
+
+  @namsocucd  [16 Feb]
+  Caption: 'Come along to our amazing events on this week, we have a Pancake Tuesday event to celebrate one of the best days of the'
+  https://www.instagram.com/p/DU0fshkCEfq/
+
+  @namsocucd  [11 Feb]
+  Caption: 'While Ireland is certainly special for its dual-healthcare system - a ‘balance’ of private and public, there is much to'
+  https://www.instagram.com/p/DUnwf7HjZvO/
+
+  @namsocucd  [08 Feb]
+  Caption: 'Come along to all of our loving Valentines themed events this week. We will be building roses for that special person in'
+  https://www.instagram.com/p/DUg8reNiCYP/
+
+  @namsocucd  [03 Feb]
+  Caption: 'COME JOIN US FOR FREE COOKIES ON THE 4TH OF FEBUARY IN HARMONY💙💙💙💙\n\n@ucdsocieties @snmhs.official @scoopsandhoops.ie'
+  https://www.instagram.com/p/DUUHMiCiNo6/
+
+  @pharmtoxucd  [25 Oct]
+  Caption: '💃🏽 🪩 Big love to everyone who pulled up to Pharmtox Mixer! Y’all ate (literally and socially) 🙂\u200d↕️\nThe vibes were immacu'
+  https://www.instagram.com/p/DQPbfpLDSMS/
+
+  @ucdphdsociety  [21 Oct]
+  Caption: '🎃 Halloween Movie Night 🎃\n\u2028Join us for a spooky evening at Fitzgerald Chamber on 24 October!\n\u2028We’ll provide the popcorn—'
+  https://www.instagram.com/p/DQElkgsiG7s/
+
+  @ucdphdsociety  [13 Oct]
+  Caption: '🏖️ Coastal Walk: Malahide to Portmarnock 🏖️\n\nJoin us for a scenic weekend walk along the coast!\n\nStart: Malahide dart st'
+  https://www.instagram.com/p/DPv55xSiMXe/
+
+  @ucdphdsociety  [08 Sep]
+  Caption: '🎓 UCD PhD Society – September Events! 🎉\n\n☕ Sept 9, 10:00 – Coffee Morning @ Global Lounge\n🎭 Sept 19, 18:00 – Culture Nig'
+  https://www.instagram.com/p/DOWIS3hiPDu/
+
+  @ucdphilsoc  [03 Feb]
+  Caption: 'this week brings our long awaited EGM, so if you have any interest in being on the committee or deciding who will be, pl'
+  https://www.instagram.com/p/DUT7P1kDIZn/
+
+  @ucdphilsoc  [26 Jan]
+  Caption: "hellloooo there philophiles, i hope you're all ready to refresh yourselves after such a long time away! we're easing bac"
+  https://www.instagram.com/p/DT-2YlSDLOF/
+
+  @physics_society_ucd  [24 Feb]
+  Caption: 'Hey PhysSoc ⚛️🌟\n\nBelated short but sweet itinerary for this week mloves 💥💃 \n\nCome by Meeting Rooms in the Student Centre'
+  https://www.instagram.com/p/DVKKNQUAi39/
+
+  @physics_society_ucd  [16 Feb]
+  Caption: 'Hey PhysSoc, welcome to yet another glorious week!\n\nBoy do we have a busy Thursday 19th for you 🌟💃 come along to our cof'
+  https://www.instagram.com/p/DUzQmmEgn7w/
+
+  @physics_society_ucd  [09 Feb]
+  Caption: 'Is it magic? ✨ Or is it something even better… #physics \n\nCome witness the wonders of liquid nitrogen as we, your humble'
+  https://www.instagram.com/p/DUjlG4WAkuc/
+
+  @ucdpolsoc  [24 Feb]
+  Caption: "Polsoc coffee morning! ☕\n\nMake sure to join us for this week's coffee morning in front of Newman Theater L!\n\n #ucdsocial"
+  https://www.instagram.com/p/DVJMKU1CGN2/
+
+  @ucdpolsoc  [23 Feb]
+  Caption: "We have a schedule update for this week! Make sure to stop by LawSoc's date on Irish interests in the EU, our weekly cof"
+  https://www.instagram.com/p/DVHp52kiEyp/
+
+  @ucdpolsoc  [18 Feb]
+  Caption: 'The economic and political development of Ireland since joining the European Economic Community in 1973 has been sensati'
+  https://www.instagram.com/p/DU5wr5yDdP-/
+
+  @ucdpolsoc  [17 Feb]
+  Caption: 'You know it, you love it! 🙌\n\nPolsoc is BACK with our weekly coffee morning tomorrow, Wednesday the 21st from 10am to 12p'
+  https://www.instagram.com/p/DU2z_yMCEhk/
+
+  @ucdpolsoc  [15 Feb]
+  Caption: 'Week 5 with Polsoc is HERE! 💥\n\nWe have a jam packed week of events for you guys, from our MEP panel with Aodhan O’Riorda'
+  https://www.instagram.com/p/DUyvKzpCFKv/
+
+  @psychsocietyucd  [24 Feb]
+  Caption: 'GAMES DAY GAMES DAY ‼️‼️🗣️🗣️🗣️\n\nGuys come to some chillaxed game time where to get to play your favourite board games an'
+  https://www.instagram.com/p/DVIseNViMcG/
+
+  @psychsocietyucd  [23 Feb]
+  Caption: 'Coffee morning time!!! Stop by today @ 10am!! \n\nIn the Harmony studio 💜💜\nCoffee, Berry green and peppermint tea, hot cho'
+  https://www.instagram.com/p/DVGDzVsCDxx/
+
+  @psychsocietyucd  [22 Feb]
+  Caption: 'Tomorrow @ 11am in the Fitzgerald Chamber we have our most anticipated event ‼️ \n\nAdam Harris, the founder of the @asiam'
+  https://www.instagram.com/p/DVFDZj5iOmP/
+
+  @psychsocietyucd  [22 Feb]
+  Caption: 'Welcome to Week 6 ✨✨\n\nFun and anticipatory events coming your way ~\nTomorrow we have two consecutive events!! \n☕🫖 Coffee'
+  https://www.instagram.com/p/DVEo3h5iB7Z/
+
+  @psychsocietyucd  [17 Feb]
+  Caption: 'Good day everyone!! ❤❤\n\nBe ready for a fruitful and fun coffee morning tomorrow ✨✨ we have new flavours just in - Berry,'
+  https://www.instagram.com/p/DU3iPskiBKx/
+
+  @psychsocietyucd  [16 Feb]
+  Caption: 'Apolo-cheese everyone, we have an updated more flourished week coming this week ✨\n\nWe got the casual games where we gath'
+  https://www.instagram.com/p/DUz4sYaiCfH/
+
+  @psychsocietyucd  [12 Feb]
+  Caption: "Valentine's day is coming our way 💘\nIn Harmony studio @ 1pm (come before all is gone!!) \n\nIn order to celebrate this sea"
+  https://www.instagram.com/p/DUpt2DWCIwF/
+
+  @ucdsocdems  [21 Jan]
+  Caption: '🟣‼️🟣JOIN US TODAY🟣‼️🟣\n\nWe have lots of unreal activities planned for semester 2! More information shall be released in t'
+  https://www.instagram.com/p/DTyeedAgAk5/
+
+  @ucdsocscistudents  [24 Feb]
+  Caption: 'As our last one was a huge success… Our SECOND Social Sciences Café is happening TOMORROW! ✨☕\n\nJoin us on Wednesday 25th'
+  https://www.instagram.com/p/DVIwttNDOPM/
+
+  @ucdsocscistudents  [06 Feb]
+  Caption: 'You’re very welcome to join us for the first Social Sciences Café of the trimester - a relaxed coffee morning for Social'
+  https://www.instagram.com/p/DUacVzGDFCu/
+
+  @ucdvnsoc  [18 Feb]
+  Caption: 'IVNA talk on Thursday the 20th!\nEveryone is welcome and we could love to see you all there!💚💚 Thursday the 20th at 6pm i'
+  https://www.instagram.com/p/DGNbt9CMQbZ/
+
+  @ucdvetsoc  [15 Feb]
+  Caption: '🥞🥞🥞'
+  https://www.instagram.com/p/DUyrxkajhRw/
+
+  @womeninstem_ucd  [19 Feb]
+  Caption: '📣Important and exciting news!📣\n\nThis International Women’s Day, we’re hosting a special Lunch & Learn in collaboration w'
+  → Title:    📣Important and exciting news!📣
+  → Location: FitzGerald Chamber, Student Centre
+  → Time:     01:00 PM
+  → Date:     Tuesday 03 Mar
+  → Members:  False
+  https://www.instagram.com/p/DU8C7O6jfSd/
+
+  @womeninstem_ucd  [17 Feb]
+  Caption: 'Hey guys!!\n\nWe hope you’ve had a great start to your week. Today is Pancake Tuesday, and you best believe we’re not miss'
+  → Title:    Hey guys!!
+  → Location: Brava Lounge, Student Centre
+  → Time:     02:00 PM
+  → Date:     Monday 02 Mar
+  → Members:  False
+  https://www.instagram.com/p/DU2l4awAKjj/
+
+  @womeninstem_ucd  [10 Feb]
+  Caption: 'Calling all gals 💕✨\n\nWe’re hosting a Galentine’s Brunch with @ucdwib and it’s going to be so much fun 💖\n\nExpect photoboo'
+  https://www.instagram.com/p/DUk435Jgtdw/
+
+
+❌ REJECTED (593 posts)
+
+  Rejection reasons:
+    545x  No explicit food keyword found
+    25x  Appears to be a paid event (price/ticket mention)
+    5x  Iftar/religious event
+    3x  Nightlife event keyword: 'ball'
+    3x  Nightlife event keyword: 'night out'
+    2x  Nightlife event keyword: 'pub crawl'
+    2x  Mentions off-campus venue: 'pub'
+    1x  Nightlife event keyword: 'formal'
+    1x  Mentions off-campus venue: 'dundrum'
+    1x  Mentions other college: 'maynooth'
+    1x  Mentions off-campus venue: 'bar'
+    1x  Mentions other college: 'tcd'
+    1x  Nightlife event keyword: 'afters'
+    1x  Food activity workshop/competition (not free food)
+    1x  Mentions off-campus venue: 'night out'
+
+  ⚠️  POSSIBLE FALSE NEGATIVES (134 posts — food mentioned but rejected):
+
+    @belfield.fm  [25 Feb]
+    Caption: 'Games and Drinks at Token!\nCome join us on the 25th March from 7 - 10pm!\n\n#ucd #belfieldfm #studentradio'
+    https://www.instagram.com/p/DVMGUvLCpv_/
+
+    @belfield.fm  [16 Feb]
+    Caption: 'Drinks at Farmer Browns, Wed 18th Feb at 6:30! Be there or be square ⭕️\n\n#belfieldfm #studentradio #ucd'
+    https://www.instagram.com/p/DU0FkZniobN/
+
+    @belfield.fm  [12 Feb]
+    Caption: 'Come down to The Clubhouse tonight at 5pm for a few drinks to meet your fellow BFMers! We hope to see you all there 🫶'
+    https://www.instagram.com/p/DUp0qwWiu4w/
+
+    @belfield.fm  [01 Feb]
+    Caption: 'WELCOME BACK! 🎉\n\nJoin us this Wednesday from 7pm in Kodiak, Rathmines for welcome back drinks to start the Spring semester off with a bang 💥\n\nWe hope'
+    https://www.instagram.com/p/DUOiz0_CuRg/
+
+    @ucdactuarial  [01 Nov]
+    Caption: 'A&F Movember is back… and the Actuaries are ready! 🥸\n\nWhether it’s a Tom Selleck or a more Mario Bros esque stache, our members are growing (and movin'
+    https://www.instagram.com/p/DQhmUMBiAjZ/
+
+    @ucdactuarial  [27 Oct]
+    Caption: 'W ALERT 🚨 ‼️ 🔔 The fourth years take an unsurprising win 🥇 not the first we have to our name. Unfortunately because of a certain 🐑 we didn’t have the'
+    https://www.instagram.com/p/DQUqMSWiJv0/
+
+    @ucdafricasociety  [09 Feb]
+    Caption: 'To our dearest members. For the First Time Ever. We present to you, the UCD Africa Society BALL💃🏾🕺🏾🪩\n\nThere’s no TMO this year, but we’ve got somethin'
+    https://www.instagram.com/p/DUi9eMkCLIb/
+
+    @ucdafricasociety  [16 Feb]
+    Caption: '👀 IMPOSTER NIGHT is happening… but who’s really who? 🤨 How well can you lie and how well can you detect a liar? Loyalty goes out the window when it co'
+    https://www.instagram.com/p/DU0e8DXiBtc/
+
+    @ucdarcsoc  [03 Feb]
+    Caption: 'We are delighted to welcome @florisvanderpoel to the Red Room this Friday the 6th February at 13:00, to deliver a lecture titled:\n\nTop of mind | Off t'
+    https://www.instagram.com/p/DUTG3ExDJ80/
+
+    @ucdarcsoc  [01 Feb]
+    Caption: 'It’s that time of year again… TUD x UCD Arch Valentines Mixer 💌💐 \n\nWe are looking for eligible contestants who are searching for love !! Think you hav'
+    https://www.instagram.com/p/DUNtL2ciPcW/
+
+    @ucdarcsoc  [19 Jan]
+    Caption: 'BARCELONA TRIP 🇪🇸 \n\nWe are thrilled to announce that ArcSoc is jetting off to Barcelona from the 8th-11th of March 2026, during the first week of the'
+    https://www.instagram.com/p/DTsVVG3jNTQ/
+
+    @artssocucd  [22 Feb]
+    Caption: "HEY YOU! Are you tired of the same old boring podcasts? Are you also an arts student who doesn't know what to do with their life post-Uni? Tune in to"
+    https://www.instagram.com/p/DVEk9BwCJ47/
+
+    @artssocucd  [16 Feb]
+    Caption: '*IMPORTANT INFORMATION FOR ARTS & HUMANITIES / OLD HOLLYWOOD BALL ATTENDEES* 🥳\n\nPlease see the above for coach departure times, rough timetable of the'
+    https://www.instagram.com/p/DU1PfecCBvX/
+
+    @ucdbiosoc  [19 Oct]
+    Caption: '🚨 WARNING: This lecture is going to be dangerously good! 🚨 \n\nPrepare for an evening of fascinating science with “50 Ways to Kill Your Enemy: Toxicolog'
+    https://www.instagram.com/p/DP_nEWcDMi4/
+
+    @ucdbiosoc  [18 Oct]
+    Caption: "‼️ It’s actually Thursday the 23rd not Tuesday!! \n\nHi everyone!! Get ready for our stream talks this year 👩\u200d🔬🧪! It's a great opportunity for first and"
+    https://www.instagram.com/p/DP9C-JNjBHv/
+
+    @ucdbiosoc  [06 Oct]
+    Caption: '💗 Bake Sale for Breast Cancer 💗\nIn honour of breast cancer awareness month we will be holding a bake sale in aid of @breastcancerireland 🎀\n\n🗓️ Wednesd'
+    https://www.instagram.com/p/DPeFlCtDCWg/
+
+    @ucdchemengsoc  [01 Apr]
+    Caption: 'Hey everyone! We’ve had so much fun being your committee this year, the events that we have shared we will carry with us for a lifetime, but alas all'
+    https://www.instagram.com/p/DH6vg_hMMkl/
+
+    @ucdchemengsoc  [25 Nov]
+    Caption: 'This year we’re running a competition for the best t-shirt design for UCD to wear at Frank Morton 2025. The exact dates are yet to be confirmed but we'
+    https://www.instagram.com/p/DCzlZC0sv-v/
+
+    @ucdchemsoc  [10 Sep]
+    Caption: '🥳✨Say hello to the 2025/2026 Chem Soc committee!! ✨ 🥳 \n\n🧪President: Aoibheann — Madam president, our fearless leader!\n🧪VP: Craig — Did someone say rig'
+    https://www.instagram.com/p/DObBSWqjP9v/
+
+    @ucdchemsoc  [13 Feb]
+    Caption: 'We’ll be having a Valentine’s Bake Sale next Tuesday in support of the Irish Heart Foundation (because theme is important)!! 🥰💖Location is TBC, but ma'
+    https://www.instagram.com/p/DUtDemajSuw/
+
+    @ucdchemsoc  [21 Jan]
+    Caption: 'Did you miss us?? Because we missed you!! 🥰We’re back to start the spring semester with a Refreshers Week Social Mixer at Farmer Browns (classic ofc)!'
+    https://www.instagram.com/p/DTxxCM6DNRs/
+
+    @ucdchemsoc  [01 Dec]
+    Caption: 'Our Christmas dinner is coming up soon!! 🎄🥳We will be selling tickets in the Third floor Kitchen in Science South on December 1st from 12pm-1pm and De'
+    https://www.instagram.com/p/DRt_yMYDHyR/
+
+    @ucdchess  [08 Feb]
+    Caption: 'We are happy to announce that we will have three top Irish chess players competing in the UCD Chess Charity Rapidplay 2026 for Focus Ireland.  From le'
+    https://www.instagram.com/p/DUgt9t4DlBD/
+
+    @ucdchess  [25 Jan]
+    Caption: 'Hey everyone! Hope everyone had a great holiday and first week back!\n\nHere is what UCD Chess has planned for Refreshers. This Wednesday (28th of Janua'
+    https://www.instagram.com/p/DT8ntmNALFY/
+
+    @ucdchess  [11 Jan]
+    Caption: 'Hey everyone! We hope that everyone had a great break! \n\nWe have a very exciting charity event coming up in a few weeks ... our Charity Rapidplay Tour'
+    https://www.instagram.com/p/DTXzVAvicav/
+
+    @ucdchess  [03 Nov]
+    Caption: 'Week 9 is upon us!\n\nStill a busy time for all, but if you want to to play some chill, low stakes OTB chess games this Thursday (6th), in Newman B110,'
+    https://www.instagram.com/p/DQl8bb-CJcA/
+
+    @chinesesoc.ucd  [26 Feb]
+    Caption: 'With just a piece of paper and a pair of scissors, we can create a world of wonders.\nIn this fast-paced era, take a break and experience the romance o'
+    https://www.instagram.com/p/DVM2vRVCLs5/
+
+    @chinesesoc.ucd  [29 Jan]
+    Caption: '🎉🧧 UCD Chinese New Year Gala | Talent Call Now Open! 🧧🎉\nWant to shine on the gala stage and share your talents with more fellow students? Whether you’'
+    https://www.instagram.com/p/DUF8sgwiMhG/
+
+    @chinesesoc.ucd  [27 Jan]
+    Caption: '【UCD CSSA & Chinese Society Sponsor Partnership | Blackrock Florist Flower & Friends】🌹✨\n\nValentine’s Day is coming! One of our sponsors — Flower & Fri'
+    https://www.instagram.com/p/DUBciNyCNtV/
+
+    @chinesesoc.ucd  [19 Nov]
+    Caption: '🎓 Career Night\n\nConsidering postgraduate studies? Hunting for a job? Still confused about your professional path?\nYour future starts with a single con'
+    https://www.instagram.com/p/DRPGqv_CHHd/
+
+    @ucd_civil_structural  [05 Feb]
+    Caption: 'Find that chicken! 🐥\n\nChicken chase is back! Meet at Kehoe’s Pub next Tuesday, 10/2/26, at 8:00pm and wait for the possible locations to drop! \n\nSame'
+    https://www.instagram.com/p/DUYNK_MDGzg/
+
+    @ucd_civil_structural  [26 Jan]
+    Caption: 'Refreshers night out 🪩\n\nTo welcome you all back for a new semester please join us in Smyths of Ranelagh this Tuesday the 27th from 7:30pm 🕺🏻\nDrink tok'
+    https://www.instagram.com/p/DT-BC1XDOt7/
+
+    @ucdcesoc  [26 Feb]
+    Caption: 'Morning breakfast with our boxing partner, Together Academy ❤️ @togetheracademy_ie \nSo grateful to the team for an amazing morning and for sharing the'
+    https://www.instagram.com/p/DVOO59oAmOl/
+
+    @ucddancesoc  [11 Feb]
+    Caption: 'And finally the one you’ve all been waiting for, a HipHop course🥳\n\nJoin Winnie in Newman Theatre 2 (in Newman Basement) for Intermediate HipHop every'
+    https://www.instagram.com/p/DUomlhdDCKi/
+
+    @ucddancesoc  [08 Feb]
+    Caption: 'EDIT: Both days are in VILLAGE 1\n\nYou ask, we deliver🙂\u200d↕️ Welcome to Beginner Bootcamp, DanceSocs two-day-long intensive tailored to all you aspiring'
+    https://www.instagram.com/p/DUg1Bi_jC9B/
+
+    @ucddramsoc  [25 Feb]
+    Caption: 'UCD Dramsoc presents… ‘Rosencrantz and Guildenstern are Dead’ 💀\n\nWritten by Tom Stoppard\n\nDirected by Adél Barany and Daniel Hughes\n\nThis week Monday'
+    https://www.instagram.com/p/DVMSVNJDH5B/
+
+    @ucddramsoc  [24 Feb]
+    Caption: 'Bullish*t your way to a free EP ticket ⚠️\n\nAUDITION to be a COG IN THE MACHINE\n\nThe propaganda machine is a military style interactive theatre and com'
+    https://www.instagram.com/p/DVI2_02DHpW/
+
+    @ucddramsoc  [22 Feb]
+    Caption: 'UCD Dramsoc presents… ‘Rosencrantz and Guildenstern are Dead’ 💀\n\nWritten by Tom Stoppard\n\nDirected by Adél Barany and Daniel Hughes\n\nThis week Monday'
+    https://www.instagram.com/p/DVEi0FCjGUN/
+
+    @ucddramsoc  [22 Feb]
+    Caption: 'UCD Dramsoc presents… ‘Rosencrantz and Guildenstern are Dead’ 💀\n\nWritten by Tom Stoppard\n\nDirected by Adél Barany and Daniel Hughes\n\nThis week Monday'
+    https://www.instagram.com/p/DVEitOBjEey/
+
+    @ucddramsoc  [17 Feb]
+    Caption: '‘Down in the Valley: A Witches’ Tale’ 🧙\u200d♀️\n\nOn at 7PM in the UCD Dramsoc Theatre till Friday\n\n#ucd #ucddramsoc #ucdsocieties'
+    https://www.instagram.com/p/DU3jUp5jDEC/
+
+    @ucddramsoc  [15 Feb]
+    Caption: 'UCD Dramsoc presents ‘Down in the Valley: A Witches’ Tale’ 🧙\u200d♀️\n\nDirected by Isabella Randolph and Maria Cristina Coco\n\nMONDAY TO FRIDAY AT 7PM\nUCD DR'
+    https://www.instagram.com/p/DUxy8KPjD80/
+
+    @ucddrawsoc  [16 Feb]
+    Caption: '*IMPORTANT INFORMATION FOR ARTS & HUMANITIES / OLD HOLLYWOOD BALL ATTENDEES* 🥳\n\nPlease see the above for coach departure times, rough timetable of the'
+    https://www.instagram.com/p/DU1PfecCBvX/
+
+    @ucddrawsoc  [10 Feb]
+    Caption: 'Surprise!!! To celebrate over 15 years of Drawsoc, and to build excitement for the Old Hollywood Ball the following night, we have booked the O’Neill'
+    https://www.instagram.com/p/DUkpjXpjHDC/
+
+    @ucdees  [20 Feb]
+    Caption: 'Here are some photos from the International Festival we were proud to be part of this week!\xa0\n\nIt was incredible to share our culture and traditions wi'
+    https://www.instagram.com/p/DU_Q90fDDmX/
+
+    @ucdees  [19 Feb]
+    Caption: 'Love is in the air… and on the canvas 💕🎨\n\nCelebrate Dragobete with UCD Eastern European Society at our cutest event of the semester — a cosy Sip & Pai'
+    https://www.instagram.com/p/DU8FuuCDCeN/
+
+    @ucdengsoc  [07 Feb]
+    Caption: 'First years listen up !!!\n\nWe’ve organised a night in farmer browns for you. So come along and make sure to drink as much as ur body can allow 🍻'
+    https://www.instagram.com/p/DUdTYtXjf-B/
+
+    @ucdengsoc  [05 Feb]
+    Caption: 'Ladies and gentlemen get ready to be suited and booted because Engball is here !!!\n\nTheme: Great Gatsby\nDate: 5th March\n\nTickets outs soon!!\n\nBtw if y'
+    https://www.instagram.com/p/DUX_XcGCKPR/
+
+    @esnucd  [23 Feb]
+    Caption: '🚲Dublin Bike Tour🚲\n\nJoin us for a lovely afternoon cycling around Dublin City centre, with stops at Dublin Castle, the RCDI and Grand Canal Dock amoun'
+    https://www.instagram.com/p/DVHdp7UCCtH/
+
+    @esnucd  [04 Feb]
+    Caption: 'We’ve done jersey night. We’ve done 90s night. We’ve done white lies night. So before we exhaust the themed outfit nights, there is one really importa'
+    https://www.instagram.com/p/DUWK6w4DFJE/
+
+    @ucdfilmsoc  [23 Feb]
+    Caption: '📽️ BRIEF ENCOUNTERS WEEK 📽️\n(sorry for the late post guys 😔)\n\n🌅 Tuesday: Before Sunrise- 5PM, UCD Cinema\n☕ Wednesday: Kino Café\n🌙 Also Wednesday: Afte'
+    https://www.instagram.com/p/DVHPNc-Dp49/
+
+    @ucdfilmsoc  [16 Feb]
+    Caption: '🎞️ Old Hollywood Week🎞️\n\n🥀Tuesday: Wuthering Heights (1939)- 5PM UCD Cinema \n🌹Wuthering Heights (2026)- 7.45PM UCD Cinema\n\n☕ Wednesday: Kino Café in H'
+    https://www.instagram.com/p/DUzFRx-CNwe/
+
+    @ucdfoodsoc  [03 Oct]
+    Caption: 'ladies nd gents, we want YOU! we’re currently looking for some fresh faces for a few positions on our committee. if you enjoy food, wanna join ben in'
+    https://www.instagram.com/p/DPXUfkPCIbl/
+
+    @ucdfoodsoc  [30 Sep]
+    Caption: 'everyone been asking about the next event, WE’RE BACKKK ‼️‼️‼️ join us tomorrow (in a location we will soon give you an update on) as we create a snot'
+    https://www.instagram.com/p/DPPeHCtDe-4/
+
+    @ucdfoodsoc  [22 Sep]
+    Caption: "another exciting week of events coming up! stay tuned for more information on our collab with foodsoc, and thursday's 'derivé', a follow-on from last"
+    https://www.instagram.com/p/DO6bBx-iLKk/
+
+    @ucdfoodsoc  [14 Sep]
+    Caption: 'no i didn’t post this a few days ago and notice a mistake and take it down, ur crazy.\n\nthese are our freshers week events, if something changes i will'
+    https://www.instagram.com/p/DOmNE4oDY4d/
+
+    @ucdfoodsoc  [14 Sep]
+    Caption: 'thanks to all the people i bothered for these clips, i appreciate you glazing foodsoc. freshers week starts tomorrow so i need to see a fat ahh line o'
+    https://www.instagram.com/p/DOmKmznDVt2/
+
+    @ucdfoodsoc  [12 Sep]
+    Caption: 'took a while but it’s done now, i proof read ts like 5 times. if there’s a mistake in here im calling it a day and going to bed.\n\nbut now you know eve'
+    https://www.instagram.com/p/DOfta3nDd_H/
+
+    @ucdgamesociety  [10 Feb]
+    Caption: 'hi guys!💚\nhere’s week 4 (a little late, j forgot to repost the correct schedule 🥲)\n\n🧩BOARD GAMES, NATURALLY!\nTo start week 4 off right it had to be bo'
+    https://www.instagram.com/p/DUlG659jDkD/
+
+    @ucdrocsoc  [23 Feb]
+    Caption: 'UCD RocSoc presents Meme Monday, on a weekly basis!!! Many more great geologic memes to come! Have a great week! \n\n#geology #geologymemes #ucdearthsci'
+    https://www.instagram.com/p/DVF713XDGY1/
+
+    @ucdgospelchoir  [13 Nov]
+    Caption: 'Join us next Monday for our food and fellowship session✨🥳We’ll have games, food, and deep meaningful conversations(DMC’s)✨Looking forward to seeing yo'
+    https://www.instagram.com/p/DRAIVDiDHBc/
+
+    @ucdpottersoc  [25 Jan]
+    Caption: 'Week 2 events are here\nWith it being Refreshers Week we have brought back the sorting ceremony for this week (rumour has it there may be food at this'
+    https://www.instagram.com/p/DT8prRDDWFs/
+
+    @ucdhistorysoc  [10 Feb]
+    Caption: '🌟 HONORARY LIFETIME MEMBERSHIP SERIES 🌟\n\nThe History Society are excited to announce that over the next three weeks we will be welcoming an amazing se'
+    https://www.instagram.com/p/DUlLt8jiF_x/
+
+    @ucdhistorysoc  [14 Feb]
+    Caption: '🌟 HONORARY LIFETIME MEMBERSHIP SERIES 🌟\n\nThe History Society is delighted to welcome Dr. David McCullagh, who will be presented with a HLM for outstan'
+    https://www.instagram.com/p/DUvW5YyCKOS/
+
+    @ucdhistorysoc  [11 Feb]
+    Caption: '✈️HISTORY SOC INTERNATIONAL TRIP TO FLORENCE ✈️\n\nThis March the history society will be jetting off to the land of great food and beautiful art for a'
+    https://www.instagram.com/p/DUn1NGUiHWY/
+
+    @ucdhistorysoc  [10 Feb]
+    Caption: '✨LAST CHANCE TO GET YOUR TICKETS✨\n\nSelling Outside Theatre L Tuesday, Wednesday, Thursday from 12 to 2\n\nMake sure to get them before they’re gone!!!'
+    https://www.instagram.com/p/DUkvSdiCCk7/
+
+    @ucdhistorysoc  [09 Feb]
+    Caption: '🇮🇪 THE 1916 PUB CRAWL 🇮🇪\n\nJoin us this Thursday for another historic pub crawl! Our first pub crawl was so successful we had to do it again! 🥳\n\nJust l'
+    https://www.instagram.com/p/DUikG8yCEc4/
+
+    @ucdhistorysoc  [05 Feb]
+    Caption: '🌟 HONORARY LIFETIME MEMBERSHIP SERIES 🌟\n\nThe History Society are delighted to present Mr. Justice Gerard Hogan an Honorary Lifetime Membership for out'
+    https://www.instagram.com/p/DUY0HNrCJ89/
+
+    @ucdhistorysoc  [01 Feb]
+    Caption: '🗣️ HISTORY SOCIETY LEGACY DEBATE 🗣️\n\nNext Wednesday we will be hosting our first debate of the semester… \n\n‘WAS DEVALERA THE VILLAIN’ \n\nOur speakers w'
+    https://www.instagram.com/p/DUN6pyYDNi1/
+
+    @ucdhistorysoc  [31 Jan]
+    Caption: '🕺🏻 HISTORY SOC 80s NIGHT 🕺🏻\n\nThank you to everyone who came along! What a great night and a great start to the semester 🌟\n\nWe can’t wait to show you w'
+    https://www.instagram.com/p/DUMC6vZDO5c/
+
+    @ucdhrs  [23 Feb]
+    Caption: '✨Cheltenham Preview Night Raffle Prizes✨\n\nA huge thank you to all of the generous companies and organisations who have kindly donated some fantastic p'
+    https://www.instagram.com/p/DVGFsFkDVJo/
+
+    @ucdhrs  [22 Jan]
+    Caption: '🍻Refreshers Night🍻\n\nWe don’t believe in Dry January so instead we’re joining forces with @tcdhorseracing again for Refreshers Night! \n\nDate: Thursday'
+    https://www.instagram.com/p/DT0oYYEDQhZ/
+
+    @ucdhrs  [07 Jan]
+    Caption: '🚗 ITM Stallion Trail Trip Itinerary\n\nOur Stallion trial trip itinerary is up and we are taking Kildare by storm! (Up the lily whites🤍)\n\nThe ITM @irish'
+    https://www.instagram.com/p/DTNveTTjXlI/
+
+    @ucdhrs  [02 Jan]
+    Caption: '🐴UCD HRS STALLION TRAIL TRIP🐴\n\nOur first event of 2026 is here. We are tagging along for a roadtrip to join the @irishthoroughbred ITM Stallion Trail'
+    https://www.instagram.com/p/DTBWPQojXiF/
+
+    @ucd_hortsoc  [28 Jan]
+    Caption: 'Gotta miss those sunny days ☀️\n\nThis route starts from outside of the sports centre!\n\nYou can also use Google maps (📍UCD Horticulture Society Garden)'
+    https://www.instagram.com/p/DFYFj_xs6sG/
+
+    @ucd_hortsoc  [20 Jan]
+    Caption: "Doing some spring cleaning we came across some old (slightly water damged) photos .... recognise anyone? 📸😊\n\nWe can't wait to have folks back in the g"
+    https://www.instagram.com/p/DFDY1yxMK7u/
+
+    @ucd_hortsoc  [09 Feb]
+    Caption: 'week 4 events! \n\n-on tuesday we will be gardening from 1 until 3, pop by whenever you can; \n-and thursday we will be crafting and drinking tea in the'
+    https://www.instagram.com/p/DUh-XmVjJnd/
+
+    @ucd_hortsoc  [03 Feb]
+    Caption: 'happy spring guys !!! its officially the season for growing (although the weather may not be on the same page) \n\ncome by the polytunnel on wednesday f'
+    https://www.instagram.com/p/DUSlccGDHCT/
+
+    @ucdindsoc  [13 Sep]
+    Caption: 'The dedicated team working together to lead, connect, and celebrate our society: The Events & Inclusions Team – creating meaningful experiences and ch'
+    https://www.instagram.com/p/DOjAJ0CAvyn/
+
+    @issucd  [26 Feb]
+    Caption: 'With just a piece of paper and a pair of scissors, we can create a world of wonders.\nIn this fast-paced era, take a break and experience the romance o'
+    https://www.instagram.com/p/DVM2vRVCLs5/
+
+    @issucd  [23 Feb]
+    Caption: 'Not just elections. This is where the next ISS era is decided. 👑\n\nIf you’ve ever wanted to lead, create, and leave a legacy — this is your moment.\n\n🎯'
+    https://www.instagram.com/p/DVGektdkr6o/
+
+    @ucdie  [21 Feb]
+    Caption: 'On Thursday, the UCD Investors and Entrepreneurs Society hosted our Hult Prize Local Competition 2026 and what an incredible evening it was! 🎉\n\nAfter'
+    https://www.instagram.com/p/DVBgfdpDGIa/
+
+    @ucdie  [04 Feb]
+    Caption: 'Curious about the world of Investment Banking, Capital Markets, or Global Markets?\n\nBank of America will be hosting an exclusive event on 6 March 2026'
+    https://www.instagram.com/p/DUVRCT_DFR7/
+
+    @ucditaliansoc  [06 Feb]
+    Caption: '🇮🇹🍊\nAperitivo is back, this time with a SPECIAL DEAL! Join us at the Global Lounge on Friday 09/02, 5:30–7:30 PM, for Italian vibes, great drinks and'
+    https://www.instagram.com/p/DUbcgUgDiin/
+
+    @ucditaliansoc  [04 Feb]
+    Caption: 'A huge thank you to the Italian Institute of Culture in Dublin, the Embassy of Italy, and the Society for International Affairs (SOFIA) at Trinity Col'
+    https://www.instagram.com/p/DUWfStxDibB/
+
+    @ucdjsoc  [23 Feb]
+    Caption: "Due to some difficulties last week we will be doing this topic again! If you weren't able to join last week or if you want a refresher, come down!"
+    https://www.instagram.com/p/DVFJoQhiLN3/
+
+    @ucdjsoc  [18 Feb]
+    Caption: 'Thanks so much to everyone who came to the Asian Market Crawl. We hope you all had a great time. ✨\n\nTo hear about more fun events keep up-to-date with'
+    https://www.instagram.com/p/DU6lIrMiDGK/
+
+    @ucdjsoc  [18 Feb]
+    Caption: 'For fluent Japanese speakers 🗾🇯🇵\n\n📢 ＜いよいよ 2/21（土）– 22（日）開催！ロンキャリ2026＞\n＼37社がロンドンに集結！／\n\nアイルランドの日英バイリンガルのみなさんへ\nCFNの吉田麻衣子です。\n\nいよいよ今週末、ロンドンキャリアフォーラムが開催です！'
+    https://www.instagram.com/p/DU58FNLCC7k/
+
+    @ucdjuggling  [25 Jan]
+    Caption: "It's here!! Refresher's week has arrived and with it many events!\nCome see and try our props at our practices, or the showcase! 🤹\nPop by the stand on"
+    https://www.instagram.com/p/DT88h2HCFUO/
+
+    @kevinbarrycumann  [11 Feb]
+    Caption: 'Pub Quiz in aid of the Irish Cancer Society 💛\n\n🗓 Monday 16th February\n⏰ 7PM\n📍 The Goat Bar & Grill, D14 PY56\n\nGrab your team and join us for a great n'
+    https://www.instagram.com/p/DUn2gDiCK1h/
+
+    @ucdlawsoc  [23 Feb]
+    Caption: '💕Week 6 with Lawsoc 💕\n\nFor the 1000578424.5 people who have DMd to ask about Brittany B tickets - alas your response here lies. \n\nTuesday from 10am-2p'
+    https://www.instagram.com/p/DVGfjMXDGvA/
+
+    @ucdlawsoc  [18 Feb]
+    Caption: 'The Law Society is proud to present Ms. Brittany Broski with Honorary Life Membership. The event will involve a Q&A with Brittany herself. \n\nAn iconic'
+    https://www.instagram.com/p/DU6UU-mjXxK/
+
+    @ucdlnh  [21 Feb]
+    Caption: '💥🇺🇸 This House DOES Believe that the US is the Biggest Threat to Global Stability 🇺🇸💥\n\nThank you to all of our fantastic speakers last Thursday night,'
+    https://www.instagram.com/p/DVBVh61jXT8/
+
+    @ucdlnh  [19 Feb]
+    Caption: "Wifi? Yeah a WGM created that, CCTV? a WGM too, Taiwan's first digital minister? WGM, Birth Control? obviously a WGM. \n\nWant your chance to speak in a"
+    https://www.instagram.com/p/DU87LKbDO_d/
+
+    @ucdlivingstones  [20 Feb]
+    Caption: "For the boys 📢📢\nGather up Lads, we got something special for you...\n\nJoin us for a Lad's hangout with fun and intense games (There will be UNO NO MERC"
+    https://www.instagram.com/p/DU_mLdjDDe8/
+
+    @ucdmsoc  [20 Feb]
+    Caption: 'Good food, great finds, and festive vibes 🧧✨\n\nCheck out the vendors you can look forward to at our Chinese New Year event this saturday, 21/2‼️‼️\n\nDon'
+    https://www.instagram.com/p/DU-j5ZsjN3a/
+
+    @ucdmsoc  [08 Feb]
+    Caption: 'Valentine’s isn’t just for lovers. It’s for besties, self-love, and treating yourself!! 💝💌💐\n\nSecure your gifts for your loved one(s) before they’re go'
+    https://www.instagram.com/p/DUfnvTZDEWA/
+
+    @ucdmathsoc  [16 Feb]
+    Caption: "Join us tomorrow evening for another intervarsity skills workshop with Gary McGuire!\n\nThe worksop will feature intervarsity style questions. It'll fea"
+    https://www.instagram.com/p/DU0bdeFiBIW/
+
+    @ucdmathsoc  [27 Jan]
+    Caption: "We're hosting a refreshers mixer this Thursday! Come celebrate (or commiserate) exam results with us upstairs in the clubhouse\n\n....first 🍸 on us😉..."
+    https://www.instagram.com/p/DUBRAZ-CO6Y/
+
+    @ucdmechsoc  [27 Jan]
+    Caption: 'Fresh semester, fresh opportunities 💥\nMeet UCD Mech Soc at the Refreshers Fair!\nOpen to all – don’t miss it 🔧⚙️'
+    https://www.instagram.com/p/DUAhqbaDGD2/
+
+    @ucdmechsoc  [25 Nov]
+    Caption: '💙 Movember Week 3 Update\n\nWith just under a week of fundraising to go, our beautiful team are back showing off their beautiful mo’s 🤩 \n\nWe have recent'
+    https://www.instagram.com/p/DRe-eKyiCzD/
+
+    @ucdmechsoc  [17 Nov]
+    Caption: '💙 Movember Week 2 Update \n\nFundraising + km’s = flying\nSmiling for photos = … a work in progress 😅\n\nShoutout to the team members who are fully committ'
+    https://www.instagram.com/p/DRLIXdkjEP5/
+
+    @ucdmedsoc  [26 Jan]
+    Caption: '🌈Happy refreshers week🌈\n\nSome exciting news to start us off on the right foot! UEM4s and GEM2s would be delighted for UEM3s and GEM1s to join them in'
+    https://www.instagram.com/p/DT_RogvjTn_/
+
+    @ucdmedsoc  [21 Jan]
+    Caption: 'Here we go again… WINE AND CHEESE 2.0🍷🧀\n\nEveryone’s favourite night is back again and better than ever, Thursday 29th January🪩🌟\n\nDoors open at 8.30pm'
+    https://www.instagram.com/p/DTyRTaFjeFN/
+
+    @ucdmusicsoc  [23 Jan]
+    Caption: 'The committee CANNOT wait to meet you at refreshers, so we thought we’d introduce ourselves now !!!\n\nWE ARE SO EXCITED TO WELCOME ALL THE NEW MEMBERS'
+    https://www.instagram.com/p/DT2hmPYjBgO/
+
+    @ucdnewmansoc  [23 Feb]
+    Caption: 'Week 6!!! We’re halfway thereee and we are in fact living on a prayer (especially through Lent)🙏 \n\nSo, let’s learn more about the importance of Prayer'
+    https://www.instagram.com/p/DVGK3T5jUpa/
+
+    @ucdnewmansoc  [17 Feb]
+    Caption: 'Poverty, Chastity & Obedience- an enjoyable way to live? 🤔\n\nWe had a great interactive panel last night from Doms. Placid, Chrysostom and David about'
+    https://www.instagram.com/p/DU2dvrmiGjL/
+
+    @ucdnewmansoc  [01 Feb]
+    Caption: '🔥give me oil in my lamp, keep me burning till the end of day🔥❗️\n\nDespite the atrocious weather light fever was a success and surely our Lord was pleas'
+    https://www.instagram.com/p/DUOPjl4CHTr/
+
+    @ucdnewmansoc  [01 Feb]
+    Caption: '🕺let’s get this party started💃\n\nOn the 7th of February, in the Gresham Hotel, be there or be a literal square- the BIGGEST event of the year! An inter'
+    https://www.instagram.com/p/DUOAxiOCPoM/
+
+    @ucdnewmansoc  [28 Jan]
+    Caption: '“sweet heart of Jesus- we implore, o make us love thee, more and more!” \n\nMonday’s talk from Bishop Alphonsus Cullinan wasn’t one to be missed! His de'
+    https://www.instagram.com/p/DUEU7A1DUDB/
+
+    @nordicsocietyucd  [26 Jan]
+    Caption: '❤️✨ We are hosting one of our biggest events of Refreshers Week: a Language Exchange you won’t want to miss! Whether you speak 1 language or 20, stop'
+    https://www.instagram.com/p/DT-OnFLjaTP/
+
+    @namsocucd  [12 Feb]
+    Caption: 'To the nurses who care for everyone else 💙\n\nSundays are on us.\n\nFREE admission every Sunday with nurse ID.\n\n#ThankYouNurses #HealthcareHeroes #SundayT'
+    https://www.instagram.com/p/DUqlyyEAnXJ/
+
+    @pharmtoxucd  [17 Sep]
+    Caption: 'Ahhh and that’s a wrap!!! \n\nWe would like to say a huge thank you for all your incredible support this year in helping us fundraise for @pieta.house!'
+    https://www.instagram.com/p/DOt1DnRDSS7/
+
+    @pharmtoxucd  [15 Apr]
+    Caption: 'Some of our raffle prize winners on the night💕 \n\nThank you to everyone who bought a raffle ticket on Friday! All proceedings will go to @pieta.house'
+    https://www.instagram.com/p/DIeLqL7tKdj/
+
+    @ucdphilsoc  [26 Feb]
+    Caption: "a little refresher on the two collab events we'll be hosting tomorrow.\n\nour corpse bride screening has been rescheduled, so make sure to keep that in"
+    https://www.instagram.com/p/DVOXdUHjQim/
+
+    @ucdphilsoc  [03 Feb]
+    Caption: 'Hello everyone!! ✨✨\nWe invite you to take a little Woodland Walk with Psychological and Philosophy Society @ucdphilsoc @psychsocietyucd - unfortunatel'
+    https://www.instagram.com/p/DUTmDlUiEMt/
+
+    @ucdphilsoc  [30 Jan]
+    Caption: '📢 How do we know God exists?\n\nJoin us for an enlightening talk with Ustadh Abdullah Andalusi, where we explore the question of God’s existence through'
+    https://www.instagram.com/p/DUJk8TPjW0l/
+
+    @ucdpolsoc  [22 Feb]
+    Caption: 'An eventful week 5 with UCD Politics & International Relations Society 11th Session! Thanks to everyone who made this a great week. #ucdsocieties #net'
+    https://www.instagram.com/p/DVD7yHgCGbq/
+
+    @ucdpolsoc  [17 Feb]
+    Caption: 'Polsoc speed networking! ⏰\n\nWe’re teaming up with the UCD Alumni Panel this Thursday to bring you speed networking, politics style! You want to meet e'
+    https://www.instagram.com/p/DU3wmgeiBxI/
+
+    @ucdscisoc  [10 Nov]
+    Caption: 'Did you know that having a Scisoc membership card gives you several perks? \n\nHere’s a list or all our wonderful sponsors and the great deals that they'
+    https://www.instagram.com/p/DQ4Aj62CpiI/
+
+    @ucdscisoc  [23 Feb]
+    Caption: 'Hooters! Wait no that’s not right. Kahooters! 📢 \n\nDo you want to relive your glory days? Do you want to claim glory in the eyes of the Scisoc gods? Ar'
+    https://www.instagram.com/p/DVGqHj0ikOt/
+
+    @ucdscifi  [22 Feb]
+    Caption: 'This week we celebrate the cosmic horrors inspired by the creations of H.P. Lovecraft, a man who never owned a cat. This week also brings the long awa'
+    https://www.instagram.com/p/DVDSUH_jKZf/
+
+    @ucdsinnfein  [06 Nov]
+    Caption: 'The UCD political societies are coming together for an inter‑party pub quiz! It’ll be a lovely evening with drinks and friendly competition and it’s a'
+    https://www.instagram.com/p/DQu40soDLhW/
+
+    @ucdsinnfein  [06 Oct]
+    Caption: 'Come have 32 drinks for 32 counties and maybe have a bit of fun along the way. \n\nMeet us in Chaplins on Thursday the 9th at 7pm for our social night.'
+    https://www.instagram.com/p/DPd-FI4jas9/
+
+    @ucdsocdems  [29 Jan]
+    Caption: 'Congrats on a great refreshers UCD Social Democrats \n\nIncredible numbers joining this week and it’s not too late for any more UCD students who are int'
+    https://www.instagram.com/p/DUFlyYOjED1/
+
+    @ucdsocscistudents  [20 Feb]
+    Caption: '🌟 Make a difference. Become a Peer Mentor for 2026–27. Apply today! 🌟\n\nAs a Peer Mentor, you will:\n🤝 Share your experience as a UCD student.\n📚 Provide'
+    https://www.instagram.com/p/DU-b0ywjChj/
+
+    @ucdsussoc  [23 Feb]
+    Caption: 'UCD’s 4th Annual Slow Fashion Show is back, and it’s bigger than ever!!\n\n11 student designers.\u2028Original looks inspired by the UN Sustainable Developme'
+    https://www.instagram.com/p/DVGIlYVAiKX/
+
+    @ucdsussoc  [25 Jan]
+    Caption: '🎨 SCREEN PRINT @ The Corner (Newman Basement)\nSUS SOC × UCD Circular collab!\n\nBring a pre-loved 100% cotton tee/tote/sweat and use our stencil to give'
+    https://www.instagram.com/p/DT8VwvsiHJ-/
+
+    @ucdtvsoc  [09 Feb]
+    Caption: 'Our 4th annual film festival is officially OPEN for submissions!! \n\nWe are looking for films with at least one UCD student involved in the making (doe'
+    https://www.instagram.com/p/DUicxAeDJlg/
+
+    @ucdtvsoc  [08 Sep]
+    Caption: 'About to start your year in UCD and want to get into filmmaking?\n\nEither you are film student, a business student or STEM student getting into filmmak'
+    https://www.instagram.com/p/DOVeK1ajFVR/
+
+    @ucdtvsoc  [26 Aug]
+    Caption: 'This is the Society that makes stuff. Watch this space.\n\n—\nEdited by: @angelogelloo \n\nThe content used in the creation of this advertisement is origin'
+    https://www.instagram.com/p/C_JSGnZMEqr/
+
+    @ucdtvsoc  [25 Jan]
+    Caption: 'FINAL REMINDER ABOUT OUR "MTV UNPLUGGED" NIGHT OUT... 📺\n\nWe\'re collaborating with over a DOZEN SOCIETIES to bring you the best night out of ReFreshers'
+    https://www.instagram.com/p/DT8UdjBCO5K/
+
+    @ucdtvsoc  [18 Jan]
+    Caption: 'GUESS WHOS BACK...\n\nThe Arts Society, alongside Film, TV and Belfield FM are hosting ReFreshers Weeks best night out: "MTV Unplugged" on Wednesday Jan'
+    https://www.instagram.com/p/DTqx77ZiIxX/
+
+    @ucdvnsoc  [08 Oct]
+    Caption: 'Plenty of great prizes to be won!! Including €10 off Vetball tickets for the winning team of 4!!\n Link to tickets on our story!!!'
+    https://www.instagram.com/p/DPi-SLziNQQ/
+
+    @ucdvetsoc  [16 Feb]
+    Caption: '📌Our next contestant, representing the final years, is Amy Beechinor, a true rebel in all aspects of life, hailing from Clonakilty Co. Cork - no conne'
+    https://www.instagram.com/p/DU095FBjbcU/
+
+
+  ⚠️  ACCEPTED BUT INCOMPLETE EXTRACTION (109 posts):
+
+    @ucdafricasociety  missing: location, time
+    Caption: 'Brunch & Vibes is callingggg 🥞☕️\nA well deserved treat from us to you come down and bring a friend too 🤍\n📅 17th Feb (Tuesday) \n⏰ 10AM–1PM\n📍 Meeting Ro'
+
+    @ucdafricasociety  missing: location, time
+    Caption: 'Snacks & Support ✨🫶🏾\nA safe space. Real conversations. Good vibes.\nIf you’re part of an ethnic minority community, this one’s for YOU 🤎\nCome through f'
+
+    @ucd.aclsoc  missing: location, time
+    Caption: 'Not everyone in the room is who they claim to be.👀👀\nThink you can read the room?\nProve it.\n\nGuess the Imposter — an evening of strategy, suspicion, an'
+
+    @ucd.aclsoc  missing: location, time
+    Caption: 'This Thursday EES is teaming up with @ucd.aclsoc and we couldn’t be more excited.\n\nExpect delicious desserts, cozy vibes, and the perfect midweek trea'
+
+    @ucd.aclsoc  missing: location, time
+    Caption: 'Join us this Wednesday evening for games night! Take part in a competitive Seen Jeem and Stop the Bus or enjoy a more relaxed board game or card game!'
+
+    @ucdarcsoc  missing: location, time
+    Caption: '🪩 REFRESHERS WEEK EVENTS🪩\n\nWelcome back everyone! Get ready to be refreshed this week with delightful coffee morning in Richview canteen on Tuesday an'
+
+    @artssocucd  missing: location, time
+    Caption: "TUESDAY COFFEE MORNING! AGAIN! And this time it's final; our coffee mornings for this term will be held in Newman Basement every Tuesday from 11am-1pm"
+
+    @artssocucd  missing: location, time
+    Caption: 'ATTENTION FILM GOERS... 🎥\n\nThe Arts Society is hosting a screening of "Apocalypse Now", a Vietnam War film in honour of late Robert Duvall. \n\nWe are h'
+
+    @ucdbiosoc  missing: location, time
+    Caption: '☕Hot Chocolate Morning ☕️\nJoin us in Meeting Room 5 at 10am on Wednesday, November 5th for a cozy catch-up, sweet treats, and some midweek warmth! 🍫🧣'
+
+    @ucdbiosoc  missing: location, time
+    Caption: '☕️ UCD BioSoc Coffee Morning ☕️\n\nTake a break from midterms and assignments and join us for a relaxed morning of chats, caffeine, and good vibes in th'
+
+    @ucdcu  missing: location, time
+    Caption: 'what’s up guys! hope you are all resting up after the weekend away! we would love to see all of you guys at CU this week 😆\n\non tuesday we have our mai'
+
+    @ucdcu  missing: location, time
+    Caption: 'so so excited for events week!! 🥳 we have SO many events and can’t wait to see you at them. as always, everyone is welcome even if you aren’t a cu mem'
+
+    @ucd_civil_structural  missing: location, time
+    Caption: 'Please join us for a lunchtime talk from our sponsor company Fehily Timoney, this Wednesday at 1pm in G87!\n\nThey will be discussing their involvement'
+
+    @ucd_civil_structural  missing: location, time
+    Caption: 'Haven’t signed up to Civil Soc yet? Come to our refreshers pizza 1pm in the Newstead Atrium. All Civilsoc members welcome!'
+
+    @ucdcesoc  missing: location, time
+    Caption: 'Dreaming of starting your own business? Want to hear from the best on how they did it? 🚀\n\nOur entrepreneurship panel has been rescheduled to next Wedn'
+
+    @ucdees  missing: location, time
+    Caption: '☕ Join the UCD Eastern European Society for a relaxed Coffee Morning!\n\nCome by Harmony Studio on Thursday, 26th February from 10:00–11:00 for coffee,'
+
+    @ucdees  missing: location, time
+    Caption: '🌍 Join us for the International Market! 🌍\n\nCelebrate the amazing diversity on campus as we bring you a taste of Eastern Europe and beyond! Expect deli'
+
+    @ucdees  missing: location, time
+    Caption: '🇱🇹✨ Join us for Lithuanian Independence Day Snacks! ✨🇱🇹\n\nCelebrate with us as we share a taste of Lithuanian culture — enjoy traditional snacks, music'
+
+    @ucdees  missing: location, time
+    Caption: 'This Thursday EES is teaming up with @ucd.aclsoc and we couldn’t be more excited.\n\nExpect delicious desserts, cozy vibes, and the perfect midweek trea'
+
+    @ucdees  missing: location, time
+    Caption: 'Take a break and join the UCD Eastern European Society for a relaxed Coffee Morning at Brava Lounge. Whether you’re stopping by for a quick coffee or'
+
+    @ucdees  missing: location, time
+    Caption: '💿✨ **CUTE, CHAOTIC & A LITTLE EMBARRASSING** ✨💿\n\nIt’s giving low-rise jeans, shiny lip gloss, eurodance on repeat, and a Nokia with 3 missed calls 💋📟'
+
+    @ucd.elecsoc  missing: location, time
+    Caption: '❗Announcing Makerthon (ElecSoc x Patch)\n\nWe’re bringing a 2½ hour Makerthon sprint to UCD and you’re invited.\n\nHere’s what’s waiting for you:\n\n⚙️ 1 mo'
+
+    @ucd.elecsoc  missing: location, time
+    Caption: 'Course selection stressing you out? ⚡\nElecSoc Stream Talks are here to help!!\n\n1st years: Come to learn more about EEE.\n2nd years: To help you decide'
+
+    @ucd.elecsoc  missing: location, time
+    Caption: 'Trivia Night Is back! Do you have what it takes to win?\nPut your knowledge to the test this Tuesday at 7.30pm in Rm 321.\nFree pizza🍕 and great vibes,'
+
+    @ucd.elecsoc  missing: location, time
+    Caption: '🤖 Brains vs Bytes: Can you outsmart the Clankers?\n\nJoin us for Trivia Night this Thursday at 6PM in Rm 321. There will be free pizza, good vibes, brag'
+
+    @ucd.elecsoc  missing: location, time
+    Caption: '⚡‼️EIRGRID GUEST SPEAKER & CLEANERGRID COMPETITION‼️⚡\n\nJoin us Thursday, 6th November at 5PM in ENG 326 for an exciting session with EirGrid, Ireland’'
+
+    @esnucd  missing: location, time
+    Caption: '☘️Coffee Morning with an Irish Twist!☘️\n\nFirst week back to college (first week in UCD for some) can be overwhelming. We wanted to provide some respit'
+
+    @ucdfilmsoc  missing: location, time
+    Caption: '🍿 OCM’s 🍿\n\nOur Wonderful OCM’s who keep everything running behind the scenes.\n\n#film #ucdfilmsoc #ucdcinema'
+
+    @ucdfilmsoc  missing: location, time
+    Caption: '📀 ENTS 📀\n\nHaven’t been to a coffee morning yet? Whats up with that, huh?\n\n#ucdfilmsoc #ucdsocieties #film'
+
+    @ucdfoodsoc  missing: location, time
+    Caption: 'as halloween approaches, the scariest thing around are mid terms. therefore, you should join @ucdfoodsoc and @ucdnutritionsociety for a snack and stud'
+
+    @ucdfoodsoc  missing: location, time
+    Caption: '🍝 Roman Banquet Incoming! 🇮🇹\n\nJoin us this Monday for an afternoon packed with Italian food, flavour, and fun!\n\n🗓️ Monday 20/10\n🕰️ From 2–3:30 PM\n📍Blu'
+
+    @ucdfoodsoc  missing: location, time
+    Caption: 'a morning pick me up post commute? freezing cold while walking to class? look no further, come join us at the brava lounge between 9am and 11am this t'
+
+    @ucdfrenchsoc  missing: location, time
+    Caption: '(Tuesday, Feb 24) Come to our weekly meet up tomorrow over some croissants and coffee! \nHarmony Studio, Student Centre\n13.30 - 14.30Pm'
+
+    @ucdfrenchsoc  missing: location, time
+    Caption: "Join us next Tuesday (17/02) for our weekly 🥐 hit!\n\n⏱️1pm to 2pm -📍Harmony Studio\n\nWe're looking forward to seeing you ♥️"
+
+    @ucdfrenchsoc  missing: location, time
+    Caption: 'Like we say in French "On change pas une équipe qui gagne !" Join us for our usual free coffee and croissants :).\n\n📍Red Room ⏱️ this Friday (06/02) ❤️'
+
+    @ucdgamesociety  missing: location, time
+    Caption: '💗WEEK 6💗\n\n🍬BOARD GAMES\n- Ready. Set. BOARD GAMES!\nThis week our board games are all about SPEED. We will be playing fast games and games all about spe'
+
+    @ucdgospelchoir  missing: location, time
+    Caption: 'Come and join us on Monday for a relaxing session and snacks. Excited to see you all theree💜!!'
+
+    @ucd_hortsoc  missing: location, time
+    Caption: "we've reached the halfway mark! hope midterms aren't getting you down \n\n- wednesday we shall be gardening from 11 to 1! usual place \n- aaand thursday"
+
+    @ucdindsoc  missing: location, time
+    Caption: 'Join us for a relaxing evening of film and fun! 🍿\n📍 Village Auditorium\n📅 26 Feb 2026\n⏰ 18:00 – 21:00\nSee you there!'
+
+    @ucditaliansoc  missing: location, time
+    Caption: 'Ciao! 🇮🇹✨\n\nThis Wednesday we’re bringing a taste of Italy to the International Market! Come support Società Italiana and explore our stand filled with'
+
+    @ucditaliansoc  missing: location, time
+    Caption: 'Ciao! \n\nJoin us for a cozy Coffee Morning with Società Italiana ☕✨\nCome along for a cup, a chat, and a relaxed start to your day with great company.'
+
+    @ucditaliansoc  missing: location, time
+    Caption: 'Ciao! 💌\nJoin us for a cosy Valentine’s Day morning of card making and pastries at Brava Lounge 🥐✨\nCome along to get creative and enjoy something sweet'
+
+    @ucditaliansoc  missing: location, time
+    Caption: 'Buongiorno✨‼️\nCome by tomorrow for a Coffee & Snack lunch break with @ucditaliansoc and @psychsocietyucd \nWe will have a variety of snacks and drinks'
+
+    @ucdjsoc  missing: location, time
+    Caption: 'You know the drill, come over again for your regular dose of snacks and prepare your kahoot skills!\n#ucdjsoc #ucdjapanesesociety'
+
+    @ucdjsoc  missing: location, time
+    Caption: "This week's event lineup, our weekly language class is up first followed by then out tea afternoon and kahoot (prizes for winners^^) and Japanese blan"
+
+    @ucdjsoc  missing: location, time
+    Caption: "For Friday's tea afternoon we will also be hosting Some of you may have played this with us before but Essentially one matches one set of cards to ano"
+
+    @ucdjsoc  missing: location, time
+    Caption: 'Tomorrow is another Language class and we will be going over how to count things. Like in english, we have *sheets* of paper or *slices* of cake. Japa'
+
+    @ucdjsoc  missing: location, time
+    Caption: 'We will be having a table at the International Festival Stalls in the Atrium! We will be selling matcha cheesecake and matcha latte if you missed them'
+
+    @ucdjuggling  missing: location, time
+    Caption: "Missed Midlands' convention but still want to hear all about it? Then our post convention pizza will be perfect for you!! \nOr join us for your usual w"
+
+    @ucdlawsoc  missing: location, time
+    Caption: 'FLOAT EU DEBATE TUESDAY 24TH IN THE FITZGERALD CHAMBER!! \n\nWith guests:\nCllr. Michael Clark\nDean of Law Imelda Maher\nBarry Ward TD\nPaul Gogarty TD\n\nFr'
+
+    @ucdlawsoc  missing: location, time
+    Caption: 'Join us for an insightful career panel discussion regarding careers in Law which differ from the usual\n\nWe will be joined by:\n\nNiamh McCormack from Ir'
+
+    @ucd_lgbtqplus  missing: location, time
+    Caption: 'Howdy, my friends 🫡\nAre we feeling creative yet? \nAre we avant-garding?\nAre we arting?\n\nWell, you will be this week, for creativity is back in the clu'
+
+    @ucdlnh  missing: location, time
+    Caption: 'THB WOMEN’S CONTRIBUTIONS TO HISTORY HAVE BEEN ERASED 🖋️💪\n\nThey say “Behind every great man is a great woman” but what happens when we don’t even know'
+
+    @ucdlnh  missing: location, time
+    Caption: 'LnH Coffee Morning today! ☕️\n\nMake sure to join us today outside Theatre L in the Newman Building from 11:45am for some chats and of course, free tea'
+
+    @ucdlnh  missing: location, time
+    Caption: "This week we were on campus asking students what they think about women's place in history with @ucdlnhfinlay ! 💜\n\nTomorrow we will discuss some of th"
+
+    @ucdlitsoc  missing: location, time
+    Caption: '𝚆𝚎𝚎𝚔 𝟼 𝚠𝚒𝚝𝚑 𝙻𝚒𝚝𝚂𝚘𝚌! 📚✨ \u200b\n\n𝙷𝚎𝚛𝚎 𝚒𝚜 𝚎𝚟𝚎𝚛𝚢𝚝𝚑𝚒𝚗𝚐 𝚑𝚊𝚙𝚙𝚎𝚗𝚒𝚗𝚐 𝚘𝚟𝚎𝚛 𝚝𝚑𝚎 𝚗𝚎𝚡𝚝 𝚏𝚎𝚠 𝚍𝚊𝚢𝚜: \u200b\n\n• 𝙼𝚘𝚗𝚍𝚊𝚢: 𝙲𝚘𝚏𝚏𝚎𝚎 𝙼𝚘𝚛𝚗𝚒𝚗𝚐! ☕️ | 𝙼𝚎𝚎𝚝𝚒𝚗𝚐 𝚁𝚘𝚘𝚖𝚜 𝟻/𝟼/𝟽 @ 𝟷𝟶𝚊𝚖 \u200b\n\n• 𝙼𝚘𝚗𝚍𝚊'
+
+    @ucdlitsoc  missing: location, time
+    Caption: '𝚆𝚎𝚎𝚔 𝟻 𝚠𝚒𝚝𝚑 𝙻𝚒𝚝𝚂𝚘𝚌! 📚✨ \n\n𝙷𝚎𝚛𝚎 𝚒𝚜 𝚎𝚟𝚎𝚛𝚢𝚝𝚑𝚒𝚗𝚐 𝚑𝚊𝚙𝚙𝚎𝚗𝚒𝚗𝚐 𝚘𝚟𝚎𝚛 𝚝𝚑𝚎 𝚗𝚎𝚡𝚝 𝚏𝚎𝚠 𝚍𝚊𝚢𝚜:\xa0 \u200b \n\n• 𝙼𝚘𝚗𝚍𝚊𝚢: 𝙲𝚘𝚏𝚏𝚎𝚎 𝙼𝚘𝚛𝚗𝚒𝚗𝚐! ☕ | 𝙱𝚕𝚞𝚎 𝚁𝚘𝚘𝚖 @ 𝟷𝟶𝚊𝚖 \u200b \n\n• 𝚆𝚎𝚍𝚗𝚎𝚜𝚍𝚊𝚢: 𝙳𝚃𝙰'
+
+    @ucdlitsoc  missing: location, time
+    Caption: '‼️ WE’RE HIRING ‼️\n\nWe’re looking for a Graphic Designer to join our team. You’ll be creating engaging Instagram content (posts + stories), as well as'
+
+    @ucdlitsoc  missing: time
+    Caption: '𝚆𝚎𝚎𝚔 𝟺 𝚠𝚒𝚝𝚑 𝙻𝚒𝚝𝚜𝚘𝚌 🎞️📔\n\n☕️ 𝙼𝚘𝚗𝚍𝚊𝚢 — 𝙹𝚘𝚒𝚗 𝚞𝚜 𝚏𝚘𝚛 𝚊 𝚌𝚘𝚏𝚏𝚎𝚎 𝚖𝚘𝚛𝚗𝚒𝚗𝚐 𝚝𝚘 𝚜𝚝𝚊𝚛𝚝 𝚘𝚏𝚏 𝚝𝚑𝚎 𝚠𝚎𝚎𝚔. 𝙷𝚊𝚛𝚖𝚘𝚗𝚢 𝚂𝚝𝚞𝚍𝚒𝚘, 𝟷𝟶𝚊𝚖. \u200b\n\n🖋️ 𝚃𝚑𝚞𝚛𝚜𝚍𝚊𝚢 — 𝙳𝚃𝙰𝚆𝙲 𝚒𝚗 𝚁𝚘𝚘𝚖𝚜 𝟺/𝟻/𝟼, 𝟷'
+
+    @ucdlitsoc  missing: location, time
+    Caption: '🗞️ 𝚆𝙴𝙴𝙺 𝟷 𝚆𝙸𝚃𝙷 𝙻𝙸𝚃𝚂𝙾𝙲\n\n 🗞️ 𝚆𝚎𝚕𝚌𝚘𝚖𝚎 𝚋𝚊𝚌𝚔!! 📚\n\n✨ 𝚆𝚎’𝚛𝚎 𝚜𝚝𝚊𝚛𝚝𝚒𝚗𝚐 𝚝𝚑𝚎 𝚜𝚎𝚖𝚎𝚜𝚝𝚎𝚛 𝚠𝚒𝚝𝚑 𝚝𝚠𝚘 𝚟𝚎𝚛𝚢 𝚒𝚖𝚙𝚘𝚛𝚝𝚊𝚗𝚝 𝚎𝚟𝚎𝚗𝚝𝚜: \n\n𝙼𝙾𝙽𝙳𝙰𝚈 🍕 𝙰𝚛𝚝𝚜 & 𝙷𝚞𝚖𝚊𝚗𝚒𝚝𝚒𝚎𝚜 𝙼𝚒𝚡𝚎𝚛 \n📍 𝙶𝚕𝚘𝚋𝚊'
+
+    @ucdlitsoc  missing: location, time
+    Caption: '🗞️ 𝙱𝚁𝙴𝙰𝙺𝙸𝙽𝙶 𝙽𝙴𝚆𝚂 🗞️ 𝙸𝚝’𝚜 𝙼𝙸𝚇𝙴𝚁 𝚃𝙸𝙼𝙴! \n\n🍕 𝚃𝚑𝚎 𝚂𝚄 𝚒𝚜 𝚑𝚘𝚜𝚝𝚒𝚗𝚐 𝚊𝚗 𝙰𝚛𝚝𝚜 & 𝙷𝚞𝚖𝚊𝚗𝚒𝚝𝚒𝚎𝚜 𝙼𝚒𝚡𝚎𝚛 𝚝𝚑𝚒𝚜 𝙼𝚘𝚗𝚍𝚊𝚢! \n\n𝙰𝚛𝚝𝚜 & 𝙷𝚞𝚖𝚊𝚗𝚒𝚝𝚒𝚎𝚜 𝚜𝚝𝚞𝚍𝚎𝚗𝚝𝚜 (𝚊𝚗𝚍 𝚘𝚝𝚑𝚎𝚛𝚜) 𝚊𝚛𝚎 𝚒𝚗𝚟𝚒𝚝'
+
+    @ucdlivingstones  missing: location, time
+    Caption: '✨ This Week at Livingstones ✨\nHello everyone, welcome back to a new week! We’ve got some exciting events coming up and we’d love to see you there 🤍'
+
+    @ucdlivingstones  missing: location, time
+    Caption: "Join us for a special Valentine's Day event this Wednesday at 6:15 pm in  Room FS-G01 in the Agriculture Building. We'll be having a special word on G"
+
+    @ucdmechsoc  missing: location, time
+    Caption: 'Dear 3rd Years!!\nChoosing your Masters? 🤔🎓\n\nJoin Mech Soc for our Masters Stream Information Night - hear from current masters students about the modu'
+
+    @ucdmechsoc  missing: location, time
+    Caption: '💻CAD Workshop this Thursday!\n\nJoin Master’s student Luke Dunne for a Fusion 360 masterclass! Whether you’re new to CAD or looking to sharpen your skil'
+
+    @ucdmechsoc  missing: location, time
+    Caption: '🚀 Careers Talk Alert!\nWe’re excited to welcome Tritech and IPS to UCD MechSoc for a special careers session! 🤝\n\nThey’ll be speaking about internship a'
+
+    @ucdmedsoc  missing: location, time
+    Caption: '🚨Rescheduled🚨\nMedSoc is excited to announce that Ireland’s Chief State Pathologist, Professor Linda Mulligan will be joining us for our next MedTalk!🌀'
+
+    @ucdmusicsoc  missing: location, time
+    Caption: "We can't wait to see you all again at our coffee afternoon. All are welcome to the event. Looking forward to seeing you there. \nAs always \n#stay tuned"
+
+    @ucdmusicsoc  missing: location, time
+    Caption: 'Week 4 here we come! 🎸🎶🔥\nJoin us this week for some of our amazing events we have planned!\n\nThis Tuesday the 10th of February we have jazz band rehear'
+
+    @ucdnetsoc  missing: location, time
+    Caption: '⚡ Netsoc Weekly Event Summary - Another stacked week ahead:\n\n🗓 Tuesday 17 Feb | 18:00–20:00 | Farmer Brown’s\n🍻 AI Pub Quiz w/ PolSoc\n\nPut your skills'
+
+    @ucdnetsoc  missing: location, time
+    Caption: '⚡️Netsoc Weekly Round-Up — here’s what we’re up to this week!\n\n🗓 Tuesday 10 Feb | 17:00–19:00 | L2.15, O’Connor\n💼 Interview Prep with HubSpot\nDo you w'
+
+    @ucdnetsoc  missing: location, time
+    Caption: 'An afternoon of games and great fun for UCD students!\nUCD Innovation Academy and NetSoc invite you to The Great Game Gathering!\n\nOn Thursday, 12th of'
+
+    @ucdnetsoc  missing: location, time
+    Caption: '🎮✨ Program Better & Jam ✨🎮\n📅 Friday 6 Feb\n⏰ 16:00–18:00\n📍 Innovation Academy – Shackleton\n\nBring your team or make one at the event where we are launc'
+
+    @ucdnewmansoc  missing: location, time
+    Caption: 'prayer, fasting and almsgiving?!? i thought i just had to give up sweets :( \n\nFollowing on from last weeks talk, we seem to be doing an any% misery sp'
+
+    @nordicsocietyucd  missing: location, time
+    Caption: 'We’re back!!! Come watch a nordic movie with free popcorn😉 Afterwards we might head to clubhouse😝 We will update on our instagram story'
+
+    @nordicsocietyucd  missing: location, time
+    Caption: 'Welcome back everyone! We have some very exciting events lined up for you this semester… starting if with bringing back our weekly fika and an ice-ska'
+
+    @nordicsocietyucd  missing: location, time
+    Caption: 'Last event of the semester!\nThank you guys all for a great semester and your dedicated participation, it means a lot to us. Next semester will be even'
+
+    @nordicsocietyucd  missing: location, time
+    Caption: 'Week 11 schedule! \nNext Monday at 3-5pm we will be hosting a gingerbread house competition! please rsvp using the form in our bio so we can have an es'
+
+    @namsocucd  missing: location, time
+    Caption: 'Come along to our amazing events on this week, we have a Pancake Tuesday event to celebrate one of the best days of the year. The incredible healthcar'
+
+    @namsocucd  missing: location, time
+    Caption: 'While Ireland is certainly special for its dual-healthcare system - a ‘balance’ of private and public, there is much to be desired.\n\nFrom long wait ti'
+
+    @namsocucd  missing: location, time
+    Caption: 'Come along to all of our loving Valentines themed events this week. We will be building roses for that special person in your life. As well as having'
+
+    @namsocucd  missing: location, time
+    Caption: 'COME JOIN US FOR FREE COOKIES ON THE 4TH OF FEBUARY IN HARMONY💙💙💙💙\n\n@ucdsocieties @snmhs.official @scoopsandhoops.ie'
+
+    @pharmtoxucd  missing: location, time
+    Caption: '💃🏽 🪩 Big love to everyone who pulled up to Pharmtox Mixer! Y’all ate (literally and socially) 🙂\u200d↕️\nThe vibes were immaculate, the games were chaotic ('
+
+    @ucdphdsociety  missing: location, time
+    Caption: '🎃 Halloween Movie Night 🎃\n\u2028Join us for a spooky evening at Fitzgerald Chamber on 24 October!\n\u2028We’ll provide the popcorn—just bring your chills and thr'
+
+    @ucdphdsociety  missing: location, time
+    Caption: '🏖️ Coastal Walk: Malahide to Portmarnock 🏖️\n\nJoin us for a scenic weekend walk along the coast!\n\nStart: Malahide dart station (meet at 2pm)\nFinish: Po'
+
+    @ucdphdsociety  missing: location, time
+    Caption: '🎓 UCD PhD Society – September Events! 🎉\n\n☕ Sept 9, 10:00 – Coffee Morning @ Global Lounge\n🎭 Sept 19, 18:00 – Culture Night Trip @ City Centre\n🍕 Sept 2'
+
+    @ucdphilsoc  missing: location, time
+    Caption: 'this week brings our long awaited EGM, so if you have any interest in being on the committee or deciding who will be, please come along.\n\nother than t'
+
+    @ucdphilsoc  missing: location, time
+    Caption: "hellloooo there philophiles, i hope you're all ready to refresh yourselves after such a long time away! we're easing back into the semester with a cof"
+
+    @physics_society_ucd  missing: location, time
+    Caption: 'Hey PhysSoc ⚛️🌟\n\nBelated short but sweet itinerary for this week mloves 💥💃 \n\nCome by Meeting Rooms in the Student Centre on Thursday for Just Dance, c'
+
+    @physics_society_ucd  missing: location, time
+    Caption: 'Hey PhysSoc, welcome to yet another glorious week!\n\nBoy do we have a busy Thursday 19th for you 🌟💃 come along to our coffee morning in the Red Room in'
+
+    @physics_society_ucd  missing: location, time
+    Caption: 'Is it magic? ✨ Or is it something even better… #physics \n\nCome witness the wonders of liquid nitrogen as we, your humble and hardworking UCD Physics S'
+
+    @ucdpolsoc  missing: location, time
+    Caption: "Polsoc coffee morning! ☕\n\nMake sure to join us for this week's coffee morning in front of Newman Theater L!\n\n #ucdsocialsciences #ucdspire #university"
+
+    @ucdpolsoc  missing: location, time
+    Caption: "We have a schedule update for this week! Make sure to stop by LawSoc's date on Irish interests in the EU, our weekly coffee morning, and Mock Dail deb"
+
+    @ucdpolsoc  missing: location, time
+    Caption: 'The economic and political development of Ireland since joining the European Economic Community in 1973 has been sensational. At the time, there was a'
+
+    @ucdpolsoc  missing: location, time
+    Caption: 'You know it, you love it! 🙌\n\nPolsoc is BACK with our weekly coffee morning tomorrow, Wednesday the 21st from 10am to 12pm! Join us outside Theatre L,'
+
+    @ucdpolsoc  missing: location, time
+    Caption: 'Week 5 with Polsoc is HERE! 💥\n\nWe have a jam packed week of events for you guys, from our MEP panel with Aodhan O’Riordan, Regina Doherty and Barry An'
+
+    @psychsocietyucd  missing: location, time
+    Caption: "GAMES DAY GAMES DAY ‼️‼️🗣️🗣️🗣️\n\nGuys come to some chillaxed game time where to get to play your favourite board games and it's lots of fun 😼💜 and snac"
+
+    @psychsocietyucd  missing: location, time
+    Caption: 'Coffee morning time!!! Stop by today @ 10am!! \n\nIn the Harmony studio 💜💜\nCoffee, Berry green and peppermint tea, hot chocolate and marshmallows all aw'
+
+    @psychsocietyucd  missing: location, time
+    Caption: 'Tomorrow @ 11am in the Fitzgerald Chamber we have our most anticipated event ‼️ \n\nAdam Harris, the founder of the @asiamireland foundation himself wil'
+
+    @psychsocietyucd  missing: location, time
+    Caption: 'Welcome to Week 6 ✨✨\n\nFun and anticipatory events coming your way ~\nTomorrow we have two consecutive events!! \n☕🫖 Coffee morning to get you started fo'
+
+    @psychsocietyucd  missing: location, time
+    Caption: 'Good day everyone!! ❤❤\n\nBe ready for a fruitful and fun coffee morning tomorrow ✨✨ we have new flavours just in - Berry, lemon and peppermint tea adde'
+
+    @psychsocietyucd  missing: location, time
+    Caption: 'Apolo-cheese everyone, we have an updated more flourished week coming this week ✨\n\nWe got the casual games where we gather and socialise with friends'
+
+    @psychsocietyucd  missing: location, time
+    Caption: "Valentine's day is coming our way 💘\nIn Harmony studio @ 1pm (come before all is gone!!) \n\nIn order to celebrate this season, we'd like to bring your a"
+
+    @ucdsocdems  missing: location, time
+    Caption: '🟣‼️🟣JOIN US TODAY🟣‼️🟣\n\nWe have lots of unreal activities planned for semester 2! More information shall be released in the next week :)\n\nIn the meanti'
+
+    @ucdsocscistudents  missing: location, time
+    Caption: 'As our last one was a huge success… Our SECOND Social Sciences Café is happening TOMORROW! ✨☕\n\nJoin us on Wednesday 25th February, anytime from 10am–1'
+
+    @ucdsocscistudents  missing: location, time
+    Caption: 'You’re very welcome to join us for the first Social Sciences Café of the trimester - a relaxed coffee morning for Social Sciences students to drop by,'
+
+    @ucdvnsoc  missing: location, time
+    Caption: 'IVNA talk on Thursday the 20th!\nEveryone is welcome and we could love to see you all there!💚💚 Thursday the 20th at 6pm in Vet 101B✨✨ Free pizza and IV'
+
+    @ucdvetsoc  missing: location, time
+    Caption: '🥞🥞🥞'
+
+    @womeninstem_ucd  missing: location, time
+    Caption: 'Calling all gals 💕✨\n\nWe’re hosting a Galentine’s Brunch with @ucdwib and it’s going to be so much fun 💖\n\nExpect photobooth moments, cotton candy, refr'
+
+
+======================================================================
+LLM COMPARISON  —  101 true-pos | 108 false-neg | 13 false-pos
+======================================================================
+
+🔴 FALSE NEGATIVES (108) — classifier rejected, LLM says food event
+
+  Keyword: "food"  (16 posts) ← consider adding to extractor
+    @ucdafricasociety  [16 Feb]  reason: No explicit food keyword found
+    LLM: The event will provide food for attendees after the activities.
+    Caption: '👀 IMPOSTER NIGHT is happening… but who’s really who? 🤨 How well can you lie and how well can you detect a liar? Loyalty'
+    https://www.instagram.com/p/DU0e8DXiBtc/
+
+    @ucd.aclsoc  [12 Feb]  reason: No explicit food keyword found
+    LLM: The post implies a warning about not attending an event that may involve free food, suggesting it is an enticing offer.
+    Caption: 'Make sure this isnt you next week !'
+    https://www.instagram.com/p/DUqrXk8DUZ_/
+
+    @ucddramasoc  [27 Feb]  reason: No explicit food keyword found
+    LLM: The post clearly mentions that food will be provided for free.
+    Caption: ''
+    https://www.instagram.com/ucddramasoc
+
+    @ucddrawsoc  [10 Feb]  reason: No explicit food keyword found
+    LLM: The event offers food for free as part of the celebration.
+    Caption: 'Surprise!!! To celebrate over 15 years of Drawsoc, and to build excitement for the Old Hollywood Ball the following nigh'
+    https://www.instagram.com/p/DUkpjXpjHDC/
+
+    @ucd.elecsoc  [13 Aug]  reason: No explicit food keyword found
+    LLM: The event clearly offers free food as indicated in the post.
+    Caption: ''
+    https://www.instagram.com/p/DNTPjITMHK8/
+
+    @ucdengineering  [27 Feb]  reason: No explicit food keyword found
+    LLM: The event is offering free food to attendees.
+    Caption: ''
+    https://www.instagram.com/ucdengineering
+
+    @ucdfoodsoc  [03 Oct]  reason: No explicit food keyword found
+    LLM: The post invites committee members to join, implying food-related activities without any mention of cost.
+    Caption: 'ladies nd gents, we want YOU! we’re currently looking for some fresh faces for a few positions on our committee. if you'
+    https://www.instagram.com/p/DPXUfkPCIbl/
+
+    @ucdfoodsoc  [14 Sep]  reason: No explicit food keyword found
+    LLM: The mention of 'food' indicates that items are being offered, and there is no indication of payment required.
+    Caption: 'no i didn’t post this a few days ago and notice a mistake and take it down, ur crazy.\n\nthese are our freshers week event'
+    https://www.instagram.com/p/DOmNE4oDY4d/
+
+    @ucdfoodsoc  [12 Sep]  reason: No explicit food keyword found
+    LLM: The mention of food in the context of meeting society members at the freshers stand indicates that free food or snacks are likely being offered.
+    Caption: 'took a while but it’s done now, i proof read ts like 5 times. if there’s a mistake in here im calling it a day and going'
+    https://www.instagram.com/p/DOfta3nDd_H/
+
+    @ucdgermansoc  [27 Feb]  reason: No explicit food keyword found
+    LLM: The event explicitly offers free food to attendees.
+    Caption: ''
+    https://www.instagram.com/ucdgermansoc
+
+    @ucdgospelchoir  [13 Nov]  reason: No explicit food keyword found
+    LLM: The event includes food and is described as a fellowship session, which implies that the food is provided for attendees.
+    Caption: 'Join us next Monday for our food and fellowship session✨🥳We’ll have games, food, and deep meaningful conversations(DMC’s'
+    https://www.instagram.com/p/DRAIVDiDHBc/
+
+    @ucdpottersoc  [22 Feb]  reason: No explicit food keyword found
+    LLM: The event offers food for free.
+    Caption: ''
+    https://www.instagram.com/p/DVEpOlsDeGz/
+
+    @ucdpottersoc  [25 Jan]  reason: No explicit food keyword found
+    LLM: The event mentions that there may be food available, suggesting it is offered for free.
+    Caption: 'Week 2 events are here\nWith it being Refreshers Week we have brought back the sorting ceremony for this week (rumour has'
+    https://www.instagram.com/p/DT8prRDDWFs/
+
+    @ucd_lgbtqplus  [09 Sep]  reason: No explicit food keyword found
+    LLM: The post mentions free food being provided for the event.
+    Caption: ''
+    https://www.instagram.com/p/C_scEFqsDCs/
+
+    @ucdmsoc  [20 Feb]  reason: No explicit food keyword found
+    LLM: The event mentions vendors and suggests food will be available, implying it is free during the event.
+    Caption: 'Good food, great finds, and festive vibes 🧧✨\n\nCheck out the vendors you can look forward to at our Chinese New Year even'
+    https://www.instagram.com/p/DU-j5ZsjN3a/
+
+    @ucdphdsociety  [18 Feb]  reason: No explicit food keyword found
+    LLM: The post indicates that free food will be provided at the event.
+    Caption: ''
+    https://www.instagram.com/p/DGOJdMItxLI/
+
+  Keyword: "unknown"  (14 posts) ← consider adding to extractor
+    @chinesesoc.ucd  [09 Feb]  reason: No explicit food keyword found
+    LLM: The event is described as a celebration and festive evening, implying that food is likely provided for attendees without charge.
+    Caption: 'Dear Member,\nWelcome back to a new semester, and a very warm welcome to our new members!\nTo kick off the term, the UCD C'
+    https://www.instagram.com/p/DUicyJ1CLGF/
+
+    @ucddrawsoc  [05 Feb]  reason: No explicit food keyword found
+    LLM: The event is likely to have free food since it's an annual festival focused on inclusivity.
+    Caption: "Join us for our annual festival 'Incluza Palooza' from the 9th to the 12th of February. 🌈\n#IncluzaPalooza\n#UniversityFor"
+    https://www.instagram.com/p/DUX1EkFjOHp/
+
+    @ucdgospelchoir  [29 Sep]  reason: No explicit food keyword found
+    LLM: The caption implies the presence of events and enthusiasm, suggesting food is likely provided for free.
+    Caption: 'Events for this and next week. Can’t wait to see you guys there. 🫶🏾'
+    https://www.instagram.com/p/DPMOEE9jCrP/
+
+    @ucdindsoc  [04 Feb]  reason: No explicit food keyword found
+    LLM: The event suggests that contestants and guests are expected to gather, implying food and drinks will likely be provided for free to participants.
+    Caption: 'Contestant Groups and Guest list Approval emails are being sent tonight \n\nHope you guys are ready 2 days left \n\n#premalu'
+    https://www.instagram.com/p/DUV9r32jCcC/
+
+    @issucd  [09 Feb]  reason: No explicit food keyword found
+    LLM: The event is described as a celebration and festive evening, implying that food is likely provided for attendees without charge.
+    Caption: 'Dear Member,\nWelcome back to a new semester, and a very warm welcome to our new members!\nTo kick off the term, the UCD C'
+    https://www.instagram.com/p/DUicyJ1CLGF/
+
+    @ucdie  [21 Feb]  reason: No explicit food keyword found
+    LLM: The event likely included free food as it was a celebratory gathering associated with the competition.
+    Caption: 'On Thursday, the UCD Investors and Entrepreneurs Society hosted our Hult Prize Local Competition 2026 and what an incred'
+    https://www.instagram.com/p/DVBgfdpDGIa/
+
+    @ucdisoc  [18 Feb]  reason: No explicit food keyword found
+    LLM: The event likely includes food, as it is a gathering for social interaction and support.
+    Caption: '🌙 Revert Support Gathering🤍\n\nJoin us for a special afternoon of sisterhood, reflection, and support at our upcoming Reve'
+    https://www.instagram.com/p/DU5pPS_jARD/
+
+    @ucdlivingstones  [30 Jan]  reason: No explicit food keyword found
+    LLM: The event welcomes attendees with a religious and celebratory theme, suggesting community gathering where free food might be served.
+    Caption: 'WELCOME TO LIVINGSTONES 🪨🌊✝️🥳\n#jesus #praiseGod #christian #ucdsocieties #ucd'
+    https://www.instagram.com/p/DUJJuzZjLmI/
+
+    @ucdmusicsoc  [21 Feb]  reason: No explicit food keyword found
+    LLM: The post indicates a fun event with games and atmosphere, which typically includes food or snacks, implying free food may have been provided.
+    Caption: "We were delighted to attend @ucdgermansociety Karnavel event in the O'Neill lounge. Thank you German Soc for the brillia"
+    https://www.instagram.com/p/DU_86WPDB_4/
+
+    @nordicsocietyucd  [23 Feb]  reason: No explicit food keyword found
+    LLM: The mention of 'Week 25 schedule' implies a programming that may include free events that offer food.
+    Caption: 'Week *25 schedule😉'
+    https://www.instagram.com/p/DVGdDg3DYaX/
+
+    @nordicsocietyucd  [17 Feb]  reason: No explicit food keyword found
+    LLM: The caption suggests fun events, which typically imply social gatherings where food is often provided for free.
+    Caption: 'Fun events planned for this week! Hope to see you all there😉'
+    https://www.instagram.com/p/DU2heRPjSv_/
+
+    @namsocucd  [03 Dec]  reason: No explicit food keyword found
+    LLM: The caption suggests a supportive space for students, implying refreshments may be offered for free.
+    Caption: "Stressed with exams?\n\nCome down to C120 for a rest, Exams can be stressful and draining but you shouldn't let that consu"
+    https://www.instagram.com/p/DRzr1rSCPg8/
+
+    @ucdsussoc  [23 Feb]  reason: No explicit food keyword found
+    LLM: The use of 'volunteer' and the sustainability focus implies a community service event that may include free refreshments.
+    Caption: 'Come volunteer at the ucd sustainability hub @ucd_greenacre on Thursday 😎\n\nSign-up link in bio!! ♻️'
+    https://www.instagram.com/p/DVGaey5iA0M/
+
+    @womeninstem_ucd  [05 Feb]  reason: No explicit food keyword found
+    LLM: The event is likely to have free food since it's an annual festival focused on inclusivity.
+    Caption: "Join us for our annual festival 'Incluza Palooza' from the 9th to the 12th of February. 🌈\n#IncluzaPalooza\n#UniversityFor"
+    https://www.instagram.com/p/DUX1EkFjOHp/
+
+  Keyword: "free food"  (3 posts) ← consider adding to extractor
+    @ucdclassicssoc  [27 Feb]  reason: No explicit food keyword found
+    LLM: The event clearly states that free food will be provided for attendees.
+    Caption: ''
+    https://www.instagram.com/ucdclassicssoc
+
+    @ucdnewmansoc  [16 Feb]  reason: Nightlife event keyword: 'night out'
+    LLM: The weekly Monday Night Dinner offers free food.
+    Caption: 'Week 5 order up!!! \n\nStarting with our weekly Monday Night Dinner! Come along for some free food, great chats and talk o'
+    https://www.instagram.com/p/DU0IrcYDbN_/
+
+    @ucdvetsoc  [16 Feb]  reason: No explicit food keyword found
+    LLM: The event is offering free food as indicated in the post.
+    Caption: ''
+    https://www.instagram.com/p/DU0hPtPiIji/
+
+  Keyword: "coffee"  (3 posts) ← consider adding to extractor
+    @ucddrawsoc  [14 Feb]  reason: No explicit food keyword found
+    LLM: The event specifies free coffee being provided, indicating food is available at no cost.
+    Caption: 'We have a busy week coming up, so we’re kicking it off with a crafternoon on Monday in the Red Room!! Bring your WIPs!!'
+    https://www.instagram.com/p/DUvBt5TjKGV/
+
+    @ucd_lgbtqplus  [25 Jan]  reason: Nightlife event keyword: 'night out'
+    LLM: The Q&A Coffee Morning suggests that drinks (coffee) will be provided for free.
+    Caption: "Greetings and salutations 🫡🏳️\u200d🌈\n\nHope you've all managed to settle in, because, oh my, do we have the program for YOU!!!"
+    https://www.instagram.com/p/DT80HAVCEzw/
+
+    @ucd_lgbtqplus  [18 Jan]  reason: No explicit food keyword found
+    LLM: Coffee will be provided for free on Monday.
+    Caption: "OH, HELLO THEREEE 😏\n\nI bet you've missed me. I know you did. I know everything. (Not in a Big Brother way, in a Figure w"
+    https://www.instagram.com/p/DTqiPDZgBgo/
+
+  Keyword: "tea"  (3 posts) ← consider adding to extractor
+    @ucd_hortsoc  [09 Feb]  reason: No explicit food keyword found
+    LLM: The post mentions crafting and drinking tea, indicating that tea is provided for free during the event.
+    Caption: 'week 4 events! \n\n-on tuesday we will be gardening from 1 until 3, pop by whenever you can; \n-and thursday we will be cra'
+    https://www.instagram.com/p/DUh-XmVjJnd/
+
+    @ucd_hortsoc  [03 Feb]  reason: No explicit food keyword found
+    LLM: The event offers tea, which is provided for free to attendees.
+    Caption: 'happy spring guys !!! its officially the season for growing (although the weather may not be on the same page) \n\ncome by'
+    https://www.instagram.com/p/DUSlccGDHCT/
+
+    @ucdsussoc  [25 Jan]  reason: No explicit food keyword found
+    LLM: The caption mentions that the tea is hot, indicating free drinks will be provided at the event.
+    Caption: 'SIGN UP ON LINK IN BIO! Join us for a cozy Climate Chats session where the tea is hot ☕ and the conversations are even h'
+    https://www.instagram.com/p/DT8S9UkiBm7/
+
+  Keyword: "drinks"  (2 posts) ← consider adding to extractor
+    @belfield.fm  [12 Feb]  reason: No explicit food keyword found
+    LLM: The caption mentions drinks, implying they are provided for free at the event.
+    Caption: 'Come down to The Clubhouse tonight at 5pm for a few drinks to meet your fellow BFMers! We hope to see you all there 🫶'
+    https://www.instagram.com/p/DUp0qwWiu4w/
+
+    @ucd_civil_structural  [05 Feb]  reason: No explicit food keyword found
+    LLM: Free drinks are being offered when the chicken is found.
+    Caption: 'Find that chicken! 🐥\n\nChicken chase is back! Meet at Kehoe’s Pub next Tuesday, 10/2/26, at 8:00pm and wait for the possi'
+    https://www.instagram.com/p/DUYNK_MDGzg/
+
+  Keyword: "null"  (2 posts) ← consider adding to extractor
+    @ucd.aclsoc  [18 Feb]  reason: No explicit food keyword found
+    LLM: The post indicates a celebration for Ramadan, which often includes communal meals that might be free for attendees.
+    Caption: 'Ramadan Mubarak! 🌙'
+    https://www.instagram.com/p/DU6NedljRT-/
+
+    @ucdvetsoc  [16 Feb]  reason: No explicit food keyword found
+    LLM: The event appears to be a casual gathering associated with the student society, likely offering free snacks or drinks.
+    Caption: '📌 Flying the banner high for the second years, we are delighted to present… Oscar Reynolds!!! Oscar joins us from the we'
+    https://www.instagram.com/p/DU1NcgPjqaP/
+
+  Keyword: "break your fast"  (2 posts) ← consider adding to extractor
+    @ucd.aclsoc  [11 Feb]  reason: No explicit food keyword found
+    LLM: The event offers food for free during the fasting period of Ramadan.
+    Caption: "Join us in celebrating Kuwait's national day! \nLearn about Kuwait's culture and heritage, take part in our fun quiz and"
+    https://www.instagram.com/p/DUnobh7jXY-/
+
+    @issucd  [11 Feb]  reason: No explicit food keyword found
+    LLM: The event offers food for free during the fasting period of Ramadan.
+    Caption: "Join us in celebrating Kuwait's national day! \nLearn about Kuwait's culture and heritage, take part in our fun quiz and"
+    https://www.instagram.com/p/DUnobh7jXY-/
+
+  Keyword: "food restrictions"  (2 posts) ← consider adding to extractor
+    @artssocucd  [16 Feb]  reason: No explicit food keyword found
+    LLM: The post mentions that all allergies and food restrictions will be taken care of based on submissions, indicating that food is provided for attendees.
+    Caption: '*IMPORTANT INFORMATION FOR ARTS & HUMANITIES / OLD HOLLYWOOD BALL ATTENDEES* 🥳\n\nPlease see the above for coach departure'
+    https://www.instagram.com/p/DU1PfecCBvX/
+
+    @ucddrawsoc  [16 Feb]  reason: No explicit food keyword found
+    LLM: The post mentions that all allergies and food restrictions will be taken care of based on submissions, indicating that food is provided for attendees.
+    Caption: '*IMPORTANT INFORMATION FOR ARTS & HUMANITIES / OLD HOLLYWOOD BALL ATTENDEES* 🥳\n\nPlease see the above for coach departure'
+    https://www.instagram.com/p/DU1PfecCBvX/
+
+  Keyword: "cny gala"  (2 posts) ← consider adding to extractor
+    @chinesesoc.ucd  [24 Feb]  reason: No explicit food keyword found
+    LLM: The celebration of Chinese New Year typically includes food offerings shared among attendees, suggesting that food will be provided for free at the gala.
+    Caption: '🀄️Happy Chinese New Year!!! 🧧 Share some moments from the amazing CNY Gala💃'
+    https://www.instagram.com/p/DVHwk7JCNlp/
+
+    @issucd  [24 Feb]  reason: No explicit food keyword found
+    LLM: The celebration of Chinese New Year typically includes food offerings shared among attendees, suggesting that food will be provided for free at the gala.
+    Caption: '🀄️Happy Chinese New Year!!! 🧧 Share some moments from the amazing CNY Gala💃'
+    https://www.instagram.com/p/DVHwk7JCNlp/
+
+  Keyword: "tea, coffee, snacks"  (2 posts) ← consider adding to extractor
+    @ucdcu  [08 Feb]  reason: Appears to be a paid event (price/ticket mention)
+    LLM: The post mentions that tea, coffee, and snacks will be available afterwards, indicating they are offered for free.
+    Caption: 'hey wonderful people! happy valentine’s week to those who celebrate👀 we have tons going on so get to swiping!➡️\n\non tues'
+    https://www.instagram.com/p/DUhAKKIiPaM/
+
+    @ucdcu  [19 Jan]  reason: Appears to be a paid event (price/ticket mention)
+    LLM: The event mentions free tea, coffee, and snacks being available.
+    Caption: 'what is up guys! i hope you’ve all had an amazing Christmas and new year! we are so excited to welcome you all back to c'
+    https://www.instagram.com/p/DTs94uQiNhT/
+
+  Keyword: "foodsoc"  (2 posts) ← consider adding to extractor
+    @ucdfoodsoc  [22 Sep]  reason: No explicit food keyword found
+    LLM: The collaboration with foodsoc suggests that food is involved in the event, likely provided for free.
+    Caption: "another exciting week of events coming up! stay tuned for more information on our collab with foodsoc, and thursday's 'd"
+    https://www.instagram.com/p/DO6bBx-iLKk/
+
+    @ucdfoodsoc  [14 Sep]  reason: No explicit food keyword found
+    LLM: The post suggests that there will be a food-related stand during Freshers Week, which implies free food offerings to attract students.
+    Caption: 'thanks to all the people i bothered for these clips, i appreciate you glazing foodsoc. freshers week starts tomorrow so'
+    https://www.instagram.com/p/DOmKmznDVt2/
+
+  Keyword: "snacks"  (2 posts) ← consider adding to extractor
+    @ucd_lgbtqplus  [05 Feb]  reason: Appears to be a paid event (price/ticket mention)
+    LLM: The post mentions snacks being provided during the event, indicating free food offerings.
+    Caption: 'IT’S FINALLY HERE🌈‼️\n\nOur annual intervarsity sleepover is coming - we’ll take over the Student Centre and spend the who'
+    https://www.instagram.com/p/DUYkhBxiBVD/
+
+    @ucdnetsoc  [23 Oct]  reason: No explicit food keyword found
+    LLM: The post invites questions and suggestions for events while implying casual engagement, suggesting free snacks or social gatherings might occur.
+    Caption: "Meet Our ✨Amazing✨ Committee Members! \nWe might not be able to Code but that's okay because we can Plan Events. This lov"
+    https://www.instagram.com/p/DQKDRu8CCcj/
+
+  Keyword: "goodies"  (2 posts) ← consider adding to extractor
+    @ucdmsoc  [15 Feb]  reason: No explicit food keyword found
+    LLM: The post mentions 'goodies', which implies free food is being offered.
+    Caption: '🧧Come celebrate Chinese New Year with us on the 21st of February!! Games, goodies & good fortune awaits!🏮\n\n#ucdmsoc #ucd'
+    https://www.instagram.com/p/DUx4mU_jFIL/
+
+    @physics_society_ucd  [23 Sep]  reason: Nightlife event keyword: 'pub crawl'
+    LLM: The event involved sponsorships providing food and goodies to entice people without indication of a cost.
+    Caption: 'Thank you to the hundreds of new + returning members and the most hardworking committee for such a spectacular Freshers'
+    https://www.instagram.com/p/DO8FiA4AjZI/
+
+  Keyword: "dinner"  (2 posts) ← consider adding to extractor
+    @ucdnewmansoc  [23 Feb]  reason: No explicit food keyword found
+    LLM: The post mentions 'delish dinner', implying that food is provided for free during the event.
+    Caption: 'Week 6!!! We’re halfway thereee and we are in fact living on a prayer (especially through Lent)🙏 \n\nSo, let’s learn more'
+    https://www.instagram.com/p/DVGK3T5jUpa/
+
+    @ucdnewmansoc  [28 Jan]  reason: No explicit food keyword found
+    LLM: The caption mentions a delicious dinner that was part of the event, suggesting that food was provided for free.
+    Caption: '“sweet heart of Jesus- we implore, o make us love thee, more and more!” \n\nMonday’s talk from Bishop Alphonsus Cullinan w'
+    https://www.instagram.com/p/DUEU7A1DUDB/
+
+  Keyword: "xlites"  (1 posts) ← consider adding to extractor
+    @ucdactuarial  [27 Oct]  reason: No explicit food keyword found
+    LLM: The post mentions food and drinks provided on the society card, indicating they are not being sold.
+    Caption: 'W ALERT 🚨 ‼️ 🔔 The fourth years take an unsurprising win 🥇 not the first we have to our name. Unfortunately because of a'
+    https://www.instagram.com/p/DQUqMSWiJv0/
+
+  Keyword: "eid event"  (1 posts) ← consider adding to extractor
+    @ucd.aclsoc  [24 Feb]  reason: No explicit food keyword found
+    LLM: Eid events typically include food offerings for attendees.
+    Caption: 'We are excited to announce that this year’s Eid event will be held in Astra Hall! Keep an eye out on our social media fo'
+    https://www.instagram.com/p/DVKEJYrDc8R/
+
+  Keyword: "home-cooked meals"  (1 posts) ← consider adding to extractor
+    @ucd.aclsoc  [19 Feb]  reason: Iftar/religious event
+    LLM: The potluck iftar implies that food is provided for free by participants.
+    Caption: 'IFTAR WITH ACLSOC!\nJoin us next week, Thursday the 26th for a potluck iftar. We will be bringing some of our favorite ho'
+    https://www.instagram.com/p/DU9IaSwjSte/
+
+  Keyword: "tea and coffee"  (1 posts) ← consider adding to extractor
+    @ucd.aclsoc  [07 Feb]  reason: No explicit food keyword found
+    LLM: The event offers tea and coffee, which implies free refreshments are being provided.
+    Caption: "A bit less chat, a lot more action. We're switching up this shay & chats by introducing a game of charades! Join us on M"
+    https://www.instagram.com/p/DUd-j9vjbLD/
+
+  Keyword: "spooktacular"  (1 posts) ← consider adding to extractor
+    @ucdarcsoc  [30 Oct]  reason: No explicit food keyword found
+    LLM: The event is described as a big Halloween event, which typically includes free snacks or treats.
+    Caption: 'EPISODE V\nTHE ARCSOC STRIKES BACK\n\nWe want to thank everyone for joining us at our first big event this year, it was spo'
+    https://www.instagram.com/p/DQcDurLjNez/
+
+  Keyword: "waffles, hot drinks"  (1 posts) ← consider adding to extractor
+    @artssocucd  [19 Feb]  reason: Nightlife event keyword: 'ball'
+    LLM: Waffles and hot drinks are being offered for free in the Global Lounge.
+    Caption: "Are you incapable of cooking when you're hungover? Or are you so locked in on your studies that you come to campus on Fr"
+    https://www.instagram.com/p/DU8Q7k7iHUx/
+
+  Keyword: "pints"  (1 posts) ← consider adding to extractor
+    @ucdbiosoc  [25 Jan]  reason: Mentions off-campus venue: 'pub'
+    LLM: The event offers free entry and likely includes drinks, which implies free food and drinks at a pub quiz format.
+    Caption: 'KEEP CALM, it’s only a pub quiz 😏🍺\nGrab your smartest mates (or just the ones who think they’re smart) and join the Sust'
+    https://www.instagram.com/p/DT8SrRfCDin/
+
+  Keyword: "tokens"  (1 posts) ← consider adding to extractor
+    @ucdbiosoc  [19 Oct]  reason: No explicit food keyword found
+    LLM: The first 20 attendees receive tokens, which implies free food or drinks.
+    Caption: '🚨 WARNING: This lecture is going to be dangerously good! 🚨 \n\nPrepare for an evening of fascinating science with “50 Ways'
+    https://www.instagram.com/p/DP_nEWcDMi4/
+
+  Keyword: "bake sale, sweet treat"  (1 posts) ← consider adding to extractor
+    @ucdbiosoc  [06 Oct]  reason: No explicit food keyword found
+    LLM: The bake sale offers sweet treats to attendees without mentioning a price, indicating it's free.
+    Caption: '💗 Bake Sale for Breast Cancer 💗\nIn honour of breast cancer awareness month we will be holding a bake sale in aid of @bre'
+    https://www.instagram.com/p/DPeFlCtDCWg/
+
+  Keyword: "coffee and biscuits"  (1 posts) ← consider adding to extractor
+    @ucdchemengsoc  [14 Apr]  reason: Nightlife event keyword: 'formal'
+    LLM: Coffee and biscuits are clearly offered for free during the gathering.
+    Caption: 'On behalf of the EDI Committee, we’re happy to invite you to an informal coffee gathering to mark the end of the year.'
+    https://www.instagram.com/p/DIbhe7SsPo_/
+
+  Keyword: "bake sale"  (1 posts) ← consider adding to extractor
+    @ucdchemsoc  [13 Feb]  reason: No explicit food keyword found
+    LLM: The event is a bake sale in support of a charity, suggesting that treats will be available for free donations.
+    Caption: 'We’ll be having a Valentine’s Bake Sale next Tuesday in support of the Irish Heart Foundation (because theme is importan'
+    https://www.instagram.com/p/DUtDemajSuw/
+
+  Keyword: "tea, coffee, snacks, bake sale"  (1 posts) ← consider adding to extractor
+    @ucdcu  [23 Feb]  reason: Appears to be a paid event (price/ticket mention)
+    LLM: The event mentions free tea, coffee, snacks, and a bake sale where proceeds go to charity, indicating that items are available for free.
+    Caption: 'hey hey!! so excited for a new week with cu!😋\n\non tuesday we have our main meeting talk followed by tea, coffee, snacks'
+    https://www.instagram.com/p/DVFQjLJCEGp/
+
+  Keyword: "tea, coffee, sweet treats"  (1 posts) ← consider adding to extractor
+    @ucdcu  [01 Feb]  reason: Appears to be a paid event (price/ticket mention)
+    LLM: The event includes free tea, coffee, and sweet treats after the main meeting.
+    Caption: 'hey guys! it’s week 3 with CU! check out some of the events we have planned\n\nat our main meeting, we will be exploring t'
+    https://www.instagram.com/p/DUO6pUNiD4e/
+
+  Keyword: "baked goods, hot chocolate"  (1 posts) ← consider adding to extractor
+    @ucdcu  [23 Nov]  reason: Mentions off-campus venue: 'dundrum'
+    LLM: The annual carol service offers music, baked goods, hot chocolate, and more for free.
+    Caption: 'it’s the last week of the semester and we are ending things with a bang!❤️\u200d🔥\n\non tuesday we have the annual carol servic'
+    https://www.instagram.com/p/DRasfutCBft/
+
+  Keyword: "chicken"  (1 posts) ← consider adding to extractor
+    @ucd_civil_structural  [06 Feb]  reason: No explicit food keyword found
+    LLM: The Chicken night event suggests free food will be available.
+    Caption: '✨Semester 2 so far✨\n\n✨Swim club is back next week please DM this page if you wish to be added to the WhatsApp group chat'
+    https://www.instagram.com/p/DUazyQPDDaN/
+
+  Keyword: "breakfast"  (1 posts) ← consider adding to extractor
+    @ucdcesoc  [26 Feb]  reason: No explicit food keyword found
+    LLM: The post describes a breakfast event with food being offered for free as part of a charitable collaboration.
+    Caption: 'Morning breakfast with our boxing partner, Together Academy ❤️ @togetheracademy_ie \nSo grateful to the team for an amazi'
+    https://www.instagram.com/p/DVOO59oAmOl/
+
+  Keyword: "delicious goodies"  (1 posts) ← consider adding to extractor
+    @ucdees  [20 Feb]  reason: No explicit food keyword found
+    LLM: The post mentions that delicious goodies were a huge hit, indicating free food was offered during the event.
+    Caption: 'Here are some photos from the International Festival we were proud to be part of this week!\xa0\n\nIt was incredible to share'
+    https://www.instagram.com/p/DU_Q90fDDmX/
+
+  Keyword: "café"  (1 posts) ← consider adding to extractor
+    @ucdfilmsoc  [08 Feb]  reason: No explicit food keyword found
+    LLM: Kino Café implies free food and drinks offered at the event.
+    Caption: '🎬 THIS WEEK AT FILMSOC 🎬\nYou already know know the drill. \n\n☕ Monday: Kino Café\n🤠 Tuesday: Indiana Jones- 5PM, UCD Cinem'
+    https://www.instagram.com/p/DUg3G0qCAxH/
+
+  Keyword: "free food, drinks, free candy"  (1 posts) ← consider adding to extractor
+    @ucdgamesociety  [15 Feb]  reason: Appears to be a paid event (price/ticket mention)
+    LLM: The event includes free food, drinks, and candy.
+    Caption: '🧿week 5 is here!🧿\n\n🫧BOARD GAMES🫧\nWe can’t CONTAIN these games any longer!\nThat’s right! This week our board gaming sessi'
+    https://www.instagram.com/p/DUysrQHjPhF/
+
+  Keyword: "sip"  (1 posts) ← consider adding to extractor
+    @ucdgeogsoc  [10 Feb]  reason: No explicit food keyword found
+    LLM: The event is a paint and sip, indicating that drinks are provided for free while painting.
+    Caption: "Don't miss out on our first paint and sip!"
+    https://www.instagram.com/p/DUkoLAqjZul/
+
+  Keyword: "pumpkin"  (1 posts) ← consider adding to extractor
+    @ucdrocsoc  [28 Oct]  reason: No explicit food keyword found
+    LLM: The event involves pumpkin carving and does not mention any cost for participation or food.
+    Caption: 'Carve out some time for rocsoc this Halloween! Pumpkin carving + movie = perfect rock-oween 🎃\n\nWe will be in the student'
+    https://www.instagram.com/p/DQW0MNGjGdo/
+
+  Keyword: "baking"  (1 posts) ← consider adding to extractor
+    @ucdpottersoc  [23 Feb]  reason: No explicit food keyword found
+    LLM: The event is likely to include food as it features a baking show, suggesting food will be baked and shared.
+    Caption: "This week's movie screening will be the first episode of the twins baking show\n\n#ucd #universitycollegedublin🍀 #ucdharry"
+    https://www.instagram.com/p/DVHNcktDTWs/
+
+  Keyword: "baking, apple strudel"  (1 posts) ← consider adding to extractor
+    @ucdpottersoc  [09 Feb]  reason: No explicit food keyword found
+    LLM: The event includes making apple strudel, which indicates free food being provided.
+    Caption: "It's Charms week!!! (Also pride week yay! 🏳️\u200d🌈) \n\nWell put the room for the speed dating up as soon as we know and feel"
+    https://www.instagram.com/p/DUhE2SAgo-b/
+
+  Keyword: "potluck, food"  (1 posts) ← consider adding to extractor
+    @ucdisoc  [22 Feb]  reason: Iftar/religious event
+    LLM: The potluck encourages participants to bring food, indicating that food will be shared freely among attendees.
+    Caption: 'Join us for 🎀 sisters’ pilates & potluck for Iftar 😋 — the perfect sisterhood combo 💕\n\n🎀 Pilates classes:\n📍 Harmony Stud'
+    https://www.instagram.com/p/DVEYKE2DaWl/
+
+  Keyword: "3-course meal"  (1 posts) ← consider adding to extractor
+    @ucdisoc  [20 Feb]  reason: Iftar/religious event
+    LLM: The event offers a mouthwatering 3-course meal included for all attendees.
+    Caption: 'Perfecting Ihsaan - Beyond Ramadan: A Sisters’ Iftaar 💗\n\nJoin us as we explore what it truly means to live with excellen'
+    https://www.instagram.com/p/DU_bN31DZjx/
+
+  Keyword: "iftar"  (1 posts) ← consider adding to extractor
+    @ucdisoc  [14 Feb]  reason: Iftar/religious event
+    LLM: Iftar will be provided for all players, indicating free food.
+    Caption: 'Brothers Iftar Cup 26’ ⚽️🏆\n\n📅 Date: 28/02/26\n📍 Location: UCD 5 a side pitches, (1-3)\n⏰ Time: 10:00am - 7:00pm\n🍽 Iftar wi'
+    https://www.instagram.com/p/DUvKkG5jXHh/
+
+  Keyword: "refreshments"  (1 posts) ← consider adding to extractor
+    @ucdjsoc  [23 Feb]  reason: No explicit food keyword found
+    LLM: The caption suggests a casual invitation to attend and learn, indicating potential availability of refreshments at the event.
+    Caption: "Due to some difficulties last week we will be doing this topic again! If you weren't able to join last week or if you wa"
+    https://www.instagram.com/p/DVFJoQhiLN3/
+
+  Keyword: "asian market crawl"  (1 posts) ← consider adding to extractor
+    @ucdjsoc  [18 Feb]  reason: No explicit food keyword found
+    LLM: The event is a market crawl, which implies food sampling or tastings likely offered for free.
+    Caption: 'Thanks so much to everyone who came to the Asian Market Crawl. We hope you all had a great time. ✨\n\nTo hear about more f'
+    https://www.instagram.com/p/DU6lIrMiDGK/
+
+  Keyword: "pizza, snacks"  (1 posts) ← consider adding to extractor
+    @ucdjuggling  [30 Nov]  reason: Mentions other college: 'tcd'
+    LLM: The event offers free pizza and snacks to attendees.
+    Caption: "As the end of the semester draws near, it's time for our annual Christmas party!\n\nUCD Juggling and TCD Circus are collab"
+    https://www.instagram.com/p/DRrvTlTCC1y/
+
+  Keyword: "🍻"  (1 posts) ← consider adding to extractor
+    @kevinbarrycumann  [23 Feb]  reason: No explicit food keyword found
+    LLM: The event mentions a meet-up in a clubhouse with beer emoji, indicating drinks are likely provided for free.
+    Caption: '⚽🔥 5-A-Side Showdown KBC v Wolfetones🔥⚽\n\nCome meet the teams at the UCD Clubhouse pres at 8PM 🍻\n\nBefore what’s sure to b'
+    https://www.instagram.com/p/DVGXtpnjEVN/
+
+  Keyword: "apple juice"  (1 posts) ← consider adding to extractor
+    @ucd_lgbtqplus  [22 Feb]  reason: No explicit food keyword found
+    LLM: The mention of 'apple juice' suggests that drinks will be provided for free at the events.
+    Caption: "Hiya divas ✨\n\nWe hope you've all been well and rested, and if you haven't, then make sure to rest RIGHT NOW! YES, NOW! O"
+    https://www.instagram.com/p/DVEuwqQAD-W/
+
+  Keyword: "cookie"  (1 posts) ← consider adding to extractor
+    @ucd_lgbtqplus  [08 Feb]  reason: Food activity workshop/competition (not free food)
+    LLM: Cookie decorating implies free food will be provided during the activity.
+    Caption: 'Hey there, fellow yearners 😌🫶🏻\n\n❗SPEED DATING has been changed to SPEED FRIENDING❗\n\nYearning times lie ahead, and so do'
+    https://www.instagram.com/p/DUgm4I5AOL0/
+
+  Keyword: "tea, coffee"  (1 posts) ← consider adding to extractor
+    @ucdlitsoc  [26 Jan]  reason: No explicit food keyword found
+    LLM: The event offers free tea and coffee during the book swap event.
+    Caption: '✨ 𝚁𝙴𝙵𝚁𝙴𝚂𝙷𝙴𝚁𝚂 𝚆𝙴𝙴𝙺! ✨ \n📅 𝙼𝚘𝚗 𝟸𝟼 𝙹𝚊𝚗 — 𝙵𝚛𝚒 𝟹𝟶 𝙹𝚊𝚗 𝙲𝚘𝚖𝚎 𝚐𝚎𝚝 𝚒𝚗𝚟𝚘𝚕𝚟𝚎𝚍 𝚊𝚗𝚍 𝚓𝚘𝚒𝚗 𝚝𝚑𝚎 𝚜𝚘𝚌𝚒𝚎𝚝𝚢! \n\n📍 𝚃𝚄𝙴𝚂𝙳𝙰𝚈\n • 𝚁𝚎𝚏𝚛𝚎𝚜𝚑𝚎𝚛𝚜’ 𝙵𝚊𝚒𝚛'
+    https://www.instagram.com/p/DT-MFrNCDdQ/
+
+  Keyword: "delicious food"  (1 posts) ← consider adding to extractor
+    @ucdlivingstones  [20 Feb]  reason: No explicit food keyword found
+    LLM: The event includes delicious food, suggesting it is provided for free.
+    Caption: "For the boys 📢📢\nGather up Lads, we got something special for you...\n\nJoin us for a Lad's hangout with fun and intense ga"
+    https://www.instagram.com/p/DU_mLdjDDe8/
+
+  Keyword: "ayam gepuk"  (1 posts) ← consider adding to extractor
+    @ucdmsoc  [25 Feb]  reason: Iftar/religious event
+    LLM: Food is being served for breaking the fast, indicating that it is provided free of charge.
+    Caption: 'Join us this Ramadan to spend a wonderful Iftar together 🌙\n\nWe will be breaking the fast with a scrumptious serving of a'
+    https://www.instagram.com/p/DVLrdT2DGG_/
+
+  Keyword: "overfed"  (1 posts) ← consider adding to extractor
+    @ucdmsoc  [24 Feb]  reason: No explicit food keyword found
+    LLM: The caption implies a celebratory event with food, suggesting the offering of free food during the Chinese New Year celebration.
+    Caption: 'at a very chinese time of our lives 🤑🧧🐎 \nCNY done right- loud, lucky & slightly overfed!! \ns/o @ucdmsoc @mmiireland @mys'
+    https://www.instagram.com/p/DVI-y36CKOM/
+
+  Keyword: "goods"  (1 posts) ← consider adding to extractor
+    @ucdmsoc  [12 Feb]  reason: No explicit food keyword found
+    LLM: The post indicates that pre-ordered goods can be collected for free at the booth.
+    Caption: 'POV: you edited your content into a reality TV show… 📺 \n\nReminder to collect your pre-ordered goods at our booth in the'
+    https://www.instagram.com/p/DUq6YUuDe-y/
+
+  Keyword: "pizza, cans"  (1 posts) ← consider adding to extractor
+    @ucdmathsoc  [22 Feb]  reason: Appears to be a paid event (price/ticket mention)
+    LLM: Free pizza and cans are being offered at the event.
+    Caption: 'Countdown and cans is back baby!\n\nJoin us this Wednesday for some pizza, cans, and a bit of countdown🔥\n\n*This is a free'
+    https://www.instagram.com/p/DVESSBvCCso/
+
+  Keyword: "🍸"  (1 posts) ← consider adding to extractor
+    @ucdmathsoc  [27 Jan]  reason: No explicit food keyword found
+    LLM: The caption mentions that the first drink is on them, indicating free drinks.
+    Caption: "We're hosting a refreshers mixer this Thursday! Come celebrate (or commiserate) exam results with us upstairs in the clu"
+    https://www.instagram.com/p/DUBRAZ-CO6Y/
+
+  Keyword: "wine and cheesers"  (1 posts) ← consider adding to extractor
+    @ucdmedsoc  [03 Feb]  reason: No explicit food keyword found
+    LLM: The event named 'Wine and Cheesers' suggests that food (wine and cheese) is provided for participants.
+    Caption: 'Did it really happen if there were no photos?🤗 Well ain’t it a good thing we had a camera on site to capture every. sing'
+    https://www.instagram.com/p/DUTnnVgjeRr/
+
+  Keyword: "food, drinks"  (1 posts) ← consider adding to extractor
+    @ucdmusicsoc  [22 Feb]  reason: No explicit food keyword found
+    LLM: The event mentions a jam session at a location serving drinks, indicating a social atmosphere likely to feature free food.
+    Caption: 'Tuesday is officially the biggest day of the week! 🎸🔥\n\nWe’ve got a packed schedule coming your way, and we’re still buzz'
+    https://www.instagram.com/p/DVEVvlaDGce/
+
+  Keyword: "free food, drinks"  (1 posts) ← consider adding to extractor
+    @ucdmusicsoc  [08 Feb]  reason: Appears to be a paid event (price/ticket mention)
+    LLM: The post explicitly states that there will be lots of free food available at the event.
+    Caption: '‼️REDUCED TICKET PRICES FOR KARNEVAL‼️\n\nwe found a way to make tickets cheaper for you so now there’s no reason not to c'
+    https://www.instagram.com/p/DUgN78EDRSn/
+
+  Keyword: "meal"  (1 posts) ← consider adding to extractor
+    @ucdnewmansoc  [01 Feb]  reason: No explicit food keyword found
+    LLM: The event includes a meal as part of its offerings, suggesting that food is provided for attendees.
+    Caption: '🕺let’s get this party started💃\n\nOn the 7th of February, in the Gresham Hotel, be there or be a literal square- the BIGGE'
+    https://www.instagram.com/p/DUOAxiOCPoM/
+
+  Keyword: "baked goods"  (1 posts) ← consider adding to extractor
+    @nordicsocietyucd  [09 Nov]  reason: Mentions off-campus venue: 'night out'
+    LLM: The caption mentions enjoying baked goods, which implies food being provided for free at the event.
+    Caption: 'Well 10 events! Finals are slowly creeping up on us, but they’re not here yet! Time to enjoy my to date favorite baked g'
+    https://www.instagram.com/p/DQ1uzhoCKAZ/
+
+  Keyword: "free goodies"  (1 posts) ← consider adding to extractor
+    @namsocucd  [01 Dec]  reason: No explicit food keyword found
+    LLM: The event includes loads of FREE goodies, indicating free food is being offered.
+    Caption: 'FINAL WEEK OF 2025🥲\n\nWe have 2 big things for you.\nAll NAMSOC Members get free entry this Monday, Tuesday, Wednesday and'
+    https://www.instagram.com/p/DRvH5cgjR07/
+
+  Keyword: "sweet treats, snacks"  (1 posts) ← consider adding to extractor
+    @pharmtoxucd  [06 Feb]  reason: Appears to be a paid event (price/ticket mention)
+    LLM: The bake sale is indicated as a support event where attendees can get snacks, implying that the food is being given for free.
+    Caption: 'Sweet treats, good vibes ✨\npharmtox bake sale is happening Next week Monday the 9th 🍩\ncome support + get a snack\nIf anyo'
+    https://www.instagram.com/p/DUafA8kjZpK/
+
+  Keyword: "caffeine, biscuits"  (1 posts) ← consider adding to extractor
+    @physics_society_ucd  [12 Sep]  reason: Nightlife event keyword: 'ball'
+    LLM: The post explicitly mentions 'Regular free caffeine ☕️ and biscuits 🍪', indicating free food is offered.
+    Caption: 'We know that the beauty of physics requires convincing. Convincing yourself of laws that make sense mathematically, as w'
+    https://www.instagram.com/p/DOgUK50gkwt/
+
+  Keyword: "coffee, tea"  (1 posts) ← consider adding to extractor
+    @ucdscisoc  [16 Feb]  reason: Appears to be a paid event (price/ticket mention)
+    LLM: The event specifically mentions free coffee or tea being offered.
+    Caption: '☕ COFE MORNING ☕\n\nAfter the chaos of Science Day and SciBall ticket sales, we’re slowing things down this week with a Co'
+    https://www.instagram.com/p/DU0bkwnitpj/
+
+  Keyword: "☕️"  (1 posts) ← consider adding to extractor
+    @ucdsussoc  [22 Feb]  reason: No explicit food keyword found
+    LLM: The event provides free drinks (indicated by the coffee cup emoji) for attendees.
+    Caption: 'Join us for our second Climate Chats of the semester on Tuesday 24 February, from 2-3pm! ☕️ 🌎 Register your interest thr'
+    https://www.instagram.com/p/DVDmv-CiLrr/
+
+
+🟡 FALSE POSITIVES (13) — classifier accepted, LLM says NOT a food event
+
+  @ucdcesoc  [03 Feb]
+  LLM: The event is a panel discussion and does not mention any free food or drinks being provided.
+  Caption: 'Dreaming of starting your own business? Want to hear from the best on how they did it? 🚀\n\nOur entrepreneurship panel has'
+  https://www.instagram.com/p/DUS13HqDdFd/
+
+  @ucdfilmsoc  [09 Feb]
+  LLM: The post does not indicate that free food or drinks are being offered.
+  Caption: '🍿 OCM’s 🍿\n\nOur Wonderful OCM’s who keep everything running behind the scenes.\n\n#film #ucdfilmsoc #ucdcinema'
+  https://www.instagram.com/p/DUiNNTPCMsW/
+
+  @ucdgamesociety  [22 Feb]
+  LLM: The post does not indicate that food or drinks are being offered for free.
+  Caption: '💗WEEK 6💗\n\n🍬BOARD GAMES\n- Ready. Set. BOARD GAMES!\nThis week our board games are all about SPEED. We will be playing fast'
+  https://www.instagram.com/p/DVEJEvnDFUJ/
+
+  @ucditaliansoc  [17 Feb]
+  LLM: The event involves selling Italian treats, which implies a cost rather than offering free food.
+  Caption: 'Ciao! 🇮🇹✨\n\nThis Wednesday we’re bringing a taste of Italy to the International Market! Come support Società Italiana and'
+  https://www.instagram.com/p/DU29YL1jQ10/
+
+  @ucdjsoc  [18 Feb]
+  LLM: The event does not mention any food or drinks being offered for free.
+  Caption: 'Tomorrow is another Language class and we will be going over how to count things. Like in english, we have *sheets* of p'
+  https://www.instagram.com/p/DU6XrUlCJuO/
+
+  @ucdjsoc  [17 Feb]
+  LLM: The food items are being sold, which indicates it is not a free food event.
+  Caption: 'We will be having a table at the International Festival Stalls in the Atrium! We will be selling matcha cheesecake and m'
+  https://www.instagram.com/p/DU2t1eCiJZK/
+
+  @ucdlitsoc  [16 Feb]
+  LLM: The post is about a job application and does not mention any free food or drinks being offered.
+  Caption: '‼️ WE’RE HIRING ‼️\n\nWe’re looking for a Graphic Designer to join our team. You’ll be creating engaging Instagram content'
+  https://www.instagram.com/p/DU0bWefDO2c/
+
+  @ucdmedsoc  [18 Feb]
+  LLM: The post does not mention any free food or drinks being provided during the event.
+  Caption: '🚨Rescheduled🚨\nMedSoc is excited to announce that Ireland’s Chief State Pathologist, Professor Linda Mulligan will be joi'
+  https://www.instagram.com/p/DU6H0uADZjo/
+
+  @ucdnewmansoc  [24 Feb]
+  LLM: The post discusses the purpose of Lent and does not indicate any free food offering.
+  Caption: 'prayer, fasting and almsgiving?!? i thought i just had to give up sweets :( \n\nFollowing on from last weeks talk, we seem'
+  https://www.instagram.com/p/DVIoF64iFzl/
+
+  @namsocucd  [11 Feb]
+  LLM: The caption discusses healthcare issues and does not mention any food or drinks being offered.
+  Caption: 'While Ireland is certainly special for its dual-healthcare system - a ‘balance’ of private and public, there is much to'
+  https://www.instagram.com/p/DUnwf7HjZvO/
+
+  @ucdphdsociety  [13 Oct]
+  LLM: No free food or drinks are mentioned in the event details.
+  Caption: '🏖️ Coastal Walk: Malahide to Portmarnock 🏖️\n\nJoin us for a scenic weekend walk along the coast!\n\nStart: Malahide dart st'
+  https://www.instagram.com/p/DPv55xSiMXe/
+
+  @ucdpolsoc  [18 Feb]
+  LLM: The caption discusses economic and political topics without mentioning any food or drinks being offered for free.
+  Caption: 'The economic and political development of Ireland since joining the European Economic Community in 1973 has been sensati'
+  https://www.instagram.com/p/DU5wr5yDdP-/
+
+  @psychsocietyucd  [12 Feb]
+  LLM: The baked goods are being sold for €1-€3, which means it is not a free food event.
+  Caption: "Valentine's day is coming our way 💘\nIn Harmony studio @ 1pm (come before all is gone!!) \n\nIn order to celebrate this sea"
+  https://www.instagram.com/p/DUpt2DWCIwF/
+
+
+🕐 TIME MISSES (69) — LLM found time, extractor did not
+
+  @ucdafricasociety  LLM time: 10:00
+  Caption: 'Brunch & Vibes is callingggg 🥞☕️\nA well deserved treat from us to you come down and bring a friend too 🤍\n📅 17th Feb (Tue'
+  https://www.instagram.com/p/DU0eTwniFov/
+
+  @ucdafricasociety  LLM time: 18:00
+  Caption: 'Snacks & Support ✨🫶🏾\nA safe space. Real conversations. Good vibes.\nIf you’re part of an ethnic minority community, this'
+  https://www.instagram.com/p/DUi0GxHCPvh/
+
+  @ucd.aclsoc  LLM time: 15:15
+  Caption: 'Not everyone in the room is who they claim to be.👀👀\nThink you can read the room?\nProve it.\n\nGuess the Imposter — an even'
+  https://www.instagram.com/p/DUorSNcDDPc/
+
+  @ucd.aclsoc  LLM time: 11:00
+  Caption: 'This Thursday EES is teaming up with @ucd.aclsoc and we couldn’t be more excited.\n\nExpect delicious desserts, cozy vibes'
+  https://www.instagram.com/p/DUdKk04jOX-/
+
+  @ucd.aclsoc  LLM time: null
+  Caption: 'Join us this Wednesday evening for games night! Take part in a competitive Seen Jeem and Stop the Bus or enjoy a more re'
+  https://www.instagram.com/p/DUMPqCMDRxT/
+
+  @ucdarcsoc  LLM time: 13:00
+  Caption: '🪩 REFRESHERS WEEK EVENTS🪩\n\nWelcome back everyone! Get ready to be refreshed this week with delightful coffee morning in'
+  https://www.instagram.com/p/DT8K2DOjLhz/
+
+  @artssocucd  LLM time: 11:00
+  Caption: "TUESDAY COFFEE MORNING! AGAIN! And this time it's final; our coffee mornings for this term will be held in Newman Baseme"
+  https://www.instagram.com/p/DO3oEXRCLRR/
+
+  @artssocucd  LLM time: 17:00
+  Caption: 'ATTENTION FILM GOERS... 🎥\n\nThe Arts Society is hosting a screening of "Apocalypse Now", a Vietnam War film in honour of'
+  https://www.instagram.com/p/DVLY9ymCAd_/
+
+  @ucdbiosoc  LLM time: 10:00
+  Caption: '☕Hot Chocolate Morning ☕️\nJoin us in Meeting Room 5 at 10am on Wednesday, November 5th for a cozy catch-up, sweet treats'
+  https://www.instagram.com/p/DQmgN55jF_g/
+
+  @ucdbiosoc  LLM time: null
+  Caption: '☕️ UCD BioSoc Coffee Morning ☕️\n\nTake a break from midterms and assignments and join us for a relaxed morning of chats,'
+  https://www.instagram.com/p/DPwD3lIDCCR/
+
+  @ucd_civil_structural  LLM time: 13:00
+  Caption: 'Please join us for a lunchtime talk from our sponsor company Fehily Timoney, this Wednesday at 1pm in G87!\n\nThey will be'
+  https://www.instagram.com/p/DVGOwMyDDxe/
+
+  @ucd_civil_structural  LLM time: 13:00
+  Caption: 'Haven’t signed up to Civil Soc yet? Come to our refreshers pizza 1pm in the Newstead Atrium. All Civilsoc members welcom'
+  https://www.instagram.com/p/DT-YF-VDGwv/
+
+  @ucdees  LLM time: 10:00
+  Caption: '☕ Join the UCD Eastern European Society for a relaxed Coffee Morning!\n\nCome by Harmony Studio on Thursday, 26th February'
+  https://www.instagram.com/p/DVIuMVmDLwI/
+
+  @ucdees  LLM time: 10:00
+  Caption: '🌍 Join us for the International Market! 🌍\n\nCelebrate the amazing diversity on campus as we bring you a taste of Eastern'
+  https://www.instagram.com/p/DU1Rn1IDmEG/
+
+  @ucdees  LLM time: 15:30
+  Caption: '🇱🇹✨ Join us for Lithuanian Independence Day Snacks! ✨🇱🇹\n\nCelebrate with us as we share a taste of Lithuanian culture — e'
+  https://www.instagram.com/p/DUyHJWZjGP8/
+
+  @ucdees  LLM time: 11:00
+  Caption: 'This Thursday EES is teaming up with @ucd.aclsoc and we couldn’t be more excited.\n\nExpect delicious desserts, cozy vibes'
+  https://www.instagram.com/p/DUdKk04jOX-/
+
+  @ucdees  LLM time: 11:00
+  Caption: 'Take a break and join the UCD Eastern European Society for a relaxed Coffee Morning at Brava Lounge. Whether you’re stop'
+  https://www.instagram.com/p/DUTMvs9jA4T/
+
+  @ucdees  LLM time: 16:00
+  Caption: '💿✨ **CUTE, CHAOTIC & A LITTLE EMBARRASSING** ✨💿\n\nIt’s giving low-rise jeans, shiny lip gloss, eurodance on repeat, and a'
+  https://www.instagram.com/p/DT_XWwFjDrL/
+
+  @ucd.elecsoc  LLM time: 18:00
+  Caption: '❗Announcing Makerthon (ElecSoc x Patch)\n\nWe’re bringing a 2½ hour Makerthon sprint to UCD and you’re invited.\n\nHere’s wh'
+  https://www.instagram.com/p/DU6xqBwiLFf/
+
+  @ucd.elecsoc  LLM time: 19:30
+  Caption: 'Trivia Night Is back! Do you have what it takes to win?\nPut your knowledge to the test this Tuesday at 7.30pm in Rm 321.'
+  https://www.instagram.com/p/DT8lEWcjNdl/
+
+  @ucd.elecsoc  LLM time: 18:00
+  Caption: '🤖 Brains vs Bytes: Can you outsmart the Clankers?\n\nJoin us for Trivia Night this Thursday at 6PM in Rm 321. There will b'
+  https://www.instagram.com/p/DQksYwHCGp9/
+
+  @ucd.elecsoc  LLM time: 17:00
+  Caption: '⚡‼️EIRGRID GUEST SPEAKER & CLEANERGRID COMPETITION‼️⚡\n\nJoin us Thursday, 6th November at 5PM in ENG 326 for an exciting'
+  https://www.instagram.com/p/DQkrpXLCFtS/
+
+  @esnucd  LLM time: 10:00
+  Caption: '☘️Coffee Morning with an Irish Twist!☘️\n\nFirst week back to college (first week in UCD for some) can be overwhelming. We'
+  https://www.instagram.com/p/DT7xQoLCEiP/
+
+  @ucdfoodsoc  LLM time: null
+  Caption: 'as halloween approaches, the scariest thing around are mid terms. therefore, you should join @ucdfoodsoc and @ucdnutriti'
+  https://www.instagram.com/p/DQPaIrXDTM2/
+
+  @ucdfoodsoc  LLM time: 14:00
+  Caption: '🍝 Roman Banquet Incoming! 🇮🇹\n\nJoin us this Monday for an afternoon packed with Italian food, flavour, and fun!\n\n🗓️ Monda'
+  https://www.instagram.com/p/DP9WT34iLqE/
+
+  @ucdfoodsoc  LLM time: 09:00
+  Caption: 'a morning pick me up post commute? freezing cold while walking to class? look no further, come join us at the brava loun'
+  https://www.instagram.com/p/DO9MEElDduO/
+
+  @ucdfrenchsoc  LLM time: 13:30
+  Caption: '(Tuesday, Feb 24) Come to our weekly meet up tomorrow over some croissants and coffee! \nHarmony Studio, Student Centre\n1'
+  https://www.instagram.com/p/DVHd4m1CPKN/
+
+  @ucdfrenchsoc  LLM time: 13:00
+  Caption: "Join us next Tuesday (17/02) for our weekly 🥐 hit!\n\n⏱️1pm to 2pm -📍Harmony Studio\n\nWe're looking forward to seeing you ♥"
+  https://www.instagram.com/p/DUyinsUCA-j/
+
+  @ucdfrenchsoc  LLM time: null
+  Caption: 'Like we say in French "On change pas une équipe qui gagne !" Join us for our usual free coffee and croissants :).\n\n📍Red'
+  https://www.instagram.com/p/DUTrH4siKui/
+
+  @ucdgospelchoir  LLM time: null
+  Caption: 'Come and join us on Monday for a relaxing session and snacks. Excited to see you all theree💜!!'
+  https://www.instagram.com/p/DU_JwgZDA9u/
+
+  @ucd_hortsoc  LLM time: 11:00
+  Caption: "we've reached the halfway mark! hope midterms aren't getting you down \n\n- wednesday we shall be gardening from 11 to 1!"
+  https://www.instagram.com/p/DVGTmYgjOMf/
+
+  @ucdindsoc  LLM time: 18:00
+  Caption: 'Join us for a relaxing evening of film and fun! 🍿\n📍 Village Auditorium\n📅 26 Feb 2026\n⏰ 18:00 – 21:00\nSee you there!'
+  https://www.instagram.com/p/DVHGtCtglDg/
+
+  @ucditaliansoc  LLM time: 10:00
+  Caption: 'Ciao! \n\nJoin us for a cozy Coffee Morning with Società Italiana ☕✨\nCome along for a cup, a chat, and a relaxed start to'
+  https://www.instagram.com/p/DU28xz0jSM1/
+
+  @ucditaliansoc  LLM time: 11:00
+  Caption: 'Ciao! 💌\nJoin us for a cosy Valentine’s Day morning of card making and pastries at Brava Lounge 🥐✨\nCome along to get crea'
+  https://www.instagram.com/p/DUoNCXGDSd9/
+
+  @ucdlawsoc  LLM time: 00:00
+  Caption: 'FLOAT EU DEBATE TUESDAY 24TH IN THE FITZGERALD CHAMBER!! \n\nWith guests:\nCllr. Michael Clark\nDean of Law Imelda Maher\nBar'
+  https://www.instagram.com/p/DVHOEIlDZ55/
+
+  @ucdlnh  LLM time: 18:30
+  Caption: 'THB WOMEN’S CONTRIBUTIONS TO HISTORY HAVE BEEN ERASED 🖋️💪\n\nThey say “Behind every great man is a great woman” but what h'
+  https://www.instagram.com/p/DVE0ERHjX2M/
+
+  @ucdlnh  LLM time: 11:45
+  Caption: 'LnH Coffee Morning today! ☕️\n\nMake sure to join us today outside Theatre L in the Newman Building from 11:45am for some'
+  https://www.instagram.com/p/DVN42ckjXXk/
+
+  @ucdlnh  LLM time: 18:30
+  Caption: "This week we were on campus asking students what they think about women's place in history with @ucdlnhfinlay ! 💜\n\nTomor"
+  https://www.instagram.com/p/DVMhfJyDS27/
+
+  @ucdlitsoc  LLM time: 10:00
+  Caption: '𝚆𝚎𝚎𝚔 𝟼 𝚠𝚒𝚝𝚑 𝙻𝚒𝚝𝚂𝚘𝚌! 📚✨ \u200b\n\n𝙷𝚎𝚛𝚎 𝚒𝚜 𝚎𝚟𝚎𝚛𝚢𝚝𝚑𝚒𝚗𝚐 𝚑𝚊𝚙𝚙𝚎𝚗𝚒𝚗𝚐 𝚘𝚟𝚎𝚛 𝚝𝚑𝚎 𝚗𝚎𝚡𝚝 𝚏𝚎𝚠 𝚍𝚊𝚢𝚜: \u200b\n\n• 𝙼𝚘𝚗𝚍𝚊𝚢: 𝙲𝚘𝚏𝚏𝚎𝚎 𝙼𝚘𝚛𝚗𝚒𝚗𝚐! ☕️ | 𝙼𝚎𝚎𝚝𝚒𝚗𝚐'
+  https://www.instagram.com/p/DVF8VLICLDj/
+
+  @ucdlitsoc  LLM time: 10:00
+  Caption: '𝚆𝚎𝚎𝚔 𝟻 𝚠𝚒𝚝𝚑 𝙻𝚒𝚝𝚂𝚘𝚌! 📚✨ \n\n𝙷𝚎𝚛𝚎 𝚒𝚜 𝚎𝚟𝚎𝚛𝚢𝚝𝚑𝚒𝚗𝚐 𝚑𝚊𝚙𝚙𝚎𝚗𝚒𝚗𝚐 𝚘𝚟𝚎𝚛 𝚝𝚑𝚎 𝚗𝚎𝚡𝚝 𝚏𝚎𝚠 𝚍𝚊𝚢𝚜:\xa0 \u200b \n\n• 𝙼𝚘𝚗𝚍𝚊𝚢: 𝙲𝚘𝚏𝚏𝚎𝚎 𝙼𝚘𝚛𝚗𝚒𝚗𝚐! ☕ | 𝙱𝚕𝚞𝚎 𝚁𝚘'
+  https://www.instagram.com/p/DU2z6EoCCrE/
+
+  @ucdlitsoc  LLM time: 10:00
+  Caption: '𝚆𝚎𝚎𝚔 𝟺 𝚠𝚒𝚝𝚑 𝙻𝚒𝚝𝚜𝚘𝚌 🎞️📔\n\n☕️ 𝙼𝚘𝚗𝚍𝚊𝚢 — 𝙹𝚘𝚒𝚗 𝚞𝚜 𝚏𝚘𝚛 𝚊 𝚌𝚘𝚏𝚏𝚎𝚎 𝚖𝚘𝚛𝚗𝚒𝚗𝚐 𝚝𝚘 𝚜𝚝𝚊𝚛𝚝 𝚘𝚏𝚏 𝚝𝚑𝚎 𝚠𝚎𝚎𝚔. 𝙷𝚊𝚛𝚖𝚘𝚗𝚢 𝚂𝚝𝚞𝚍𝚒𝚘, 𝟷𝟶𝚊𝚖. \u200b\n\n🖋️ 𝚃𝚑𝚞𝚛'
+  https://www.instagram.com/p/DUhEULsiI-M/
+
+  @ucdlitsoc  LLM time: 12:00
+  Caption: '🗞️ 𝚆𝙴𝙴𝙺 𝟷 𝚆𝙸𝚃𝙷 𝙻𝙸𝚃𝚂𝙾𝙲\n\n 🗞️ 𝚆𝚎𝚕𝚌𝚘𝚖𝚎 𝚋𝚊𝚌𝚔!! 📚\n\n✨ 𝚆𝚎’𝚛𝚎 𝚜𝚝𝚊𝚛𝚝𝚒𝚗𝚐 𝚝𝚑𝚎 𝚜𝚎𝚖𝚎𝚜𝚝𝚎𝚛 𝚠𝚒𝚝𝚑 𝚝𝚠𝚘 𝚟𝚎𝚛𝚢 𝚒𝚖𝚙𝚘𝚛𝚝𝚊𝚗𝚝 𝚎𝚟𝚎𝚗𝚝𝚜: \n\n𝙼𝙾𝙽𝙳𝙰𝚈 🍕 𝙰𝚛'
+  https://www.instagram.com/p/DTrz4DgiKKz/
+
+  @ucdlitsoc  LLM time: 12:00
+  Caption: '🗞️ 𝙱𝚁𝙴𝙰𝙺𝙸𝙽𝙶 𝙽𝙴𝚆𝚂 🗞️ 𝙸𝚝’𝚜 𝙼𝙸𝚇𝙴𝚁 𝚃𝙸𝙼𝙴! \n\n🍕 𝚃𝚑𝚎 𝚂𝚄 𝚒𝚜 𝚑𝚘𝚜𝚝𝚒𝚗𝚐 𝚊𝚗 𝙰𝚛𝚝𝚜 & 𝙷𝚞𝚖𝚊𝚗𝚒𝚝𝚒𝚎𝚜 𝙼𝚒𝚡𝚎𝚛 𝚝𝚑𝚒𝚜 𝙼𝚘𝚗𝚍𝚊𝚢! \n\n𝙰𝚛𝚝𝚜 & 𝙷𝚞𝚖𝚊𝚗𝚒𝚝𝚒𝚎𝚜 𝚜'
+  https://www.instagram.com/p/DTql9-djsmR/
+
+  @ucdlivingstones  LLM time: 18:00
+  Caption: '✨ This Week at Livingstones ✨\nHello everyone, welcome back to a new week! We’ve got some exciting events coming up and w'
+  https://www.instagram.com/p/DVGdU-mDDcK/
+
+  @ucdlivingstones  LLM time: 18:15
+  Caption: "Join us for a special Valentine's Day event this Wednesday at 6:15 pm in  Room FS-G01 in the Agriculture Building. We'll"
+  https://www.instagram.com/p/DUg649JjAYO/
+
+  @ucdmechsoc  LLM time: 17:00
+  Caption: 'Dear 3rd Years!!\nChoosing your Masters? 🤔🎓\n\nJoin Mech Soc for our Masters Stream Information Night - hear from current m'
+  https://www.instagram.com/p/DUtJauqDNN3/
+
+  @ucdmechsoc  LLM time: null
+  Caption: '💻CAD Workshop this Thursday!\n\nJoin Master’s student Luke Dunne for a Fusion 360 masterclass! Whether you’re new to CAD o'
+  https://www.instagram.com/p/DUjfda-DEYw/
+
+  @ucdmechsoc  LLM time: 13:00
+  Caption: '🚀 Careers Talk Alert!\nWe’re excited to welcome Tritech and IPS to UCD MechSoc for a special careers session! 🤝\n\nThey’ll'
+  https://www.instagram.com/p/DRMoBGKDCEh/
+
+  @ucdmusicsoc  LLM time: 12:00
+  Caption: 'Week 4 here we come! 🎸🎶🔥\nJoin us this week for some of our amazing events we have planned!\n\nThis Tuesday the 10th of Feb'
+  https://www.instagram.com/p/DUePZgODLLS/
+
+  @ucdnetsoc  LLM time: 16:00
+  Caption: '⚡ Netsoc Weekly Event Summary - Another stacked week ahead:\n\n🗓 Tuesday 17 Feb | 18:00–20:00 | Farmer Brown’s\n🍻 AI Pub Qu'
+  https://www.instagram.com/p/DU1FhdtCHHK/
+
+  @ucdnetsoc  LLM time: 14:00
+  Caption: '⚡️Netsoc Weekly Round-Up — here’s what we’re up to this week!\n\n🗓 Tuesday 10 Feb | 17:00–19:00 | L2.15, O’Connor\n💼 Interv'
+  https://www.instagram.com/p/DUjZHjUCPZk/
+
+  @ucdnetsoc  LLM time: null
+  Caption: 'An afternoon of games and great fun for UCD students!\nUCD Innovation Academy and NetSoc invite you to The Great Game Gat'
+  https://www.instagram.com/p/DUYNHSjjbQW/
+
+  @ucdnetsoc  LLM time: 16:00
+  Caption: '🎮✨ Program Better & Jam ✨🎮\n📅 Friday 6 Feb\n⏰ 16:00–18:00\n📍 Innovation Academy – Shackleton\n\nBring your team or make one a'
+  https://www.instagram.com/p/DUUF57xiOZD/
+
+  @nordicsocietyucd  LLM time: 15:00
+  Caption: 'Week 11 schedule! \nNext Monday at 3-5pm we will be hosting a gingerbread house competition! please rsvp using the form i'
+  https://www.instagram.com/p/DRMUp1rDSX7/
+
+  @ucdphdsociety  LLM time: null
+  Caption: '🎃 Halloween Movie Night 🎃\n\u2028Join us for a spooky evening at Fitzgerald Chamber on 24 October!\n\u2028We’ll provide the popcorn—'
+  https://www.instagram.com/p/DQElkgsiG7s/
+
+  @ucdphdsociety  LLM time: 18:00
+  Caption: '🎓 UCD PhD Society – September Events! 🎉\n\n☕ Sept 9, 10:00 – Coffee Morning @ Global Lounge\n🎭 Sept 19, 18:00 – Culture Nig'
+  https://www.instagram.com/p/DOWIS3hiPDu/
+
+  @physics_society_ucd  LLM time: 11:00
+  Caption: 'Hey PhysSoc ⚛️🌟\n\nBelated short but sweet itinerary for this week mloves 💥💃 \n\nCome by Meeting Rooms in the Student Centre'
+  https://www.instagram.com/p/DVKKNQUAi39/
+
+  @physics_society_ucd  LLM time: 10:00
+  Caption: 'Hey PhysSoc, welcome to yet another glorious week!\n\nBoy do we have a busy Thursday 19th for you 🌟💃 come along to our cof'
+  https://www.instagram.com/p/DUzQmmEgn7w/
+
+  @physics_society_ucd  LLM time: 10:00
+  Caption: 'Is it magic? ✨ Or is it something even better… #physics \n\nCome witness the wonders of liquid nitrogen as we, your humble'
+  https://www.instagram.com/p/DUjlG4WAkuc/
+
+  @ucdpolsoc  LLM time: 10:00
+  Caption: 'You know it, you love it! 🙌\n\nPolsoc is BACK with our weekly coffee morning tomorrow, Wednesday the 21st from 10am to 12p'
+  https://www.instagram.com/p/DU2z_yMCEhk/
+
+  @ucdpolsoc  LLM time: 10:00
+  Caption: 'Week 5 with Polsoc is HERE! 💥\n\nWe have a jam packed week of events for you guys, from our MEP panel with Aodhan O’Riorda'
+  https://www.instagram.com/p/DUyvKzpCFKv/
+
+  @psychsocietyucd  LLM time: 14:30
+  Caption: 'GAMES DAY GAMES DAY ‼️‼️🗣️🗣️🗣️\n\nGuys come to some chillaxed game time where to get to play your favourite board games an'
+  https://www.instagram.com/p/DVIseNViMcG/
+
+  @psychsocietyucd  LLM time: 10:00
+  Caption: 'Coffee morning time!!! Stop by today @ 10am!! \n\nIn the Harmony studio 💜💜\nCoffee, Berry green and peppermint tea, hot cho'
+  https://www.instagram.com/p/DVGDzVsCDxx/
+
+  @psychsocietyucd  LLM time: 11:00
+  Caption: 'Tomorrow @ 11am in the Fitzgerald Chamber we have our most anticipated event ‼️ \n\nAdam Harris, the founder of the @asiam'
+  https://www.instagram.com/p/DVFDZj5iOmP/
+
+  @psychsocietyucd  LLM time: 10:00
+  Caption: 'Welcome to Week 6 ✨✨\n\nFun and anticipatory events coming your way ~\nTomorrow we have two consecutive events!! \n☕🫖 Coffee'
+  https://www.instagram.com/p/DVEo3h5iB7Z/
+
+  @ucdsocscistudents  LLM time: 10:00
+  Caption: 'As our last one was a huge success… Our SECOND Social Sciences Café is happening TOMORROW! ✨☕\n\nJoin us on Wednesday 25th'
+  https://www.instagram.com/p/DVIwttNDOPM/
+
+  @ucdsocscistudents  LLM time: 10:00
+  Caption: 'You’re very welcome to join us for the first Social Sciences Café of the trimester - a relaxed coffee morning for Social'
+  https://www.instagram.com/p/DUacVzGDFCu/
+
+  @ucdvnsoc  LLM time: 18:00
+  Caption: 'IVNA talk on Thursday the 20th!\nEveryone is welcome and we could love to see you all there!💚💚 Thursday the 20th at 6pm i'
+  https://www.instagram.com/p/DGNbt9CMQbZ/
+
+  @womeninstem_ucd  LLM time: 16:00
+  Caption: 'Calling all gals 💕✨\n\nWe’re hosting a Galentine’s Brunch with @ucdwib and it’s going to be so much fun 💖\n\nExpect photoboo'
+  https://www.instagram.com/p/DUk435Jgtdw/
+
+
+📍 LOCATION MISSES (70) — LLM found location, extractor did not
+
+  @ucdafricasociety  LLM location: Meeting Rooms 5, 6 & 7 – Student Centre
+  Caption: 'Brunch & Vibes is callingggg 🥞☕️\nA well deserved treat from us to you come down and bring a friend too 🤍\n📅 17th Feb (Tue'
+  https://www.instagram.com/p/DU0eTwniFov/
+
+  @ucdafricasociety  LLM location: B004, Health Science
+  Caption: 'Snacks & Support ✨🫶🏾\nA safe space. Real conversations. Good vibes.\nIf you’re part of an ethnic minority community, this'
+  https://www.instagram.com/p/DUi0GxHCPvh/
+
+  @ucd.aclsoc  LLM location: UCD Global Lounge
+  Caption: 'Not everyone in the room is who they claim to be.👀👀\nThink you can read the room?\nProve it.\n\nGuess the Imposter — an even'
+  https://www.instagram.com/p/DUorSNcDDPc/
+
+  @ucd.aclsoc  LLM location: Harmony Studio
+  Caption: 'This Thursday EES is teaming up with @ucd.aclsoc and we couldn’t be more excited.\n\nExpect delicious desserts, cozy vibes'
+  https://www.instagram.com/p/DUdKk04jOX-/
+
+  @ucd.aclsoc  LLM location: null
+  Caption: 'Join us this Wednesday evening for games night! Take part in a competitive Seen Jeem and Stop the Bus or enjoy a more re'
+  https://www.instagram.com/p/DUMPqCMDRxT/
+
+  @ucdarcsoc  LLM location: Richview cafeteria
+  Caption: '🪩 REFRESHERS WEEK EVENTS🪩\n\nWelcome back everyone! Get ready to be refreshed this week with delightful coffee morning in'
+  https://www.instagram.com/p/DT8K2DOjLhz/
+
+  @artssocucd  LLM location: Newman Basement
+  Caption: "TUESDAY COFFEE MORNING! AGAIN! And this time it's final; our coffee mornings for this term will be held in Newman Baseme"
+  https://www.instagram.com/p/DO3oEXRCLRR/
+
+  @artssocucd  LLM location: Theatre N
+  Caption: 'ATTENTION FILM GOERS... 🎥\n\nThe Arts Society is hosting a screening of "Apocalypse Now", a Vietnam War film in honour of'
+  https://www.instagram.com/p/DVLY9ymCAd_/
+
+  @ucdbiosoc  LLM location: Meeting Room 5
+  Caption: '☕Hot Chocolate Morning ☕️\nJoin us in Meeting Room 5 at 10am on Wednesday, November 5th for a cozy catch-up, sweet treats'
+  https://www.instagram.com/p/DQmgN55jF_g/
+
+  @ucdbiosoc  LLM location: Red Room
+  Caption: '☕️ UCD BioSoc Coffee Morning ☕️\n\nTake a break from midterms and assignments and join us for a relaxed morning of chats,'
+  https://www.instagram.com/p/DPwD3lIDCCR/
+
+  @ucd_civil_structural  LLM location: G87
+  Caption: 'Please join us for a lunchtime talk from our sponsor company Fehily Timoney, this Wednesday at 1pm in G87!\n\nThey will be'
+  https://www.instagram.com/p/DVGOwMyDDxe/
+
+  @ucd_civil_structural  LLM location: Newstead Atrium
+  Caption: 'Haven’t signed up to Civil Soc yet? Come to our refreshers pizza 1pm in the Newstead Atrium. All Civilsoc members welcom'
+  https://www.instagram.com/p/DT-YF-VDGwv/
+
+  @ucdees  LLM location: Harmony Studio
+  Caption: '☕ Join the UCD Eastern European Society for a relaxed Coffee Morning!\n\nCome by Harmony Studio on Thursday, 26th February'
+  https://www.instagram.com/p/DVIuMVmDLwI/
+
+  @ucdees  LLM location: Atrium, UCD Student Centre
+  Caption: '🌍 Join us for the International Market! 🌍\n\nCelebrate the amazing diversity on campus as we bring you a taste of Eastern'
+  https://www.instagram.com/p/DU1Rn1IDmEG/
+
+  @ucdees  LLM location: Blue Room
+  Caption: '🇱🇹✨ Join us for Lithuanian Independence Day Snacks! ✨🇱🇹\n\nCelebrate with us as we share a taste of Lithuanian culture — e'
+  https://www.instagram.com/p/DUyHJWZjGP8/
+
+  @ucdees  LLM location: Harmony Studio
+  Caption: 'This Thursday EES is teaming up with @ucd.aclsoc and we couldn’t be more excited.\n\nExpect delicious desserts, cozy vibes'
+  https://www.instagram.com/p/DUdKk04jOX-/
+
+  @ucdees  LLM location: Brava Lounge
+  Caption: 'Take a break and join the UCD Eastern European Society for a relaxed Coffee Morning at Brava Lounge. Whether you’re stop'
+  https://www.instagram.com/p/DUTMvs9jA4T/
+
+  @ucdees  LLM location: Meeting Rooms 5, 6 & 7
+  Caption: '💿✨ **CUTE, CHAOTIC & A LITTLE EMBARRASSING** ✨💿\n\nIt’s giving low-rise jeans, shiny lip gloss, eurodance on repeat, and a'
+  https://www.instagram.com/p/DT_XWwFjDrL/
+
+  @ucd.elecsoc  LLM location: UCD Engineering Building
+  Caption: '❗Announcing Makerthon (ElecSoc x Patch)\n\nWe’re bringing a 2½ hour Makerthon sprint to UCD and you’re invited.\n\nHere’s wh'
+  https://www.instagram.com/p/DU6xqBwiLFf/
+
+  @ucd.elecsoc  LLM location: Rm 321
+  Caption: 'Trivia Night Is back! Do you have what it takes to win?\nPut your knowledge to the test this Tuesday at 7.30pm in Rm 321.'
+  https://www.instagram.com/p/DT8lEWcjNdl/
+
+  @ucd.elecsoc  LLM location: Rm 321
+  Caption: '🤖 Brains vs Bytes: Can you outsmart the Clankers?\n\nJoin us for Trivia Night this Thursday at 6PM in Rm 321. There will b'
+  https://www.instagram.com/p/DQksYwHCGp9/
+
+  @ucd.elecsoc  LLM location: ENG 326
+  Caption: '⚡‼️EIRGRID GUEST SPEAKER & CLEANERGRID COMPETITION‼️⚡\n\nJoin us Thursday, 6th November at 5PM in ENG 326 for an exciting'
+  https://www.instagram.com/p/DQkrpXLCFtS/
+
+  @esnucd  LLM location: Blue Room, UCD Student Centre
+  Caption: '☘️Coffee Morning with an Irish Twist!☘️\n\nFirst week back to college (first week in UCD for some) can be overwhelming. We'
+  https://www.instagram.com/p/DT7xQoLCEiP/
+
+  @ucdfoodsoc  LLM location: meeting rooms 5-7
+  Caption: 'as halloween approaches, the scariest thing around are mid terms. therefore, you should join @ucdfoodsoc and @ucdnutriti'
+  https://www.instagram.com/p/DQPaIrXDTM2/
+
+  @ucdfoodsoc  LLM location: Blue Room, UCD Student Centre
+  Caption: '🍝 Roman Banquet Incoming! 🇮🇹\n\nJoin us this Monday for an afternoon packed with Italian food, flavour, and fun!\n\n🗓️ Monda'
+  https://www.instagram.com/p/DP9WT34iLqE/
+
+  @ucdfoodsoc  LLM location: Brava Lounge
+  Caption: 'a morning pick me up post commute? freezing cold while walking to class? look no further, come join us at the brava loun'
+  https://www.instagram.com/p/DO9MEElDduO/
+
+  @ucdfrenchsoc  LLM location: Harmony Studio, Student Centre
+  Caption: '(Tuesday, Feb 24) Come to our weekly meet up tomorrow over some croissants and coffee! \nHarmony Studio, Student Centre\n1'
+  https://www.instagram.com/p/DVHd4m1CPKN/
+
+  @ucdfrenchsoc  LLM location: Harmony Studio
+  Caption: "Join us next Tuesday (17/02) for our weekly 🥐 hit!\n\n⏱️1pm to 2pm -📍Harmony Studio\n\nWe're looking forward to seeing you ♥"
+  https://www.instagram.com/p/DUyinsUCA-j/
+
+  @ucdfrenchsoc  LLM location: Red Room
+  Caption: 'Like we say in French "On change pas une équipe qui gagne !" Join us for our usual free coffee and croissants :).\n\n📍Red'
+  https://www.instagram.com/p/DUTrH4siKui/
+
+  @ucdgospelchoir  LLM location: null
+  Caption: 'Come and join us on Monday for a relaxing session and snacks. Excited to see you all theree💜!!'
+  https://www.instagram.com/p/DU_JwgZDA9u/
+
+  @ucd_hortsoc  LLM location: polytunnel
+  Caption: "we've reached the halfway mark! hope midterms aren't getting you down \n\n- wednesday we shall be gardening from 11 to 1!"
+  https://www.instagram.com/p/DVGTmYgjOMf/
+
+  @ucdindsoc  LLM location: Village Auditorium
+  Caption: 'Join us for a relaxing evening of film and fun! 🍿\n📍 Village Auditorium\n📅 26 Feb 2026\n⏰ 18:00 – 21:00\nSee you there!'
+  https://www.instagram.com/p/DVHGtCtglDg/
+
+  @ucditaliansoc  LLM location: Blue Room
+  Caption: 'Ciao! \n\nJoin us for a cozy Coffee Morning with Società Italiana ☕✨\nCome along for a cup, a chat, and a relaxed start to'
+  https://www.instagram.com/p/DU28xz0jSM1/
+
+  @ucditaliansoc  LLM location: Brava Lounge
+  Caption: 'Ciao! 💌\nJoin us for a cosy Valentine’s Day morning of card making and pastries at Brava Lounge 🥐✨\nCome along to get crea'
+  https://www.instagram.com/p/DUoNCXGDSd9/
+
+  @ucdlawsoc  LLM location: Fitzgerald Chamber
+  Caption: 'FLOAT EU DEBATE TUESDAY 24TH IN THE FITZGERALD CHAMBER!! \n\nWith guests:\nCllr. Michael Clark\nDean of Law Imelda Maher\nBar'
+  https://www.instagram.com/p/DVHOEIlDZ55/
+
+  @ucdlnh  LLM location: FitzGerald Chamber
+  Caption: 'THB WOMEN’S CONTRIBUTIONS TO HISTORY HAVE BEEN ERASED 🖋️💪\n\nThey say “Behind every great man is a great woman” but what h'
+  https://www.instagram.com/p/DVE0ERHjX2M/
+
+  @ucdlnh  LLM location: Newman Building
+  Caption: 'LnH Coffee Morning today! ☕️\n\nMake sure to join us today outside Theatre L in the Newman Building from 11:45am for some'
+  https://www.instagram.com/p/DVN42ckjXXk/
+
+  @ucdlnh  LLM location: FitzGerald Chamber
+  Caption: "This week we were on campus asking students what they think about women's place in history with @ucdlnhfinlay ! 💜\n\nTomor"
+  https://www.instagram.com/p/DVMhfJyDS27/
+
+  @ucdlitsoc  LLM location: Meeting Rooms 5/6/7
+  Caption: '𝚆𝚎𝚎𝚔 𝟼 𝚠𝚒𝚝𝚑 𝙻𝚒𝚝𝚂𝚘𝚌! 📚✨ \u200b\n\n𝙷𝚎𝚛𝚎 𝚒𝚜 𝚎𝚟𝚎𝚛𝚢𝚝𝚑𝚒𝚗𝚐 𝚑𝚊𝚙𝚙𝚎𝚗𝚒𝚗𝚐 𝚘𝚟𝚎𝚛 𝚝𝚑𝚎 𝚗𝚎𝚡𝚝 𝚏𝚎𝚠 𝚍𝚊𝚢𝚜: \u200b\n\n• 𝙼𝚘𝚗𝚍𝚊𝚢: 𝙲𝚘𝚏𝚏𝚎𝚎 𝙼𝚘𝚛𝚗𝚒𝚗𝚐! ☕️ | 𝙼𝚎𝚎𝚝𝚒𝚗𝚐'
+  https://www.instagram.com/p/DVF8VLICLDj/
+
+  @ucdlitsoc  LLM location: Blue Room
+  Caption: '𝚆𝚎𝚎𝚔 𝟻 𝚠𝚒𝚝𝚑 𝙻𝚒𝚝𝚂𝚘𝚌! 📚✨ \n\n𝙷𝚎𝚛𝚎 𝚒𝚜 𝚎𝚟𝚎𝚛𝚢𝚝𝚑𝚒𝚗𝚐 𝚑𝚊𝚙𝚙𝚎𝚗𝚒𝚗𝚐 𝚘𝚟𝚎𝚛 𝚝𝚑𝚎 𝚗𝚎𝚡𝚝 𝚏𝚎𝚠 𝚍𝚊𝚢𝚜:\xa0 \u200b \n\n• 𝙼𝚘𝚗𝚍𝚊𝚢: 𝙲𝚘𝚏𝚏𝚎𝚎 𝙼𝚘𝚛𝚗𝚒𝚗𝚐! ☕ | 𝙱𝚕𝚞𝚎 𝚁𝚘'
+  https://www.instagram.com/p/DU2z6EoCCrE/
+
+  @ucdlitsoc  LLM location: Global Lounge
+  Caption: '🗞️ 𝚆𝙴𝙴𝙺 𝟷 𝚆𝙸𝚃𝙷 𝙻𝙸𝚃𝚂𝙾𝙲\n\n 🗞️ 𝚆𝚎𝚕𝚌𝚘𝚖𝚎 𝚋𝚊𝚌𝚔!! 📚\n\n✨ 𝚆𝚎’𝚛𝚎 𝚜𝚝𝚊𝚛𝚝𝚒𝚗𝚐 𝚝𝚑𝚎 𝚜𝚎𝚖𝚎𝚜𝚝𝚎𝚛 𝚠𝚒𝚝𝚑 𝚝𝚠𝚘 𝚟𝚎𝚛𝚢 𝚒𝚖𝚙𝚘𝚛𝚝𝚊𝚗𝚝 𝚎𝚟𝚎𝚗𝚝𝚜: \n\n𝙼𝙾𝙽𝙳𝙰𝚈 🍕 𝙰𝚛'
+  https://www.instagram.com/p/DTrz4DgiKKz/
+
+  @ucdlitsoc  LLM location: Global Lounge
+  Caption: '🗞️ 𝙱𝚁𝙴𝙰𝙺𝙸𝙽𝙶 𝙽𝙴𝚆𝚂 🗞️ 𝙸𝚝’𝚜 𝙼𝙸𝚇𝙴𝚁 𝚃𝙸𝙼𝙴! \n\n🍕 𝚃𝚑𝚎 𝚂𝚄 𝚒𝚜 𝚑𝚘𝚜𝚝𝚒𝚗𝚐 𝚊𝚗 𝙰𝚛𝚝𝚜 & 𝙷𝚞𝚖𝚊𝚗𝚒𝚝𝚒𝚎𝚜 𝙼𝚒𝚡𝚎𝚛 𝚝𝚑𝚒𝚜 𝙼𝚘𝚗𝚍𝚊𝚢! \n\n𝙰𝚛𝚝𝚜 & 𝙷𝚞𝚖𝚊𝚗𝚒𝚝𝚒𝚎𝚜 𝚜'
+  https://www.instagram.com/p/DTql9-djsmR/
+
+  @ucdlivingstones  LLM location: Agriculture Science Building
+  Caption: '✨ This Week at Livingstones ✨\nHello everyone, welcome back to a new week! We’ve got some exciting events coming up and w'
+  https://www.instagram.com/p/DVGdU-mDDcK/
+
+  @ucdlivingstones  LLM location: Room FS-G01 in the Agriculture Building
+  Caption: "Join us for a special Valentine's Day event this Wednesday at 6:15 pm in  Room FS-G01 in the Agriculture Building. We'll"
+  https://www.instagram.com/p/DUg649JjAYO/
+
+  @ucdmechsoc  LLM location: Room 121, Engineering Building
+  Caption: 'Dear 3rd Years!!\nChoosing your Masters? 🤔🎓\n\nJoin Mech Soc for our Masters Stream Information Night - hear from current m'
+  https://www.instagram.com/p/DUtJauqDNN3/
+
+  @ucdmechsoc  LLM location: null
+  Caption: '💻CAD Workshop this Thursday!\n\nJoin Master’s student Luke Dunne for a Fusion 360 masterclass! Whether you’re new to CAD o'
+  https://www.instagram.com/p/DUjfda-DEYw/
+
+  @ucdmechsoc  LLM location: Room 326, Engineering Building
+  Caption: '🚀 Careers Talk Alert!\nWe’re excited to welcome Tritech and IPS to UCD MechSoc for a special careers session! 🤝\n\nThey’ll'
+  https://www.instagram.com/p/DRMoBGKDCEh/
+
+  @ucdmusicsoc  LLM location: harmony studio
+  Caption: 'Week 4 here we come! 🎸🎶🔥\nJoin us this week for some of our amazing events we have planned!\n\nThis Tuesday the 10th of Feb'
+  https://www.instagram.com/p/DUePZgODLLS/
+
+  @ucdnetsoc  LLM location: Innovation Academy – Shackleton
+  Caption: '⚡ Netsoc Weekly Event Summary - Another stacked week ahead:\n\n🗓 Tuesday 17 Feb | 18:00–20:00 | Farmer Brown’s\n🍻 AI Pub Qu'
+  https://www.instagram.com/p/DU1FhdtCHHK/
+
+  @ucdnetsoc  LLM location: Innovation Academy – Shackleton
+  Caption: '⚡️Netsoc Weekly Round-Up — here’s what we’re up to this week!\n\n🗓 Tuesday 10 Feb | 17:00–19:00 | L2.15, O’Connor\n💼 Interv'
+  https://www.instagram.com/p/DUjZHjUCPZk/
+
+  @ucdnetsoc  LLM location: null
+  Caption: 'An afternoon of games and great fun for UCD students!\nUCD Innovation Academy and NetSoc invite you to The Great Game Gat'
+  https://www.instagram.com/p/DUYNHSjjbQW/
+
+  @ucdnetsoc  LLM location: Innovation Academy – Shackleton
+  Caption: '🎮✨ Program Better & Jam ✨🎮\n📅 Friday 6 Feb\n⏰ 16:00–18:00\n📍 Innovation Academy – Shackleton\n\nBring your team or make one a'
+  https://www.instagram.com/p/DUUF57xiOZD/
+
+  @namsocucd  LLM location: Harmony
+  Caption: 'COME JOIN US FOR FREE COOKIES ON THE 4TH OF FEBUARY IN HARMONY💙💙💙💙\n\n@ucdsocieties @snmhs.official @scoopsandhoops.ie'
+  https://www.instagram.com/p/DUUHMiCiNo6/
+
+  @ucdphdsociety  LLM location: Fitzgerald Chamber
+  Caption: '🎃 Halloween Movie Night 🎃\n\u2028Join us for a spooky evening at Fitzgerald Chamber on 24 October!\n\u2028We’ll provide the popcorn—'
+  https://www.instagram.com/p/DQElkgsiG7s/
+
+  @ucdphdsociety  LLM location: UCD Village
+  Caption: '🎓 UCD PhD Society – September Events! 🎉\n\n☕ Sept 9, 10:00 – Coffee Morning @ Global Lounge\n🎭 Sept 19, 18:00 – Culture Nig'
+  https://www.instagram.com/p/DOWIS3hiPDu/
+
+  @ucdphilsoc  LLM location: Harmony Studio
+  Caption: 'this week brings our long awaited EGM, so if you have any interest in being on the committee or deciding who will be, pl'
+  https://www.instagram.com/p/DUT7P1kDIZn/
+
+  @physics_society_ucd  LLM location: Meeting Rooms in the Student Centre
+  Caption: 'Hey PhysSoc ⚛️🌟\n\nBelated short but sweet itinerary for this week mloves 💥💃 \n\nCome by Meeting Rooms in the Student Centre'
+  https://www.instagram.com/p/DVKKNQUAi39/
+
+  @physics_society_ucd  LLM location: Red Room
+  Caption: 'Hey PhysSoc, welcome to yet another glorious week!\n\nBoy do we have a busy Thursday 19th for you 🌟💃 come along to our cof'
+  https://www.instagram.com/p/DUzQmmEgn7w/
+
+  @physics_society_ucd  LLM location: Science East
+  Caption: 'Is it magic? ✨ Or is it something even better… #physics \n\nCome witness the wonders of liquid nitrogen as we, your humble'
+  https://www.instagram.com/p/DUjlG4WAkuc/
+
+  @ucdpolsoc  LLM location: Newman Theater L
+  Caption: "Polsoc coffee morning! ☕\n\nMake sure to join us for this week's coffee morning in front of Newman Theater L!\n\n #ucdsocial"
+  https://www.instagram.com/p/DVJMKU1CGN2/
+
+  @ucdpolsoc  LLM location: outside Theatre L, Newman building
+  Caption: 'You know it, you love it! 🙌\n\nPolsoc is BACK with our weekly coffee morning tomorrow, Wednesday the 21st from 10am to 12p'
+  https://www.instagram.com/p/DU2z_yMCEhk/
+
+  @ucdpolsoc  LLM location: outside of Theatre L in Newman
+  Caption: 'Week 5 with Polsoc is HERE! 💥\n\nWe have a jam packed week of events for you guys, from our MEP panel with Aodhan O’Riorda'
+  https://www.instagram.com/p/DUyvKzpCFKv/
+
+  @psychsocietyucd  LLM location: Harmony Studio
+  Caption: 'GAMES DAY GAMES DAY ‼️‼️🗣️🗣️🗣️\n\nGuys come to some chillaxed game time where to get to play your favourite board games an'
+  https://www.instagram.com/p/DVIseNViMcG/
+
+  @psychsocietyucd  LLM location: Harmony studio
+  Caption: 'Coffee morning time!!! Stop by today @ 10am!! \n\nIn the Harmony studio 💜💜\nCoffee, Berry green and peppermint tea, hot cho'
+  https://www.instagram.com/p/DVGDzVsCDxx/
+
+  @psychsocietyucd  LLM location: Fitzgerald Chamber
+  Caption: 'Tomorrow @ 11am in the Fitzgerald Chamber we have our most anticipated event ‼️ \n\nAdam Harris, the founder of the @asiam'
+  https://www.instagram.com/p/DVFDZj5iOmP/
+
+  @psychsocietyucd  LLM location: Harmony
+  Caption: 'Welcome to Week 6 ✨✨\n\nFun and anticipatory events coming your way ~\nTomorrow we have two consecutive events!! \n☕🫖 Coffee'
+  https://www.instagram.com/p/DVEo3h5iB7Z/
+
+  @ucdsocscistudents  LLM location: Newman Building
+  Caption: 'As our last one was a huge success… Our SECOND Social Sciences Café is happening TOMORROW! ✨☕\n\nJoin us on Wednesday 25th'
+  https://www.instagram.com/p/DVIwttNDOPM/
+
+  @ucdsocscistudents  LLM location: Newman Building
+  Caption: 'You’re very welcome to join us for the first Social Sciences Café of the trimester - a relaxed coffee morning for Social'
+  https://www.instagram.com/p/DUacVzGDFCu/
+
+  @ucdvnsoc  LLM location: Vet 101B
+  Caption: 'IVNA talk on Thursday the 20th!\nEveryone is welcome and we could love to see you all there!💚💚 Thursday the 20th at 6pm i'
+  https://www.instagram.com/p/DGNbt9CMQbZ/
+
+  @womeninstem_ucd  LLM location: Astra Hall
+  Caption: 'Calling all gals 💕✨\n\nWe’re hosting a Galentine’s Brunch with @ucdwib and it’s going to be so much fun 💖\n\nExpect photoboo'
+  https://www.instagram.com/p/DUk435Jgtdw/
+

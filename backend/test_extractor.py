@@ -152,6 +152,142 @@ test_cases = [
         True,
         "L3: village kitchen → on-campus location recognised"
     ),
+
+    # ── Phase A new test cases ─────────────────────────────────────────────────
+
+    # A3: Past-tense recap — should be REJECTED
+    (
+        "Thanks for coming to our event last night — pizza was amazing! See you next time 🍕",
+        False,
+        "A3-1: past-tense recap — 'thanks for coming' + 'pizza was amazing'"
+    ),
+    (
+        "Hope everyone had a great time! We served some delicious coffee and cake 🎂",
+        False,
+        "A3-2: past-tense — 'hope everyone had' triggers recap filter"
+    ),
+    (
+        "What a brilliant evening! Great to see everyone who joined us 🙌",
+        False,
+        "A3-3: past-tense — 'great to see everyone' without food still shouldn't sneak through"
+    ),
+
+    # A3: Future-tense posts with past-sounding words — should NOT be rejected
+    (
+        "We've been busy planning our coffee morning this Friday! Biscuits and tea provided, Newman 2pm.",
+        True,
+        "A3-4: 'we've been' is present-perfect, not a recap — should ACCEPT"
+    ),
+
+    # A5: Staff/committee-only — should be REJECTED
+    (
+        "Exec training session this Saturday — lunch provided for committee members only.",
+        False,
+        "A5-1: exec training + committee members only → staff filter"
+    ),
+    (
+        "Committee only meeting tonight! Pizza provided. Engineering Building 6pm.",
+        False,
+        "A5-2: 'committee only' → staff filter fires"
+    ),
+    (
+        "Volunteers only event — sandwiches and drinks. Student Centre 5pm.",
+        False,
+        "A5-3: 'volunteers only' → staff filter"
+    ),
+
+    # A5: General society meeting (NOT committee-only) — should ACCEPT
+    (
+        "General meeting open to all members! Tea and biscuits provided. Newman 7pm.",
+        True,
+        "A5-4: open to all members — not committee-only → ACCEPT"
+    ),
+
+    # A6: Score-based paid penalty — small fee without ticket language should ACCEPT
+    (
+        "UCD 5K Fun Run — €5 registration, refreshments provided afterwards! All welcome.",
+        True,
+        "A6-1: €5 registration (no ticket language) + refreshments → ACCEPT"
+    ),
+    (
+        "Coffee morning this Friday — €2 suggested donation, biscuits and tea available. Newman 10am.",
+        True,
+        "A6-2: €2 suggested donation + coffee/biscuits → ACCEPT"
+    ),
+
+    # A6: Membership price with member context — should ACCEPT
+    (
+        "UCD Economics Society members welcome! Annual membership €3. Free pizza at our first meeting.",
+        True,
+        "A6-3: membership €3 + member context + free pizza → ACCEPT"
+    ),
+
+    # A6: Large price (€15) without free-food → should REJECT
+    (
+        "Society Christmas dinner €15 per head — 3-course meal. Student Centre Friday.",
+        False,
+        "A6-4: €15 dinner, no free-food override → REJECT"
+    ),
+
+    # A6: Ticket language with price → should REJECT
+    (
+        "Get your tickets now — €8 a pop, includes refreshments! Book via link in bio.",
+        False,
+        "A6-5: 'get your tickets' + €8 → REJECT (ticket language)"
+    ),
+
+    # A6: €30 fundraiser gala → should REJECT (fundraiser hard-blocks even with free pizza mention)
+    (
+        "Gala fundraiser dinner €30 per person. Free pizza reception beforehand for all! Student Centre 7pm.",
+        False,
+        "A6-6: €30 fundraiser gala — 'fundraiser' hard-blocks; free pizza mention doesn't override"
+    ),
+
+    # A2: Context modifiers — "included", "on us", "kindly sponsored"
+    (
+        "Tea, coffee and snacks will be provided at our next meeting. Newman Building Tuesday 6pm.",
+        True,
+        "A2-1: 'provided' context modifier + tea/coffee/snacks → ACCEPT"
+    ),
+    (
+        "Lunch is included for all attendees. Join us at the Student Centre Thursday.",
+        True,
+        "A2-2: 'included' context modifier + lunch → ACCEPT"
+    ),
+    (
+        "Coffee and biscuits on us! Come to our open session at the Science Building Friday.",
+        True,
+        "A2-3: 'on us' context modifier + coffee/biscuits → ACCEPT"
+    ),
+    (
+        "Kindly sponsored refreshments at our talk. UCD O'Brien Centre Thursday 5pm.",
+        True,
+        "A2-4: 'kindly sponsored' context modifier + refreshments → ACCEPT"
+    ),
+
+    # A4: Implied-free event types
+    (
+        "Welcome Reception for all new UCD students! Student Centre Monday 3pm.",
+        True,
+        "A4-1: 'welcome reception' implied-free event type → ACCEPT"
+    ),
+    (
+        "UCD Freshers Fair this week! Come visit all the societies. Astra Hall.",
+        True,
+        "A4-2: 'freshers fair' implied-free event type → ACCEPT"
+    ),
+
+    # Members-only: should ACCEPT with flag (not rejected as paid/restricted)
+    (
+        "For members only 🍕 Pizza night this Thursday. Engineering Building 7pm.",
+        True,
+        "Members-1: 'for members only' + pizza → ACCEPT (members_only flag set)"
+    ),
+    (
+        "Members welcome! Sandwiches and soft drinks provided. Newman G15 Wednesday 5pm.",
+        True,
+        "Members-2: 'members welcome' + sandwiches → ACCEPT"
+    ),
 ]
 
 passed = 0

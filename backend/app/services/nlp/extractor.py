@@ -179,13 +179,23 @@ class EventExtractor:
             'food and drinks', 'food and drink', 'food & drinks', 'food & drink',
             'food on the night',
             'grub', 'munchies',
+            # Implied-free event types (cultural norm at UCD — these events always have food)
+            'welcome reception', 'freshers fair', "fresher's fair",
+            'open evening',
         ]
         # Weak food indicators — only count if "free", "provided", or "complimentary"
-        # also appears somewhere in the text
+        # (or other context modifiers) also appears somewhere in the text
         self.weak_food_keywords = [
             'food', 'lunch', 'dinner', 'breakfast', 'drinks', 'drink',
             'snack', 'tea', 'coffee',
             'refreshers',   # demoted: "Refreshers Week" posts have no food mention
+        ]
+        # Context modifiers that make weak food keywords count as sufficient evidence.
+        # Extends the original {"free", "provided", "complimentary"} set.
+        self.context_modifiers = [
+            'provided', 'complimentary', 'included', 'on us', 'on the house',
+            'kindly sponsored', 'brought to you by', 'at no cost', 'at no charge',
+            'for free',
         ]
         
     
@@ -505,7 +515,7 @@ class EventExtractor:
         """
         # Preprocess text
         clean_text = self._preprocess_text(text)
-        
+
         logger.debug(f"Classifying text: {clean_text[:100]}...")
 
         # Iftar block: exclude regardless of other food keywords
@@ -514,21 +524,31 @@ class EventExtractor:
             logger.debug("REJECT: Iftar/religious event")
             return False
 
-        # Rule 1: MUST have explicit food keyword
+        # A3: Past-tense recap filter — before food detection (cheaper, high precision)
+        if self._is_past_tense_post(clean_text):
+            logger.debug("REJECT: Past-tense recap post")
+            return False
+
+        # Rule 1: MUST have explicit food keyword (A2: now uses richer context modifiers)
         if not self._has_explicit_food(clean_text):
             logger.debug("REJECT: No explicit food keyword")
             return False
-        
+
         # Rule 1.5: NOT a food activity workshop/competition
         if self._is_food_activity(clean_text):
             logger.debug("REJECT: Food activity workshop")
+            return False
+
+        # A5: Staff/committee-only filter
+        if self._is_staff_only(clean_text):
+            logger.debug("REJECT: Staff/committee-only event")
             return False
 
         # Rule 2: MUST NOT be other college
         if self._is_other_college(clean_text):
             logger.debug("REJECT: Other college mentioned")
             return False
-        
+
         # Rule 3: MUST NOT be off-campus (EXPLICIT rejection)
         if self._is_off_campus(clean_text):
             logger.debug("REJECT: Off-campus venue mentioned")
@@ -539,11 +559,11 @@ class EventExtractor:
             logger.debug("REJECT: Online/virtual event with no UCD location")
             return False
 
-        # Rule 4: MUST NOT be paid (except €2 membership)
+        # Rule 4: MUST NOT be paid (A6: score-based, not purely binary)
         if self._is_paid_event(clean_text):
             logger.debug("REJECT: Paid event indicator")
             return False
-        
+
         # Rule 5: MUST NOT be nightlife event
         if self._is_nightlife_event(clean_text):
             logger.debug("REJECT: Nightlife event")
@@ -605,11 +625,11 @@ class EventExtractor:
         if any(kw in text for kw in self.strong_food_keywords):
             return True
 
-        # Weak keywords only count when "free", "provided", "complimentary",
-        # or "we'll bring/have/provide/serve" is present
+        # Weak keywords only count when a free/provision context modifier is present
         has_free_context = (
-            'free' in text or 'provided' in text or 'complimentary' in text or
-            bool(re.search(r"\bwe.(?:ll|will)\s+(?:be\s+)?(?:bring(?:ing)?|have|provide|serve|supply)\b", text))
+            'free' in text
+            or any(mod in text for mod in self.context_modifiers)
+            or bool(re.search(r"\bwe.(?:ll|will)\s+(?:be\s+)?(?:bring(?:ing)?|have|provide|serve|supply)\b", text))
         )
         if has_free_context and any(kw in text for kw in self.weak_food_keywords):
             return True
@@ -654,13 +674,17 @@ class EventExtractor:
     
     def _is_paid_event(self, text: str) -> bool:
         """
-        Check if text indicates a paid event.
+        Return True only if the event is clearly a paid-access event.
 
-        Allow €2 membership. Ignore price mentions that are explicitly negated.
-        Removed 'cost', 'price', 'pay' as standalone keywords — too many false
-        positives ("no cost", "you don't need to pay", "free of charge").
+        Improvements over original binary approach:
+        - Small amounts (≤€5) without explicit ticket/admission language are NOT
+          rejected — catches "€5 registration, refreshments provided" cases.
+        - Membership context with reasonable price (≤€5) is always allowed.
+        - Hard reject only for: explicit ticket language + any price, OR amounts ≥€10
+          without an explicit free-food override.
+        - Food-sale keywords (bake sale, fundraiser) are always hard-rejected.
         """
-        # Explicit "it's free" overrides — check these first
+        # Step 1: Free overrides — explicit "free" / "no ticket needed" etc.
         free_overrides = [
             r'\bfree\s+(?:of\s+)?(?:charge|cost|entry|admission)\b',
             r'\bno\s+(?:entry\s+)?(?:fee|cost|charge)\b',
@@ -674,30 +698,41 @@ class EventExtractor:
                 logger.debug(f"Free override matched: {pattern}")
                 return False
 
-        # Allow €2 membership only
-        if re.search(r'€2\b|\beuro\s+2\b|\b2\s*euro\b', text) or '€2' in text:
-            if any(word in text for word in ['membership', 'ucard', 'sign up', 'member']):
-                euro_matches = re.findall(r'€\d+|\beuro\s+\d+|\b\d+\s*euro', text)
-                if len(euro_matches) == 1:
-                    logger.debug("Found €2 membership - allowed")
-                    return False
+        # Step 2: Membership context — allow any price ≤€5 (UCD membership fees vary)
+        is_member_context = bool(re.search(r'\b(?:membership|ucard)\b', text))
+        euro_amounts = [int(x) for x in re.findall(r'€(\d+)', text)]
+        if is_member_context and euro_amounts and all(a <= 5 for a in euro_amounts):
+            logger.debug("Found membership price ≤€5 — allowed")
+            return False
 
-        # Reject any other explicit € price
-        if re.search(r'€\d+|\beuro\s+\d+|\b\d+\s*euro', text):
-            logger.debug("Found price indicator")
+        # Step 3: Explicit ticket / admission language → always paid
+        # (even without a price, registering for "tickets" implies a paid event)
+        has_ticket_language = bool(re.search(
+            r'\b(?:tickets?|admission|entry\s+fee|buy\s+(?:your\s+)?tickets?|get\s+(?:your\s+)?tickets?)\b',
+            text
+        ))
+        if has_ticket_language:
+            logger.debug("Found ticket/admission language")
             return True
 
-        # Reject ticket/entry fee keywords (not 'cost'/'price'/'pay' — too broad)
-        # Also reject food sale events (bake/cake/cookie sales) — food isn't free
-        # Also reject fundraisers — selling food, not giving it away
-        paid_keywords = [
-            'ticket', 'tickets', 'entry fee', 'admission',
+        # Step 4: Large price (≥€10) without an explicit free-food statement → paid
+        if euro_amounts and max(euro_amounts) >= 10:
+            has_free_food_stated = bool(re.search(
+                r'\bfree\s+(?:food|pizza|lunch|dinner|snacks?|refreshments?|drinks?|coffee|tea|breakfast)\b',
+                text
+            ))
+            if not has_free_food_stated:
+                logger.debug(f"Found large price €{max(euro_amounts)} with no free-food override")
+                return True
+
+        # Step 5: Food-sale keywords — food is sold, not given away
+        food_sale_keywords = [
             'bake sale', 'cake sale', 'cookie sale', 'food sale', 'food stall',
             'fundraiser', 'charity sale', 'charity bake',
         ]
-        for keyword in paid_keywords:
+        for keyword in food_sale_keywords:
             if keyword in text:
-                logger.debug(f"Found paid keyword: {keyword}")
+                logger.debug(f"Found food-sale keyword: {keyword}")
                 return True
 
         return False
@@ -760,6 +795,51 @@ class EventExtractor:
             r'\bfor\s+members\b',
             r'\bmembers\s+only\b',
             r'\bonly\s+for\s+members\b',
+            r'\bmembers\s+welcome\b',
+            r'\bjoin.*\bmember\b.*\battend\b',
+        ]
+        return any(re.search(p, text, re.IGNORECASE) for p in patterns)
+
+    def _is_past_tense_post(self, text: str) -> bool:
+        """
+        Return True if the post is a recap of a PAST event rather than a future
+        announcement — e.g. "Thanks for coming — pizza was amazing!"
+
+        Only fires on patterns that clearly indicate a past-event framing, so as not
+        to reject posts that use incidental past-tense ("we've been hosting...").
+        """
+        past_patterns = [
+            # Explicit thank-you for attending
+            r'\b(?:thanks|thank\s+you)\s+(?:to\s+(?:all|everyone)\s+)?(?:who\s+)?(?:came|joined|attended|turned\s+up|showed\s+up|came\s+out)\b',
+            # Positive recap phrasing
+            r'\bwhat\s+a\s+(?:great|amazing|wonderful|brilliant|fantastic)\s+(?:night|evening|day|event|time)\b',
+            r'\bhope\s+(?:everyone|you\s+all)\s+(?:had|enjoyed)\b',
+            r'\bgreat\s+(?:to\s+see|seeing)\s+(?:everyone|you\s+all)\b',
+            # Food described in past tense as having been consumed
+            r'\b(?:food|pizza|snacks?|refreshments?|coffee|tea|cake|sandwiches?)\s+(?:were?|was)\s+(?:amazing|great|delicious|lovely|tasty|so\s+good|perfect|a\s+hit)\b',
+            r'\bwe\s+(?:had|served|enjoyed)\s+(?:some\s+)?(?:amazing|great|delicious|lovely)?\s*(?:food|pizza|snacks?|refreshments?|coffee|tea|cake|sandwiches?)\b',
+        ]
+        return any(re.search(p, text, re.IGNORECASE) for p in past_patterns)
+
+    def _is_staff_only(self, text: str) -> bool:
+        """
+        Return True if the event is restricted to committee/exec/volunteers/staff
+        only — i.e. NOT open to general students.
+
+        Distinct from _is_members_only: 'members' = society members = open students;
+        'committee/exec/volunteers' = closed internal group.
+
+        Keeps false-positive risk low by requiring explicit "only" or activity-specific
+        words alongside the committee/exec identifier.
+        """
+        patterns = [
+            r'\b(?:committee|exec(?:utive)?)\s+(?:members?\s+)?only\b',
+            r'\bfor\s+(?:committee|exec(?:utive)?)\s+members?\s+only\b',
+            r'\bvolunteers?\s+only\b',
+            r'\bstaff\s+only\b',
+            r'\bboard\s+(?:of\s+(?:directors|trustees)\s+)?(?:meeting|only)\b',
+            r'\bexec(?:utive)?\s+(?:meeting|training|session)\b',
+            r'\bcommittee\s+training\b',
         ]
         return any(re.search(p, text, re.IGNORECASE) for p in patterns)
 
@@ -788,11 +868,17 @@ class EventExtractor:
         if any(kw in clean_text for kw in _iftar_kw):
             return "Iftar/religious event"
 
+        if self._is_past_tense_post(clean_text):
+            return "Past-tense recap post (not an upcoming event)"
+
         if not self._has_explicit_food(clean_text):
             return "No explicit food keyword found"
 
         if self._is_food_activity(clean_text):
             return "Food activity workshop/competition (not free food)"
+
+        if self._is_staff_only(clean_text):
+            return "Staff/committee-only event (not open to students)"
 
         if self._is_other_college(clean_text):
             for college in self.other_colleges:
