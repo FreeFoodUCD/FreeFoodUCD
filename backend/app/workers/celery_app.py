@@ -1,3 +1,5 @@
+import sentry_sdk
+from sentry_sdk.integrations.celery import CeleryIntegration
 from celery import Celery
 from celery.schedules import crontab
 from celery.signals import worker_process_init, worker_process_shutdown
@@ -5,6 +7,14 @@ from app.core.config import settings
 import logging
 
 logger = logging.getLogger(__name__)
+
+# Initialise Sentry for Celery workers (no-op if SENTRY_DSN is unset)
+if settings.SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=settings.SENTRY_DSN,
+        environment=settings.ENVIRONMENT,
+        integrations=[CeleryIntegration()],
+    )
 
 # Create Celery app
 celery_app = Celery(

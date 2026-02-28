@@ -1,11 +1,17 @@
+import sentry_sdk
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 from app.core.config import settings
+from app.core.limiter import limiter
 from app.api.v1.api import api_router
 
+# Initialise Sentry before anything else (no-op if SENTRY_DSN is unset)
+if settings.SENTRY_DSN:
+    sentry_sdk.init(dsn=settings.SENTRY_DSN, environment=settings.ENVIRONMENT)
+
 # Create FastAPI application
-_is_prod = True  # overridden to False in dev via ENVIRONMENT env var below
-# We evaluate this after settings is imported (settings.ENVIRONMENT is "production" in Railway)
 from app.core.config import settings as _settings
 _is_prod = _settings.ENVIRONMENT == "production"
 
@@ -17,14 +23,18 @@ app = FastAPI(
     redoc_url=None if _is_prod else "/redoc",
 )
 
+# Rate limiting
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.allowed_origins_list,
     allow_origin_regex=r"https://freefooducd.*\.vercel\.app",
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "X-Admin-Key", "Authorization"],
 )
 
 # Include API router

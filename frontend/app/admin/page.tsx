@@ -222,7 +222,7 @@ export default function AdminDashboard() {
 
   // Check if admin key is stored
   useEffect(() => {
-    const storedKey = localStorage.getItem('admin_key');
+    const storedKey = sessionStorage.getItem('admin_key');
     if (storedKey) {
       setAdminKey(storedKey);
       setIsAuthenticated(true);
@@ -238,7 +238,7 @@ export default function AdminDashboard() {
       });
       
       if (response.ok) {
-        localStorage.setItem('admin_key', adminKey);
+        sessionStorage.setItem('admin_key', adminKey);
         setIsAuthenticated(true);
         loadDashboardData(adminKey);
         setMessage('');
@@ -251,7 +251,7 @@ export default function AdminDashboard() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('admin_key');
+    sessionStorage.removeItem('admin_key');
     setIsAuthenticated(false);
     setAdminKey('');
   };

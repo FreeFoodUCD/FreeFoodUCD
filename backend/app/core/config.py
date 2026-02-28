@@ -46,6 +46,9 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     LOG_LEVEL: str = "INFO"
     API_V1_PREFIX: str = "/api/v1"
+
+    # Monitoring
+    SENTRY_DSN: Optional[str] = None
     
     # CORS
     ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:8000"

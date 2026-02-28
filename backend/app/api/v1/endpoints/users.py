@@ -1,16 +1,21 @@
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, Header, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from typing import Optional
 from uuid import UUID
 from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime, timedelta, timezone
-import random
+import secrets
 import string
+import hmac
+import hashlib
+import time
 
 from app.db.base import get_db
 from app.db.models import User, UserSocietyPreference
 from app.services.notifications import brevo
+from app.core.config import settings
+from app.core.limiter import limiter
 
 router = APIRouter()
 
@@ -19,7 +24,7 @@ router = APIRouter()
 class UserSignupRequest(BaseModel):
     """User signup request schema."""
     email: EmailStr = Field(..., description="Email address")
-    
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -37,7 +42,7 @@ class UserResponse(BaseModel):
     email_verified: bool
     notification_preferences: dict
     is_active: bool
-    
+
     class Config:
         from_attributes = True
 
@@ -64,12 +69,59 @@ class VerifyCodeRequest(BaseModel):
 
 
 def generate_verification_code() -> str:
-    """Generate a 6-digit verification code."""
-    return ''.join(random.choices(string.digits, k=6))
+    """Generate a 6-digit verification code using a CSPRNG."""
+    return ''.join(secrets.choice(string.digits) for _ in range(6))
+
+
+def _make_user_token(user_id: str) -> str:
+    """Create a short-lived HMAC-signed token for user authentication."""
+    expires = int(time.time()) + 3600  # 1 hour
+    message = f"{user_id}:{expires}"
+    sig = hmac.new(settings.SECRET_KEY.encode(), message.encode(), hashlib.sha256).hexdigest()
+    return f"{message}:{sig}"
+
+
+def _verify_user_token(token: str) -> Optional[str]:
+    """Verify HMAC token. Returns user_id if valid, else None."""
+    parts = token.split(":")
+    if len(parts) != 3:
+        return None
+    user_id, expires_str, sig = parts
+    try:
+        expires = int(expires_str)
+    except ValueError:
+        return None
+    if time.time() > expires:
+        return None
+    message = f"{user_id}:{expires}"
+    expected = hmac.new(settings.SECRET_KEY.encode(), message.encode(), hashlib.sha256).hexdigest()
+    if not hmac.compare_digest(sig, expected):
+        return None
+    return user_id
+
+
+async def _require_user_token(authorization: Optional[str] = Header(None)) -> str:
+    """Dependency: validates Bearer token and returns user_id."""
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Missing or invalid token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    user_id = _verify_user_token(authorization[7:])
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return user_id
 
 
 @router.post("/users/signup", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+@limiter.limit("3/10minute")
 async def signup_user(
+    request: Request,
     user_data: UserSignupRequest,
     background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db)
@@ -82,11 +134,11 @@ async def signup_user(
     query = select(User).where(User.email == user_data.email)
     result = await db.execute(query)
     existing_user = result.scalar_one_or_none()
-    
+
     # Generate verification code
     verification_code = generate_verification_code()
     code_expires = datetime.now(timezone.utc) + timedelta(minutes=10)
-    
+
     if existing_user:
         # If user exists but is not verified, resend verification code
         if not existing_user.email_verified:
@@ -94,10 +146,10 @@ async def signup_user(
             existing_user.verification_code_expires = code_expires
             await db.commit()
             await db.refresh(existing_user)
-            
+
             # Resend verification code in background
             background_tasks.add_task(brevo.send_verification_email, user_data.email, verification_code)
-            
+
             return UserResponse(
                 id=existing_user.id,
                 email=existing_user.email,
@@ -113,7 +165,7 @@ async def signup_user(
                 status_code=status.HTTP_409_CONFLICT,
                 detail="already_signed_up"
             )
-    
+
     # Create new user
     new_user = User(
         phone_number=None,
@@ -124,14 +176,14 @@ async def signup_user(
         verification_code_expires=code_expires,
         notification_preferences={"email": True}
     )
-    
+
     db.add(new_user)
     await db.commit()
     await db.refresh(new_user)
-    
+
     # Send verification code via Brevo in background (returns immediately)
     background_tasks.add_task(brevo.send_verification_email, user_data.email, verification_code)
-    
+
     return UserResponse(
         id=new_user.id,
         email=new_user.email,
@@ -146,16 +198,20 @@ async def signup_user(
 @router.get("/users/{user_id}", response_model=UserResponse)
 async def get_user(
     user_id: UUID,
+    token_user_id: str = Depends(_require_user_token),
     db: AsyncSession = Depends(get_db)
 ):
     """Get user details by ID."""
+    if str(user_id) != token_user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
     query = select(User).where(User.id == user_id)
     result = await db.execute(query)
     user = result.scalar_one_or_none()
-    
+
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    
+
     return UserResponse(
         id=user.id,
         email=user.email,
@@ -171,20 +227,24 @@ async def get_user(
 async def update_user_preferences(
     user_id: UUID,
     preferences: UserPreferencesUpdate,
+    token_user_id: str = Depends(_require_user_token),
     db: AsyncSession = Depends(get_db)
 ):
     """Update user notification preferences."""
+    if str(user_id) != token_user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
     query = select(User).where(User.id == user_id)
     result = await db.execute(query)
     user = result.scalar_one_or_none()
-    
+
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    
+
     user.notification_preferences = preferences.notification_preferences
     await db.commit()
     await db.refresh(user)
-    
+
     return UserResponse(
         id=user.id,
         email=user.email,
@@ -200,17 +260,21 @@ async def update_user_preferences(
 async def update_society_preference(
     user_id: UUID,
     preference: SocietyPreferenceUpdate,
+    token_user_id: str = Depends(_require_user_token),
     db: AsyncSession = Depends(get_db)
 ):
     """Update notification preference for a specific society."""
+    if str(user_id) != token_user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
     # Check if user exists
     user_query = select(User).where(User.id == user_id)
     user_result = await db.execute(user_query)
     user = user_result.scalar_one_or_none()
-    
+
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    
+
     # Check if preference exists
     pref_query = select(UserSocietyPreference).where(
         UserSocietyPreference.user_id == user_id,
@@ -218,7 +282,7 @@ async def update_society_preference(
     )
     pref_result = await db.execute(pref_query)
     existing_pref = pref_result.scalar_one_or_none()
-    
+
     if existing_pref:
         # Update existing preference
         existing_pref.notify = preference.notify
@@ -230,74 +294,83 @@ async def update_society_preference(
             notify=preference.notify
         )
         db.add(new_pref)
-    
+
     await db.commit()
-    
+
     return {"message": "Society preference updated successfully"}
 
 # Made with Bob
 
 
 @router.post("/users/verify")
+@limiter.limit("5/10minute")
 async def verify_user(
+    request: Request,
     verify_data: VerifyCodeRequest,
     background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db)
 ):
     """
     Verify user with code sent via email.
+    Returns a short-lived Bearer token for use on authenticated user endpoints.
     """
     # Find user
     query = select(User).where(User.email == verify_data.email)
     result = await db.execute(query)
     user = result.scalar_one_or_none()
-    
+
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found"
         )
-    
+
     # Check if already verified
     if user.email_verified:
-        return {"message": "Already verified", "verified": True}
-    
+        return {
+            "message": "Already verified",
+            "verified": True,
+            "user_id": str(user.id),
+            "token": _make_user_token(str(user.id)),
+        }
+
     # Check verification code
     if not user.verification_code or not user.verification_code_expires:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="No verification code found. Please request a new one."
         )
-    
+
     # Check if code expired
     if datetime.now(timezone.utc) > user.verification_code_expires:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Verification code expired. Please request a new one."
         )
-    
+
     # Verify code
     if user.verification_code != verify_data.code:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid verification code"
         )
-    
+
     # Mark as verified
     user.email_verified = True
-    
+
     # Clear verification code
     user.verification_code = None
     user.verification_code_expires = None
-    
+
     await db.commit()
     await db.refresh(user)
-    
+
     # Send welcome email in background (returns immediately)
     background_tasks.add_task(brevo.send_welcome_email, verify_data.email)
-    
+
     return {
         "message": "Verification successful",
         "verified": True,
-        "user_id": str(user.id)
+        "user_id": str(user.id),
+        "token": _make_user_token(str(user.id)),
     }
