@@ -5,7 +5,7 @@ Uses Apify's Instagram Profile Scraper for reliable data extraction.
 
 from apify_client import ApifyClient
 from typing import List, Dict, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 import logging
 
 logger = logging.getLogger(__name__)
@@ -138,7 +138,7 @@ class ApifyInstagramScraper:
                 'caption': caption,
                 'image_url': image_urls[0] if image_urls else None,   # backwards-compat single field
                 'image_urls': image_urls,                              # new: full carousel list
-                'timestamp': timestamp or datetime.now()
+                'timestamp': timestamp or datetime.now(timezone.utc)
             }
             
         except Exception as e:
@@ -275,7 +275,7 @@ class ApifyInstagramScraper:
                 'url': item.get('url', ''),
                 'text': item.get('caption', ''),
                 'image_url': item.get('displayUrl'),
-                'timestamp': datetime.fromisoformat(item['timestamp'].replace('Z', '+00:00')) if item.get('timestamp') else datetime.now(),
+                'timestamp': datetime.fromisoformat(item['timestamp'].replace('Z', '+00:00')) if item.get('timestamp') else datetime.now(timezone.utc),
                 'expires_at': None  # Stories expire in 24h
             }
         except Exception as e:

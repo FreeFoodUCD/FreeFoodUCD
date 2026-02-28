@@ -172,6 +172,7 @@ async def _scrape_all_posts_async():
         logger.info(f"Batch returned results for {len(batch_results)}/{len(handles)} societies")
 
         total_new_posts = 0
+        batch_event_ids = []
 
         for handle_lower, posts_data in batch_results.items():
             society = society_by_handle.get(handle_lower)
@@ -222,7 +223,9 @@ async def _scrape_all_posts_async():
                 total_new_posts += 1
 
                 try:
-                    await _process_scraped_content_async("post", str(post.id))
+                    nlp_result = await _process_scraped_content_async("post", str(post.id))
+                    if nlp_result.get('event_created') and nlp_result.get('event_id'):
+                        batch_event_ids.append(nlp_result['event_id'])
                 except Exception as nlp_error:
                     logger.error(f"NLP processing failed for post {post.id}: {nlp_error}")
 
@@ -250,6 +253,14 @@ async def _scrape_all_posts_async():
                 ))
 
         await session.commit()
+
+        # Send one combined email per user for all events found this scrape run
+        if batch_event_ids:
+            try:
+                from app.workers.notification_tasks import _notify_events_batch_async
+                await _notify_events_batch_async(batch_event_ids)
+            except Exception as notify_error:
+                logger.error(f"Failed batch notification for {len(batch_event_ids)} event(s): {notify_error}")
 
         logger.info(
             f"Batch scrape complete: {total_new_posts} new posts "
@@ -296,18 +307,19 @@ async def _scrape_society_posts_async(society_id: str):
             
             posts_found = 0
             new_posts = 0
-            
+            society_event_ids = []
+
             for post_data in posts_data:
                 # Extract post ID from URL (e.g., https://instagram.com/p/ABC123/)
                 post_id = post_data['url'].split('/p/')[-1].rstrip('/')
-                
+
                 # Filter out old posts (>7 days old)
                 post_timestamp = post_data['timestamp']
                 post_age = datetime.now(timezone.utc) - post_timestamp
                 if post_age.days > 7:
                     logger.info(f"Skipping old post from @{society.instagram_handle}: {post_age.days} days old")
                     continue
-                
+
                 # Check if post already exists
                 existing_query = select(Post).where(
                     Post.society_id == society.id,
@@ -315,11 +327,11 @@ async def _scrape_society_posts_async(society_id: str):
                 )
                 result = await session.execute(existing_query)
                 existing_post = result.scalar_one_or_none()
-                
+
                 if existing_post:
                     logger.debug(f"Post already exists: {post_data['url']}")
                     continue
-                
+
                 # Create new post
                 post = Post(
                     society_id=society.id,
@@ -332,24 +344,26 @@ async def _scrape_society_posts_async(society_id: str):
                     detected_at=post_data['timestamp'],
                     processed=False
                 )
-                
+
                 session.add(post)
                 await session.flush()  # Get post ID
-                
+
                 new_posts += 1
                 posts_found += 1
-                
+
                 # Process NLP synchronously (no Celery on Railway)
                 try:
-                    await _process_scraped_content_async('post', str(post.id))
+                    nlp_result = await _process_scraped_content_async('post', str(post.id))
+                    if nlp_result.get('event_created') and nlp_result.get('event_id'):
+                        society_event_ids.append(nlp_result['event_id'])
                 except Exception as nlp_error:
                     logger.error(f"NLP processing failed for post {post.id}: {nlp_error}")
-                
+
                 logger.info(f"New post from @{society.instagram_handle}: {post_data['url']}")
-            
+
             # Update last check time
             society.last_post_check = datetime.now()
-            
+
             # Log scraping activity
             log = ScrapingLog(
                 society_id=society.id,
@@ -360,9 +374,17 @@ async def _scrape_society_posts_async(society_id: str):
             )
             session.add(log)
             await session.commit()
-            
+
+            # Send one combined email per user for all events found this run
+            if society_event_ids:
+                try:
+                    from app.workers.notification_tasks import _notify_events_batch_async
+                    await _notify_events_batch_async(society_event_ids)
+                except Exception as notify_error:
+                    logger.error(f"Failed batch notification for {len(society_event_ids)} event(s): {notify_error}")
+
             logger.info(f"Scraped {posts_found} posts from @{society.instagram_handle} ({new_posts} new)")
-            
+
             return {
                 "society": society.instagram_handle,
                 "posts_found": posts_found,
@@ -526,13 +548,6 @@ async def _process_scraped_content_async(content_type: str, content_id: str):
             
             await session.commit()
             await session.refresh(event)
-
-            # Send discovery notifications
-            try:
-                from app.workers.notification_tasks import _notify_event_async
-                await _notify_event_async(str(event.id))
-            except Exception as notify_error:
-                logger.error(f"Failed to send notifications for event {event.id}: {notify_error}")
 
             return {
                 "event_created": True,

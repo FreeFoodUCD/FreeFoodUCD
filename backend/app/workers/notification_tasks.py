@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 
 from app.workers.celery_app import celery_app
 from app.db.base import task_db_session
-from app.db.models import Event, User, UserSocietyPreference, NotificationLog
+from app.db.models import Event, Post, Society, User, UserSocietyPreference, NotificationLog
 from app.services.notifications.whatsapp import WhatsAppService
 from app.services.notifications.brevo import BrevoEmailService
 from app.core.config import settings
@@ -56,10 +56,15 @@ async def _notify_event_async(event_id: str):
         event.notification_sent_at = datetime.now(timezone.utc)
         await session.commit()
 
-        # Load society for event data
-        from app.db.models import Society
+        # Load society and source URL for event data
         society = await session.get(Society, event.society_id)
 
+        source_url = None
+        if event.source_type == 'post' and event.source_id:
+            post = await session.get(Post, event.source_id)
+            source_url = post.source_url if post else None
+
+        now = datetime.now(timezone.utc)
         event_data = {
             "society_name": society.name if society else "Unknown Society",
             "title": event.title or "Free Food Event",
@@ -69,6 +74,8 @@ async def _notify_event_async(event_id: str):
             "source_type": event.source_type or "post",
             "description": event.description or "",
             "members_only": (event.extracted_data or {}).get('members_only', False),
+            "source_url": source_url,
+            "reminder_will_fire": bool(event.start_time and event.start_time > now + timedelta(minutes=75)),
         }
 
         # Filter email users
@@ -278,6 +285,11 @@ async def _send_upcoming_event_notifications_async():
                 continue
 
             # Format event data for notifications
+            reminder_source_url = None
+            if event.source_type == 'post' and event.source_id:
+                reminder_post = await session.get(Post, event.source_id)
+                reminder_source_url = reminder_post.source_url if reminder_post else None
+
             event_data = {
                 'society_name': event.society.name if event.society else 'Unknown Society',
                 'title': event.title,
@@ -285,6 +297,7 @@ async def _send_upcoming_event_notifications_async():
                 'start_time': event.start_time.strftime('%I:%M %p') if event.start_time else 'Time TBA',
                 'date': event.start_time.strftime('%A, %B %d') if event.start_time else 'Date TBA',
                 'members_only': (event.extracted_data or {}).get('members_only', False),
+                'source_url': reminder_source_url,
             }
 
             # Send WhatsApp reminders
@@ -368,6 +381,158 @@ async def _send_upcoming_event_notifications_async():
         return {
             "events_reminded": len(upcoming_events),
             "users_notified": total_notified,
+        }
+
+
+@celery_app.task(bind=True, max_retries=3)
+def notify_events_batch(self, event_ids: list):
+    """
+    Send one combined email per user for all events found in a single scrape run.
+    Replaces per-event notify_event calls to prevent email spam when multiple events
+    are discovered in the same scrape.
+    """
+    try:
+        return asyncio.run(_notify_events_batch_async(event_ids))
+    except Exception as e:
+        logger.error(f"Error in batch event notification: {e}")
+        raise self.retry(exc=e, countdown=60 * (2 ** self.request.retries))
+
+
+async def _notify_events_batch_async(event_ids: list):
+    """
+    Async implementation of notify_events_batch.
+
+    Deduplicates eligible users across all events and sends each user one email
+    covering all events they're eligible for. Uses single-event template for 1 event,
+    multi-event template for 2+.
+    """
+    if not event_ids:
+        return {"users_notified": 0}
+
+    async with task_db_session() as session:
+        now = datetime.now(timezone.utc)
+
+        # Load all events
+        events = []
+        for eid in event_ids:
+            event = await session.get(Event, eid)
+            if event:
+                events.append(event)
+
+        if not events:
+            logger.warning(f"No events found for batch IDs: {event_ids}")
+            return {"users_notified": 0}
+
+        # Mark all events notified BEFORE sending (idempotency: safe to retry)
+        for event in events:
+            event.notified = True
+            event.notification_sent_at = now
+        await session.commit()
+
+        # Query already-notified (event_id, user_id) pairs for idempotency on retry
+        already_logged_result = await session.execute(
+            select(NotificationLog.event_id, NotificationLog.user_id).where(
+                NotificationLog.event_id.in_([e.id for e in events]),
+                NotificationLog.notification_type == 'email',
+            )
+        )
+        already_logged = {(str(row[0]), str(row[1])) for row in already_logged_result}
+
+        # Build user -> [eligible event_data] mapping across all events
+        user_events_map: dict = {}  # uid -> {'user': User, 'events': [event_data]}
+
+        for event in events:
+            source_url = None
+            if event.source_type == 'post' and event.source_id:
+                post = await session.get(Post, event.source_id)
+                source_url = post.source_url if post else None
+
+            society = await session.get(Society, event.society_id)
+            event_data = {
+                "event_id": str(event.id),
+                "society_name": society.name if society else "Unknown Society",
+                "title": event.title or "Free Food Event",
+                "location": event.location or "Location TBA",
+                "start_time": event.start_time.strftime("%I:%M %p") if event.start_time else "Time TBA",
+                "date": event.start_time.strftime("%A, %B %d") if event.start_time else "Date TBA",
+                "source_type": event.source_type or "post",
+                "description": event.description or "",
+                "members_only": (event.extracted_data or {}).get('members_only', False),
+                "source_url": source_url,
+                "reminder_will_fire": bool(event.start_time and event.start_time > now + timedelta(minutes=75)),
+            }
+
+            users = await _get_eligible_users(session, event)
+            email_users = [u for u in users if u.notification_preferences.get('email', False)]
+
+            for user in email_users:
+                uid = str(user.id)
+                eid = str(event.id)
+                if (eid, uid) in already_logged:
+                    continue  # Already sent for this event in a previous attempt
+                if uid not in user_events_map:
+                    user_events_map[uid] = {'user': user, 'events': []}
+                user_events_map[uid]['events'].append(event_data)
+
+        # Apply test email allowlist
+        if settings.NOTIFICATION_TEST_EMAILS:
+            allowlist = {e.strip().lower() for e in settings.NOTIFICATION_TEST_EMAILS.split(",")}
+            user_events_map = {
+                uid: v for uid, v in user_events_map.items()
+                if v['user'].email and v['user'].email.lower() in allowlist
+            }
+
+        if not user_events_map:
+            logger.info(f"No users to notify in batch for {len(events)} event(s)")
+            return {"users_notified": 0}
+
+        logger.info(f"Sending batch notification to {len(user_events_map)} users for {len(events)} event(s)")
+
+        email_notifier = BrevoEmailService()
+        semaphore = asyncio.Semaphore(10)
+
+        async def _send_batch(uid, entry):
+            user = entry['user']
+            user_events = entry['events']
+            async with semaphore:
+                if len(user_events) == 1:
+                    result = await email_notifier.send_event_notification(user.email, user_events[0])
+                else:
+                    result = await email_notifier.send_batch_event_notification(user.email, user_events)
+                return uid, user_events, result
+
+        outcomes = await asyncio.gather(
+            *[_send_batch(uid, entry) for uid, entry in user_events_map.items() if entry['user'].email],
+            return_exceptions=True,
+        )
+
+        log_entries = []
+        for outcome in outcomes:
+            if isinstance(outcome, Exception):
+                logger.error(f"Batch email send error: {outcome}")
+                continue
+            uid, user_events, result = outcome
+            for ed in user_events:
+                log_entries.append({
+                    'user_id': uid,
+                    'event_id': ed['event_id'],
+                    'status': 'sent' if result.get('success') else 'failed',
+                    'error': result.get('error'),
+                })
+
+        for entry in log_entries:
+            session.add(NotificationLog(
+                event_id=entry['event_id'],
+                user_id=entry['user_id'],
+                notification_type='email',
+                status=entry['status'],
+                error_message=entry.get('error'),
+            ))
+        await session.commit()
+
+        return {
+            "users_notified": len(user_events_map),
+            "events_in_batch": len(events),
         }
 
 
