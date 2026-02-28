@@ -1,4 +1,4 @@
-# FreeFoodUCD — Project Plan
+# FreeFoodUCD — NLP Plan
 
 ## What Has Been Built
 
@@ -55,7 +55,7 @@ The root causes of poor recall: keyword gaps, over-firing paid event filter, no 
 | A5 | Staff/committee-only filter → reject | `extractor.py` | **Done** |
 | A6 | Score-based paid penalty (replace binary reject) | `extractor.py` | **Done** |
 
-**Phase A is complete. All 42 regression tests pass.**
+**Phase A is complete. All 59 regression tests pass (42 original + 17 Phase A edge cases).**
 
 #### What Phase A changed in `extractor.py`
 
@@ -72,26 +72,42 @@ Also added to `config.py`:
 
 ---
 
-### Phase B — LLM Fallback (next)
+### Phase B — LLM Fallback (complete)
 
-Posts that score in the "borderline" zone under the rule-based system are routed to GPT-4o-mini for a final accept/reject decision. Only borderline posts are sent to the LLM (~30% of posts). Results are Redis-cached for 7 days so the same post is never re-classified.
+Borderline posts (weak food keyword, no context modifier, no strong keyword) are routed to GPT-4o-mini. The same call also returns location + time hints to fill gaps the rule-based extractors miss. Results are Redis-cached 7 days so the same post is never re-classified.
 
 | # | Change | File | Status |
 |---|--------|------|--------|
-| B1 | LLM fallback classifier (GPT-4o-mini, Redis-cached 7 days) | `app/services/nlp/llm_classifier.py` *(new)* | **Not started** |
+| B1 | LLM fallback classifier + extraction hints (GPT-4o-mini, Redis-cached 7 days) | `app/services/nlp/llm_classifier.py` *(new)* | **Done** |
 | B2 | Classification decision logging (food_score, paid_penalty, composite, stage_reached) | `extractor.py`, `scraping_tasks.py` | **Not started** |
 | B3 | Regression test suite as proper pytest fixtures | `tests/nlp/test_classifier.py` *(new)* | **Not started** |
 | B4 | Admin classification-stats endpoint (`borderline_rate`, `llm_call_count`) | `admin.py` | **Not started** |
 
-#### Phase B design notes
+**Phase B1 is complete. All 59 regression tests pass. `OPENAI_API_KEY` set in Railway.**
 
-- LLM is called only for borderline posts (composite score 30–65 under the scoring model).
-- LLM prompt: caption + OCR text → `{is_event: bool, confidence: 0-100, reason: str}`.
-- Flip to ACCEPT only if LLM confidence ≥ 80.
-- Redis cache key: `llm_classify:{sha256(post_url)[:16]}`, TTL 7 days.
-- Circuit breaker: >100 LLM calls/hour → disable LLM fallback + Sentry alert.
-- Estimated cost: ~$0.45/month (OpenAI credit already available).
-- `OPENAI_API_KEY` already added to config (optional; Phase A does not need it).
+#### What Phase B1 implemented
+
+**Grey zone gate** — `_has_weak_food_only()` in `extractor.py`:
+- Fires only when: weak food keyword present + no strong keyword + no free context modifier
+- Strong keywords and well-provisioned posts never touch the LLM
+
+**LLM call** — single GPT-4o-mini call per borderline post, returning `{food, location, time}`:
+- Prompt includes canonical UCD building list to constrain location output to known names
+- `max_tokens=60`, caption capped at 600 chars, `temperature=0`, JSON mode
+- ~320 tokens/call → **~$0.10/year**
+
+**Fallback flow** in `extract_event()`:
+1. `classify_event()` returns False → `_try_llm_fallback()` runs all hard filters first (staff-only, off-campus, paid, nightlife) — LLM cannot bypass safety checks
+2. If LLM returns `food: true` → event is accepted with reduced confidence (0.7 if time+location found, 0.5 otherwise; vs 1.0/0.8 for rule-based)
+3. `hints['location']` fills rule-based location gap if present
+4. `hints['time']` fills rule-based time gap if present
+5. `extracted_data['llm_assisted'] = True` stored in JSONB for audit trail
+
+**Caching + reliability:**
+- Redis cache: `llm_extract:{sha256[:16]}`, TTL 7 days
+- Circuit breaker: any exception → `None` → rule-based reject (never crashes pipeline)
+- `USE_SCORING_PIPELINE=False` in Railway → LLM entirely skipped
+- No `OPENAI_API_KEY` → singleton never created, zero API calls
 
 ---
 
@@ -107,21 +123,17 @@ Posts that score in the "borderline" zone under the rule-based system are routed
 
 ## Next Concrete Steps
 
-1. **Deploy Phase A** — push to `main`, Railway auto-deploys. Monitor the next scrape run (8am or 3pm Dublin) to confirm no regressions.
+1. **Run re-audit** — Phase A + B1 are live. Re-run `audit_classifier.py` against the latest post batch and compare precision/recall to the baseline (88.6% / 48.3%). Target: precision ≥ 95%, recall ≥ 70%.
 
-2. **Manually label 30–50 audit posts** — take posts from `backend/audit_report.txt` (mix of clear positives, borderlines, clear negatives) and label them by hand. These become the gold-standard fixtures for `tests/nlp/test_classifier.py`.
+2. **Implement Phase B2** — add per-post classification decision logging:
+   - Log `stage_reached` (which filter fired), `llm_called`, `llm_food` result to `Event.extracted_data` JSONB
+   - Enables admin audit trail without a schema change
 
-3. **Implement Phase B1** — create `backend/app/services/nlp/llm_classifier.py`:
-   - Async function `classify_with_llm(caption: str, ocr_text: str) -> dict`
-   - Redis cache with 7-day TTL
-   - Prompt: structured JSON output `{is_event, confidence, reason}`
-   - Wire into `_process_scraped_content_async` in `scraping_tasks.py` for borderline posts only
+3. **Implement Phase B4** — admin stats endpoint:
+   - `GET /admin/nlp-stats` → `{borderline_rate, llm_call_count, llm_accept_rate}` over last N scrape runs
+   - Pulls from `ScrapingLog` + `Event.extracted_data`
 
-4. **Implement Phase B2** — add classification score logging:
-   - Log `food_score`, `paid_penalty`, `composite`, `stage_reached`, `llm_called` for every post
-   - Optional: store in `Event.extracted_data` JSONB for admin audit trail
-
-5. **Run re-audit** — after Phase B is live for one week, re-run `audit_classifier.py` against the last batch of posts and compare precision/recall to baseline (88.6% / 48.3%).
+4. **Manually label 30–50 audit posts** — take posts from `backend/audit_report.txt`, label by hand, convert to gold-standard pytest fixtures in `tests/nlp/test_classifier.py` (B3).
 
 ---
 
@@ -138,6 +150,7 @@ Posts that score in the "borderline" zone under the rule-based system are routed
 | `backend/app/services/notifications/brevo.py` | Brevo email service (sole email provider) |
 | `backend/app/core/config.py` | All env-var settings (feature flags, keys) |
 | `backend/app/db/models.py` | SQLAlchemy models |
-| `backend/test_extractor.py` | 42-fixture regression test (run: `venv/bin/python test_extractor.py`) |
+| `backend/app/services/nlp/llm_classifier.py` | GPT-4o-mini classifier + extraction hints, Redis-cached |
+| `backend/test_extractor.py` | 59-fixture regression test (run: `venv/bin/python test_extractor.py`) |
 | `backend/audit_classifier.py` | LLM-based audit of full post history (silver-standard eval) |
 | `backend/audit_report.txt` | Last audit results (707 posts, GPT-4o-mini as judge) |
