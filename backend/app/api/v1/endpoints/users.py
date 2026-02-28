@@ -29,7 +29,10 @@ _rl_hits: dict[str, list[float]] = defaultdict(list)
 
 def _rate_limit(request: Request, key_suffix: str, limit: int, window: int):
     """Sliding-window rate limit. Raises 429 if IP exceeds `limit` calls in `window` seconds."""
-    ip = request.client.host if request.client else "unknown"
+    forwarded_for = request.headers.get("X-Forwarded-For")
+    ip = forwarded_for.split(",")[0].strip() if forwarded_for else (
+        request.client.host if request.client else "unknown"
+    )
     key = f"{key_suffix}:{ip}"
     now = time.time()
     cutoff = now - window
