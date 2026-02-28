@@ -244,7 +244,7 @@ You got us early - we're still fine tuning our bots. We'll notify you when we la
                 post_link_html = (
                     f'<p style="margin: 10px 0; font-size: 14px;">'
                     f'<a href="{source_url}" style="color: #6366f1; text-decoration: none;">'
-                    f'<img src="https://freefooducd.com/ig-icon.svg" width="14" height="14" style="vertical-align: middle; margin-right: 4px;" alt="Instagram"/>'
+                    f'<img src="https://freefooducd.com/ig-icon.png" width="14" height="14" style="vertical-align: middle; margin-right: 4px;" alt="Instagram"/>'
                     f'see post &rarr;</a></p>'
                 )
                 post_link_text = f"Post: {source_url}\n"
@@ -363,7 +363,7 @@ FreeFoodUCD · unsubscribe: https://freefooducd.com/unsubscribe?email={email}
                 post_link_html = (
                     f'<p style="margin: 10px 0; font-size: 14px;">'
                     f'<a href="{source_url}" style="color: #6366f1; text-decoration: none;">'
-                    f'<img src="https://freefooducd.com/ig-icon.svg" width="14" height="14" style="vertical-align: middle; margin-right: 4px;" alt="Instagram"/>'
+                    f'<img src="https://freefooducd.com/ig-icon.png" width="14" height="14" style="vertical-align: middle; margin-right: 4px;" alt="Instagram"/>'
                     f'see post &rarr;</a></p>'
                 )
                 post_link_text = f"Post: {source_url}\n"
@@ -477,7 +477,7 @@ FreeFoodUCD · unsubscribe: https://freefooducd.com/unsubscribe?email={email}
                     post_link_html = (
                         f'<p style="margin: 6px 0 0 0; font-size: 13px;">'
                         f'<a href="{source_url}" style="color: #6366f1; text-decoration: none;">'
-                        f'<img src="https://freefooducd.com/ig-icon.svg" width="13" height="13" style="vertical-align: middle; margin-right: 4px;" alt="Instagram"/>'
+                        f'<img src="https://freefooducd.com/ig-icon.png" width="13" height="13" style="vertical-align: middle; margin-right: 4px;" alt="Instagram"/>'
                         f'see post &rarr;</a></p>'
                     )
                     post_link_text = f"  Post: {source_url}\n"
