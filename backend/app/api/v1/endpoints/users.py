@@ -11,7 +11,7 @@ import hmac
 import hashlib
 import time
 
-import redis.asyncio as aioredis
+from collections import defaultdict
 
 from app.db.base import get_db
 from app.db.models import User, UserSocietyPreference
@@ -20,23 +20,25 @@ from app.core.config import settings
 
 router = APIRouter()
 
+# In-memory sliding-window rate limiter (single uvicorn worker — no shared state needed)
+_rl_hits: dict[str, list[float]] = defaultdict(list)
 
-async def _rate_limit(request: Request, key_suffix: str, limit: int, window: int):
-    """Enforce rate limit via Redis. Raises 429 if exceeded."""
-    ip = (request.client.host if request.client else "unknown")
-    key = f"rl:{key_suffix}:{ip}"
-    client = aioredis.from_url(settings.REDIS_URL)
-    try:
-        count = await client.incr(key)
-        if count == 1:
-            await client.expire(key, window)
-        if count > limit:
-            raise HTTPException(
-                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                detail="Too many requests. Please try again later.",
-            )
-    finally:
-        await client.aclose()
+
+def _rate_limit(request: Request, key_suffix: str, limit: int, window: int):
+    """Sliding-window rate limit. Raises 429 if IP exceeds `limit` calls in `window` seconds."""
+    ip = request.client.host if request.client else "unknown"
+    key = f"{key_suffix}:{ip}"
+    now = time.time()
+    cutoff = now - window
+    hits = _rl_hits[key]
+    # Evict timestamps outside the current window
+    hits[:] = [t for t in hits if t > cutoff]
+    if len(hits) >= limit:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Too many requests. Please try again later.",
+        )
+    hits.append(now)
 
 
 # Pydantic schemas
@@ -148,7 +150,7 @@ async def signup_user(
     Sign up a new user for email notifications.
     Sends verification code via email.
     """
-    await _rate_limit(request, "signup", limit=3, window=600)
+    _rate_limit(request, "signup", limit=3, window=600)
     # Check if user already exists
     query = select(User).where(User.email == user_data.email)
     result = await db.execute(query)
@@ -332,7 +334,7 @@ async def verify_user(
     Verify user with code sent via email.
     Returns a short-lived Bearer token for use on authenticated user endpoints.
     """
-    await _rate_limit(request, "verify", limit=5, window=600)
+    _rate_limit(request, "verify", limit=5, window=600)
     # Find user
     query = select(User).where(User.email == verify_data.email)
     result = await db.execute(query)
