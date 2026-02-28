@@ -18,6 +18,9 @@ from app.db.models import User, UserSocietyPreference
 from app.services.notifications import brevo
 from app.core.config import settings
 
+import logging
+logger = logging.getLogger(__name__)
+
 router = APIRouter()
 
 # In-memory sliding-window rate limiter (single uvicorn worker — no shared state needed)
@@ -33,7 +36,9 @@ def _rate_limit(request: Request, key_suffix: str, limit: int, window: int):
     hits = _rl_hits[key]
     # Evict timestamps outside the current window
     hits[:] = [t for t in hits if t > cutoff]
+    logger.warning(f"RATE_LIMIT key={key} hits_in_window={len(hits)} limit={limit}")
     if len(hits) >= limit:
+        logger.warning(f"RATE_LIMIT BLOCKED key={key}")
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail="Too many requests. Please try again later.",
