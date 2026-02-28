@@ -44,23 +44,6 @@ async def root():
     }
 
 
-@app.get("/debug-rl")
-async def debug_rate_limit(request: Request):
-    """Temporary: shows Redis rate limit key count for this IP. Remove after testing."""
-    import redis.asyncio as aioredis
-    ip = request.client.host if request.client else "unknown"
-    key = f"rl:signup:{ip}"
-    client = aioredis.from_url(settings.REDIS_URL)
-    try:
-        count = await client.incr(key)
-        ttl = await client.ttl(key)
-        if count == 1:
-            await client.expire(key, 600)
-    finally:
-        await client.aclose()
-    return {"ip": ip, "key": key, "count": count, "ttl_seconds": ttl}
-
-
 @app.get("/health")
 async def health_check():
     """Health check endpoint."""
