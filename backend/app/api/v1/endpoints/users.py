@@ -11,13 +11,32 @@ import hmac
 import hashlib
 import time
 
+import redis.asyncio as aioredis
+
 from app.db.base import get_db
 from app.db.models import User, UserSocietyPreference
 from app.services.notifications import brevo
 from app.core.config import settings
-from app.core.limiter import limiter
 
 router = APIRouter()
+
+
+async def _rate_limit(request: Request, key_suffix: str, limit: int, window: int):
+    """Enforce rate limit via Redis. Raises 429 if exceeded."""
+    ip = (request.client.host if request.client else "unknown")
+    key = f"rl:{key_suffix}:{ip}"
+    client = aioredis.from_url(settings.REDIS_URL)
+    try:
+        count = await client.incr(key)
+        if count == 1:
+            await client.expire(key, window)
+        if count > limit:
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail="Too many requests. Please try again later.",
+            )
+    finally:
+        await client.aclose()
 
 
 # Pydantic schemas
@@ -119,7 +138,6 @@ async def _require_user_token(authorization: Optional[str] = Header(None)) -> st
 
 
 @router.post("/users/signup", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-@limiter.limit("3 per 10 minutes")
 async def signup_user(
     request: Request,
     user_data: UserSignupRequest,
@@ -130,6 +148,7 @@ async def signup_user(
     Sign up a new user for email notifications.
     Sends verification code via email.
     """
+    await _rate_limit(request, "signup", limit=3, window=600)
     # Check if user already exists
     query = select(User).where(User.email == user_data.email)
     result = await db.execute(query)
@@ -303,7 +322,6 @@ async def update_society_preference(
 
 
 @router.post("/users/verify")
-@limiter.limit("5 per 10 minutes")
 async def verify_user(
     request: Request,
     verify_data: VerifyCodeRequest,
@@ -314,6 +332,7 @@ async def verify_user(
     Verify user with code sent via email.
     Returns a short-lived Bearer token for use on authenticated user endpoints.
     """
+    await _rate_limit(request, "verify", limit=5, window=600)
     # Find user
     query = select(User).where(User.email == verify_data.email)
     result = await db.execute(query)
