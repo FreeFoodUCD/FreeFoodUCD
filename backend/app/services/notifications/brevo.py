@@ -171,7 +171,7 @@ You'll get notified about free food events from UCD societies.
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Hi{f" {first_name}" if first_name else ""},</p>
 
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-                            You got us early — we're still fine tuning our bots. We'll notify you when we launch. :)
+                            You got us early - we're still fine tuning our bots. We'll notify you when we launch. :)
                         </p>
 
                         <p style="font-size: 14px; color: #6b7280; margin-top: 40px;">-FreeFoodUCD</p>
@@ -182,7 +182,7 @@ You'll get notified about free food events from UCD societies.
                 "textContent": f"""
 Hi{f" {first_name}" if first_name else ""},
 
-You got us early — we're still fine tuning our bots. We'll notify you when we launch. :)
+You got us early - we're still fine tuning our bots. We'll notify you when we launch. :)
 
 -FreeFoodUCD
                 """
@@ -223,6 +223,8 @@ You got us early — we're still fine tuning our bots. We'll notify you when we 
             location = event_data.get("location", "Location TBA")
             time = event_data.get("start_time", "Time TBA")
             date = event_data.get("date", "Date TBA")
+            source_url = event_data.get("source_url")
+            reminder_will_fire = event_data.get("reminder_will_fire", False)
 
             members_tag = ""
             if event_data.get("members_only"):
@@ -236,6 +238,27 @@ You got us early — we're still fine tuning our bots. We'll notify you when we 
 
             maps_url = f"https://www.google.com/maps/search/?api=1&query={location.replace(' ', '+')}+UCD"
 
+            post_link_html = ""
+            post_link_text = ""
+            if source_url:
+                post_link_html = (
+                    f'<p style="margin: 10px 0; font-size: 14px;">'
+                    f'<a href="{source_url}" style="color: #6366f1; text-decoration: none;">'
+                    f'<img src="https://freefooducd.com/ig-icon.svg" width="14" height="14" style="vertical-align: middle; margin-right: 4px;" alt="Instagram"/>'
+                    f'see post &rarr;</a></p>'
+                )
+                post_link_text = f"Post: {source_url}\n"
+
+            reminder_note_html = ""
+            reminder_note_text = ""
+            if reminder_will_fire:
+                reminder_note_html = """
+                <div style="margin-top: 20px; background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 16px;">&#9200;</span>
+                    <span style="font-size: 13px; color: #92400e; font-weight: 500;">we'll send you a reminder an hour before it starts</span>
+                </div>"""
+                reminder_note_text = "⏰ we'll send you a reminder an hour before it starts\n"
+
             html_content = f"""
             <!DOCTYPE html>
             <html>
@@ -244,7 +267,7 @@ You got us early — we're still fine tuning our bots. We'll notify you when we 
                     <p style="margin: 0; font-size: 20px; font-weight: 600;">free food spotted</p>
                 </div>
 
-                <div style="background: #f9fafb; border-radius: 12px; padding: 25px; margin-bottom: 20px;">
+                <div style="background: #f9fafb; border-radius: 12px; padding: 25px; margin-bottom: 16px;">
                     <h2 style="margin-top: 0; color: #111827; font-size: 20px;">{title}</h2>
                     {members_tag}
                     <div style="margin: 20px 0;">
@@ -252,8 +275,10 @@ You got us early — we're still fine tuning our bots. We'll notify you when we 
                         <p style="margin: 10px 0; font-size: 15px;">📍 <strong>Location:</strong> {location} &nbsp;<a href="{maps_url}" style="color: #059669; font-size: 13px; text-decoration: none;">Open in Google Maps ↗</a></p>
                         <p style="margin: 10px 0; font-size: 15px;">🕒 <strong>Time:</strong> {time}</p>
                         <p style="margin: 10px 0; font-size: 15px;">📅 <strong>Date:</strong> {date}</p>
+                        {post_link_html}
                     </div>
                 </div>
+                {reminder_note_html}
 
                 <div style="text-align: center; padding: 16px; color: #9ca3af; font-size: 12px; border-top: 1px solid #e5e7eb; margin-top: 24px;">
                     FreeFoodUCD &middot; <a href="https://freefooducd.com/unsubscribe?email={email}" style="color: #9ca3af;">unsubscribe</a>
@@ -270,7 +295,7 @@ Location: {location}
 Maps: {maps_url}
 Time: {time}
 Date: {date}
-
+{post_link_text}{reminder_note_text}
 ---
 FreeFoodUCD · unsubscribe: https://freefooducd.com/unsubscribe?email={email}
             """
@@ -318,6 +343,7 @@ FreeFoodUCD · unsubscribe: https://freefooducd.com/unsubscribe?email={email}
             title = event_data.get("title", "Free Food Event")
             location = event_data.get("location", "Location TBA")
             time = event_data.get("start_time", "Time TBA")
+            source_url = event_data.get("source_url")
 
             members_tag = ""
             if event_data.get("members_only"):
@@ -330,6 +356,17 @@ FreeFoodUCD · unsubscribe: https://freefooducd.com/unsubscribe?email={email}
                     </p>"""
 
             maps_url = f"https://www.google.com/maps/search/?api=1&query={location.replace(' ', '+')}+UCD"
+
+            post_link_html = ""
+            post_link_text = ""
+            if source_url:
+                post_link_html = (
+                    f'<p style="margin: 10px 0; font-size: 14px;">'
+                    f'<a href="{source_url}" style="color: #6366f1; text-decoration: none;">'
+                    f'<img src="https://freefooducd.com/ig-icon.svg" width="14" height="14" style="vertical-align: middle; margin-right: 4px;" alt="Instagram"/>'
+                    f'see post &rarr;</a></p>'
+                )
+                post_link_text = f"Post: {source_url}\n"
 
             html_content = f"""
             <!DOCTYPE html>
@@ -346,6 +383,7 @@ FreeFoodUCD · unsubscribe: https://freefooducd.com/unsubscribe?email={email}
                         <p style="margin: 10px 0; font-size: 15px;">🏛 <strong>Society:</strong> {society}</p>
                         <p style="margin: 10px 0; font-size: 15px;">📍 <strong>Location:</strong> {location} &nbsp;<a href="{maps_url}" style="color: #059669; font-size: 13px; text-decoration: none;">Open in Google Maps ↗</a></p>
                         <p style="margin: 10px 0; font-size: 15px;">🕒 <strong>Time:</strong> {time}</p>
+                        {post_link_html}
                     </div>
                 </div>
 
@@ -363,7 +401,7 @@ Society: {society}
 Location: {location}
 Maps: {maps_url}
 Time: {time}
-
+{post_link_text}
 ---
 FreeFoodUCD · unsubscribe: https://freefooducd.com/unsubscribe?email={email}
             """
@@ -393,6 +431,112 @@ FreeFoodUCD · unsubscribe: https://freefooducd.com/unsubscribe?email={email}
             
         except Exception as e:
             logger.error(f"Error sending reminder email to {email}: {str(e)}")
+            return {"success": False, "error": str(e)}
+
+
+    async def send_batch_event_notification(self, email: str, events_data: list) -> Dict:
+        """
+        Send a combined email listing multiple free food events (2+) found in one scrape.
+
+        Args:
+            email: Recipient's email address
+            events_data: List of event_data dicts (same keys as send_event_notification)
+
+        Returns:
+            Dict with success status
+        """
+        try:
+            n = len(events_data)
+
+            cards_html = ""
+            cards_text = ""
+            for event_data in events_data:
+                society = event_data.get("society_name", "Unknown Society")
+                title = event_data.get("title", "Free Food Event")
+                location = event_data.get("location", "Location TBA")
+                time = event_data.get("start_time", "Time TBA")
+                date = event_data.get("date", "Date TBA")
+                source_url = event_data.get("source_url")
+                members_only = event_data.get("members_only", False)
+
+                maps_url = f"https://www.google.com/maps/search/?api=1&query={location.replace(' ', '+')}+UCD"
+
+                members_tag = ""
+                if members_only:
+                    members_tag = """
+                        <p style="margin: 0 0 10px 0;">
+                          <span style="background: #fef3c7; color: #92400e; padding: 3px 8px;
+                                       border-radius: 20px; font-size: 11px; font-weight: 600;">
+                            &#128101; for members only
+                          </span>
+                        </p>"""
+
+                post_link_html = ""
+                post_link_text = ""
+                if source_url:
+                    post_link_html = (
+                        f'<p style="margin: 6px 0 0 0; font-size: 13px;">'
+                        f'<a href="{source_url}" style="color: #6366f1; text-decoration: none;">'
+                        f'<img src="https://freefooducd.com/ig-icon.svg" width="13" height="13" style="vertical-align: middle; margin-right: 4px;" alt="Instagram"/>'
+                        f'see post &rarr;</a></p>'
+                    )
+                    post_link_text = f"  Post: {source_url}\n"
+
+                cards_html += f"""
+                <div style="background: #f9fafb; border-radius: 12px; padding: 18px 20px; margin-bottom: 14px;">
+                    <h3 style="margin: 0 0 6px 0; color: #111827; font-size: 16px;">{title}</h3>
+                    {members_tag}
+                    <p style="margin: 5px 0; font-size: 14px;">🏛 <strong>{society}</strong></p>
+                    <p style="margin: 5px 0; font-size: 14px;">📍 {location} &nbsp;<a href="{maps_url}" style="color: #059669; font-size: 12px; text-decoration: none;">map ↗</a></p>
+                    <p style="margin: 5px 0; font-size: 14px;">🕒 {time} &nbsp;&middot;&nbsp; 📅 {date}</p>
+                    {post_link_html}
+                </div>"""
+
+                cards_text += f"\n{title}\n  Society: {society}\n  Location: {location}\n  Maps: {maps_url}\n  Time: {time}, {date}\n{post_link_text}"
+
+            html_content = f"""
+            <!DOCTYPE html>
+            <html>
+            <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #1A1A1A;">
+                <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 24px 30px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
+                    <p style="margin: 0; font-size: 20px; font-weight: 600;">free food spotted: {n} events</p>
+                </div>
+                {cards_html}
+                <div style="background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px; padding: 12px 16px; margin-bottom: 24px;">
+                    <span style="font-size: 16px;">&#9200;</span>
+                    <span style="font-size: 13px; color: #92400e; font-weight: 500;"> we'll remind you an hour before each event starts</span>
+                </div>
+                <div style="text-align: center; padding: 16px; color: #9ca3af; font-size: 12px; border-top: 1px solid #e5e7eb; margin-top: 24px;">
+                    FreeFoodUCD &middot; <a href="https://freefooducd.com/unsubscribe?email={email}" style="color: #9ca3af;">unsubscribe</a>
+                </div>
+            </body>
+            </html>
+            """
+
+            plain_text = f"free food spotted: {n} events\n{cards_text}\n⏰ we'll remind you an hour before each event starts\n\n---\nFreeFoodUCD - unsubscribe: https://freefooducd.com/unsubscribe?email={email}"
+
+            data = {
+                "sender": {"name": self.from_name, "email": self.from_email},
+                "to": [{"email": email, "name": email.split("@")[0]}],
+                "subject": "heads up: free food spotted",
+                "headers": {
+                    "List-Unsubscribe": f"<https://freefooducd.com/unsubscribe?email={email}>",
+                    "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+                },
+                "tags": ["transactional", "event-batch-notification"],
+                "htmlContent": html_content,
+                "textContent": plain_text,
+            }
+
+            async with httpx.AsyncClient() as client:
+                response = await client.post(self.api_url, json=data, headers=self.headers, timeout=10.0)
+                response.raise_for_status()
+
+            logger.info(f"Batch event notification ({n} events) sent to {email}")
+            return {"success": True, "status": "sent"}
+
+        except Exception as e:
+            logger.error(f"Error sending batch event notification to {email}: {str(e)}")
             return {"success": False, "error": str(e)}
 
 
