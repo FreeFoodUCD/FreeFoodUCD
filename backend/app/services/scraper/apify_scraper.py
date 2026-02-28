@@ -61,9 +61,11 @@ class ApifyInstagramScraper:
             # Run the Actor and wait for it to finish
             logger.info(f"Running Apify actor with input: {run_input}")
             run = self.client.actor(self.actor_id).call(run_input=run_input)
-            
+
             # Log run details
             logger.info(f"Apify run completed. Run ID: {run.get('id')}, Status: {run.get('status')}")
+            if run.get("status") != "SUCCEEDED":
+                raise RuntimeError(f"Apify actor run failed: status={run.get('status')} run_id={run.get('id')}")
             logger.info(f"Dataset ID: {run.get('defaultDatasetId')}")
             
             # Fetch results from the Actor's dataset
@@ -175,6 +177,8 @@ class ApifyInstagramScraper:
 
             run = self.client.actor(self.actor_id).call(run_input=run_input)
             logger.info(f"Batch run completed. ID: {run.get('id')}, status: {run.get('status')}")
+            if run.get("status") != "SUCCEEDED":
+                raise RuntimeError(f"Apify actor run failed: status={run.get('status')} run_id={run.get('id')}")
 
             results: Dict[str, List[Dict]] = {}
 

@@ -9,6 +9,7 @@ from app.core.config import settings
 from datetime import datetime, timedelta, timezone
 import hmac
 import logging
+import redis as redis_lib
 
 logger = logging.getLogger(__name__)
 
@@ -660,6 +661,13 @@ async def trigger_scrape(
 
         if not society:
             raise HTTPException(status_code=404, detail=f"Society @{society_handle} not found")
+
+        # Per-society cooldown: skip Apify if scraped < 10 min ago (saves ~$0.20/call)
+        _r = redis_lib.from_url(settings.REDIS_URL, decode_responses=True)
+        cooldown_key = f"scrape_cooldown:{society_handle}"
+        if _r.get(cooldown_key) and not force_reprocess:
+            return {"message": f"Cooldown active for @{society_handle} — last scraped < 10 min ago"}
+        _r.setex(cooldown_key, 600, "1")
 
         # Scrape posts using working logic
         scraper = ApifyInstagramScraper(api_token=settings.APIFY_API_TOKEN)

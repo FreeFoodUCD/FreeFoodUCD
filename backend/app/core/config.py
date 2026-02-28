@@ -53,6 +53,9 @@ class Settings(BaseSettings):
     # CORS
     ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:8000"
 
+    # Scraping
+    SCRAPE_MAX_POSTS_PER_SOCIETY: int = 3
+
     # Email allowlist (comma-separated; if set, only these addresses receive event emails)
     NOTIFICATION_TEST_EMAILS: str = ""
     

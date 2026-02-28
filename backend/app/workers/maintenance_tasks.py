@@ -2,7 +2,7 @@ from app.workers.celery_app import celery_app
 from app.db.base import task_db_session
 from app.db.models import Story, Event, ScrapingLog
 from sqlalchemy import select, delete
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import logging
 import asyncio
 
@@ -22,7 +22,7 @@ async def _cleanup_expired_stories_async():
     """Async implementation of cleanup_expired_stories."""
     async with task_db_session() as session:
         # Delete stories older than 48 hours (give some buffer)
-        cutoff_time = datetime.now() - timedelta(hours=48)
+        cutoff_time = datetime.now(timezone.utc) - timedelta(hours=48)
         
         query = delete(Story).where(Story.detected_at < cutoff_time)
         result = await session.execute(query)
@@ -47,7 +47,7 @@ async def _archive_old_events_async():
     """Async implementation of archive_old_events."""
     async with task_db_session() as session:
         # Archive events older than 7 days
-        cutoff_time = datetime.now() - timedelta(days=7)
+        cutoff_time = datetime.now(timezone.utc) - timedelta(days=7)
         
         query = select(Event).where(
             Event.start_time < cutoff_time,
@@ -76,7 +76,7 @@ def cleanup_old_logs():
 async def _cleanup_old_logs_async():
     """Async implementation of cleanup_old_logs."""
     async with task_db_session() as session:
-        cutoff_time = datetime.now() - timedelta(days=30)
+        cutoff_time = datetime.now(timezone.utc) - timedelta(days=30)
         
         query = delete(ScrapingLog).where(ScrapingLog.created_at < cutoff_time)
         result = await session.execute(query)
@@ -105,7 +105,7 @@ async def _health_check_async():
             await session.execute(select(1))
             
             # Check recent scraping activity (last 10 minutes)
-            recent_cutoff = datetime.now() - timedelta(minutes=10)
+            recent_cutoff = datetime.now(timezone.utc) - timedelta(minutes=10)
             query = select(ScrapingLog).where(
                 ScrapingLog.created_at >= recent_cutoff
             )
@@ -124,7 +124,7 @@ async def _health_check_async():
                 "database": "connected",
                 "recent_scrapes": len(recent_logs),
                 "success_rate": f"{success_rate:.1f}%",
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now(timezone.utc).isoformat()
             }
             
             logger.info(f"Health check: {health_status}")
@@ -135,7 +135,7 @@ async def _health_check_async():
         return {
             "status": "unhealthy",
             "error": str(e),
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
         }
 
 # Made with Bob

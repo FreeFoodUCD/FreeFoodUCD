@@ -11,8 +11,14 @@ from datetime import datetime, timedelta, timezone
 import logging
 import asyncio
 import hashlib
+import json
+import redis as redis_lib
 
 logger = logging.getLogger(__name__)
+
+
+def _get_redis() -> redis_lib.Redis:
+    return redis_lib.from_url(settings.REDIS_URL, decode_responses=True)
 
 def get_scraper():
     """Create a fresh Apify scraper instance."""
@@ -74,44 +80,44 @@ def scrape_society_stories(self, society_id: str):
 
 async def _scrape_society_stories_async(society_id: str):
     """Async implementation of scrape_society_stories."""
-    start_time = datetime.now()
-    
+    start_time = datetime.now(timezone.utc)
+
     async with task_db_session() as session:
         # Get society
         society = await session.get(Society, society_id)
         if not society:
             logger.error(f"Society {society_id} not found")
             return {"error": "Society not found"}
-        
+
         try:
             # TODO: Initialize scraper and scrape stories
             # This is a placeholder - actual implementation would use the scraper service
             stories_found = 0
-            
+
             # For now, just log the attempt
             logger.info(f"Would scrape stories for @{society.instagram_handle}")
-            
+
             # Update last check time
-            society.last_story_check = datetime.now()
-            
+            society.last_story_check = datetime.now(timezone.utc)
+
             # Log scraping activity
             log = ScrapingLog(
                 society_id=society.id,
                 scrape_type='story',
                 status='success',
                 items_found=stories_found,
-                duration_ms=int((datetime.now() - start_time).total_seconds() * 1000)
+                duration_ms=int((datetime.now(timezone.utc) - start_time).total_seconds() * 1000)
             )
             session.add(log)
-            
+
             await session.commit()
-            
+
             return {
                 "society": society.instagram_handle,
                 "stories_found": stories_found,
                 "status": "success"
             }
-            
+
         except Exception as e:
             # Log failure
             log = ScrapingLog(
@@ -120,7 +126,7 @@ async def _scrape_society_stories_async(society_id: str):
                 status='failed',
                 items_found=0,
                 error_message=str(e),
-                duration_ms=int((datetime.now() - start_time).total_seconds() * 1000)
+                duration_ms=int((datetime.now(timezone.utc) - start_time).total_seconds() * 1000)
             )
             session.add(log)
             await session.commit()
@@ -145,10 +151,17 @@ async def _scrape_all_posts_async():
     """
     Async implementation of scrape_all_posts.
 
-    Scrapes all active societies in a single batch call.
-    """
-    start_time = datetime.now()
+    Runs in three isolated phases to avoid holding a DB connection during the
+    60-120 second Apify HTTP call, and to cache Apify results in Redis so that
+    Celery retries (or same-hour re-triggers) never pay the $0.20 Apify cost twice.
 
+    Phase 1 — Short DB session: load society metadata, close session.
+    Phase 2 — Apify call + Redis cache: no DB session open.
+    Phase 3 — Fresh DB session: re-load ORM objects, persist posts, commit.
+    """
+    start_time = datetime.now(timezone.utc)
+
+    # ── Phase 1: load society metadata (session closed immediately after) ────
     async with task_db_session() as session:
         query = select(Society).where(
             Society.is_active == True,
@@ -162,119 +175,204 @@ async def _scrape_all_posts_async():
             return {"societies_scraped": 0, "total_new_posts": 0}
 
         handles = [s.instagram_handle for s in societies]
-        society_by_handle = {s.instagram_handle.lower(): s for s in societies}
+        # snapshot handle → id so we can re-fetch ORM objects in Phase 3
+        society_id_by_handle = {s.instagram_handle.lower(): str(s.id) for s in societies}
 
-        logger.info(f"Batch scraping {len(handles)} societies")
+    logger.info(f"Batch scraping {len(handles)} societies")
 
-        scraper = get_scraper()
-        batch_results = await scraper.scrape_posts_batch(handles, max_posts_per_user=3)
+    # ── Distributed run lock (prevents overlapping scrape_all_posts runs) ────
+    LOCK_KEY = "scrape_all_posts_lock"
+    r = _get_redis()
+    if not r.set(LOCK_KEY, "1", nx=True, ex=1800):
+        logger.warning("scrape_all_posts already running — skipping duplicate invocation")
+        return {"status": "skipped", "reason": "already_running"}
 
-        logger.info(f"Batch returned results for {len(batch_results)}/{len(handles)} societies")
+    try:
+        # ── Phase 2: Apify call with Redis result cache ───────────────────────
+        handle_hash = hashlib.md5(",".join(sorted(handles)).encode()).hexdigest()[:8]
+        cache_key = f"apify_batch:{handle_hash}:{datetime.now(timezone.utc).strftime('%Y%m%d_%H')}"
 
-        total_new_posts = 0
-        batch_event_ids = []
+        cached = r.get(cache_key)
+        if cached:
+            logger.info("Using cached Apify results (saving ~$0.20)")
+            raw = json.loads(cached)
+            # Deserialise timestamp strings back to timezone-aware datetime objects
+            batch_results: dict = {}
+            for handle, posts in raw.items():
+                batch_results[handle] = []
+                for post in posts:
+                    if post.get("timestamp"):
+                        post["timestamp"] = datetime.fromisoformat(post["timestamp"])
+                    batch_results[handle].append(post)
+        else:
+            apify_start = datetime.now(timezone.utc)
+            scraper = get_scraper()
+            batch_results = await scraper.scrape_posts_batch(
+                handles, max_posts_per_user=settings.SCRAPE_MAX_POSTS_PER_SOCIETY
+            )
+            apify_ms = int((datetime.now(timezone.utc) - apify_start).total_seconds() * 1000)
 
-        for handle_lower, posts_data in batch_results.items():
-            society = society_by_handle.get(handle_lower)
-            if not society:
-                logger.warning(f"Got results for unknown handle @{handle_lower}, skipping")
-                continue
+            logger.info(
+                f"Batch returned results for {len(batch_results)}/{len(handles)} societies "
+                f"(Apify took {apify_ms}ms)"
+            )
 
-            posts_found = 0
-            new_posts = 0
+            # Zero-result guard: if ALL societies returned nothing, something is wrong
+            if not batch_results and len(handles) > 10:
+                logger.error(
+                    f"ALERT: Apify returned 0 results for all {len(handles)} societies "
+                    f"— possible quota exhaustion or Instagram block"
+                )
+                async with task_db_session() as session:
+                    session.add(ScrapingLog(
+                        society_id=None,
+                        scrape_type="post",
+                        status="failed",
+                        items_found=0,
+                        error_message="Zero results from Apify for all handles",
+                        duration_ms=apify_ms,
+                    ))
+                    await session.commit()
+                raise RuntimeError("Apify zero-result — aborting scrape")
 
-            for post_data in posts_data:
-                try:
-                    post_id = post_data["url"].split("/p/")[-1].rstrip("/")
+            # Serialise to Redis (timestamp → ISO string) with 90-minute TTL
+            serialisable: dict = {}
+            for handle, posts in batch_results.items():
+                serialisable[handle] = []
+                for post in posts:
+                    p = dict(post)
+                    if isinstance(p.get("timestamp"), datetime):
+                        p["timestamp"] = p["timestamp"].isoformat()
+                    serialisable[handle].append(p)
+            r.setex(cache_key, 5400, json.dumps(serialisable))
 
-                    # Skip posts older than 7 days
-                    post_age = datetime.now(timezone.utc) - post_data["timestamp"]
-                    if post_age.days > 7:
-                        logger.info(f"Skipping old post from @{handle_lower}: {post_age.days} days old")
-                        continue
+            # Batch-level timing log (Fix 8) — records how long Apify took
+            async with task_db_session() as session:
+                session.add(ScrapingLog(
+                    society_id=None,
+                    scrape_type="post",
+                    status="success" if batch_results else "partial",
+                    items_found=sum(len(v) for v in batch_results.values()),
+                    duration_ms=apify_ms,
+                ))
+                await session.commit()
 
-                    # Skip already-saved posts (check globally — unique constraint is on instagram_post_id alone)
-                    existing = await session.execute(
-                        select(Post).where(Post.instagram_post_id == post_id)
-                    )
-                    if existing.scalar_one_or_none():
-                        continue
+        # ── Phase 3: fresh DB session for all writes ─────────────────────────
+        async with task_db_session() as session:
+            # Re-fetch Society ORM objects by id (avoiding stale references)
+            society_ids = list(society_id_by_handle.values())
+            result = await session.execute(
+                select(Society).where(Society.id.in_(society_ids))
+            )
+            society_by_handle = {s.instagram_handle.lower(): s for s in result.scalars().all()}
 
-                    post = Post(
-                        society_id=society.id,
-                        instagram_post_id=post_id,
-                        caption=post_data["caption"],
-                        media_urls=post_data.get("image_urls") or (
-                            [post_data["image_url"]] if post_data.get("image_url") else []
-                        ),
-                        source_url=post_data["url"],
-                        detected_at=post_data["timestamp"],
-                        processed=False,
-                    )
-                    session.add(post)
+            total_new_posts = 0
+            batch_event_ids = []
+
+            for handle_lower, posts_data in batch_results.items():
+                society = society_by_handle.get(handle_lower)
+                if not society:
+                    logger.warning(f"Got results for unknown handle @{handle_lower}, skipping")
+                    continue
+
+                posts_found = 0
+                new_posts = 0
+
+                for post_data in posts_data:
                     try:
-                        await session.flush()
-                    except IntegrityError:
-                        await session.rollback()
-                        logger.warning(f"Skipping duplicate post {post_id} (race condition)")
-                        continue
+                        post_id = post_data["url"].split("/p/")[-1].rstrip("/")
 
-                    new_posts += 1
-                    posts_found += 1
-                    total_new_posts += 1
+                        # Skip posts older than 7 days
+                        post_age = datetime.now(timezone.utc) - post_data["timestamp"]
+                        if post_age.days > 7:
+                            logger.info(f"Skipping old post from @{handle_lower}: {post_age.days} days old")
+                            continue
 
-                    try:
-                        nlp_result = await _process_scraped_content_async("post", str(post.id))
-                        if nlp_result.get('event_created') and nlp_result.get('event_id'):
-                            batch_event_ids.append(nlp_result['event_id'])
-                    except Exception as nlp_error:
-                        logger.error(f"NLP processing failed for post {post.id}: {nlp_error}")
+                        # Skip already-saved posts (unique constraint is on instagram_post_id)
+                        existing = await session.execute(
+                            select(Post).where(Post.instagram_post_id == post_id)
+                        )
+                        if existing.scalar_one_or_none():
+                            continue
 
-                    logger.info(f"New post from @{handle_lower}: {post_data['url']}")
-                except Exception as post_error:
-                    logger.error(f"Skipping malformed post from @{handle_lower}: {post_error}")
+                        post = Post(
+                            society_id=society.id,
+                            instagram_post_id=post_id,
+                            caption=post_data["caption"],
+                            media_urls=post_data.get("image_urls") or (
+                                [post_data["image_url"]] if post_data.get("image_url") else []
+                            ),
+                            source_url=post_data["url"],
+                            detected_at=post_data["timestamp"],
+                            processed=False,
+                        )
+                        session.add(post)
+                        try:
+                            await session.flush()
+                        except IntegrityError:
+                            await session.rollback()
+                            logger.warning(f"Skipping duplicate post {post_id} (race condition)")
+                            continue
 
-            society.last_post_check = datetime.now()
-            session.add(ScrapingLog(
-                society_id=society.id,
-                scrape_type="post",
-                status="success",
-                items_found=posts_found,
-                duration_ms=int((datetime.now() - start_time).total_seconds() * 1000),
-            ))
+                        new_posts += 1
+                        posts_found += 1
+                        total_new_posts += 1
 
-        # Log societies that returned no results (private / no posts)
-        for handle_lower, society in society_by_handle.items():
-            if handle_lower not in batch_results:
-                society.last_post_check = datetime.now()
+                        try:
+                            nlp_result = await _process_scraped_content_async("post", str(post.id))
+                            if nlp_result.get("event_created") and nlp_result.get("event_id"):
+                                batch_event_ids.append(nlp_result["event_id"])
+                        except Exception as nlp_error:
+                            logger.error(f"NLP processing failed for post {post.id}: {nlp_error}")
+
+                        logger.info(f"New post from @{handle_lower}: {post_data['url']}")
+                    except Exception as post_error:
+                        logger.error(f"Skipping malformed post from @{handle_lower}: {post_error}")
+
+                society.last_post_check = datetime.now(timezone.utc)
                 session.add(ScrapingLog(
                     society_id=society.id,
                     scrape_type="post",
                     status="success",
-                    items_found=0,
-                    duration_ms=0,
+                    items_found=posts_found,
+                    duration_ms=int((datetime.now(timezone.utc) - start_time).total_seconds() * 1000),
                 ))
 
-        await session.commit()
+            # Log societies that returned no results (private / no posts)
+            for handle_lower, society in society_by_handle.items():
+                if handle_lower not in batch_results:
+                    society.last_post_check = datetime.now(timezone.utc)
+                    session.add(ScrapingLog(
+                        society_id=society.id,
+                        scrape_type="post",
+                        status="success",
+                        items_found=0,
+                        duration_ms=0,
+                    ))
 
-        # Send one combined email per user for all events found this scrape run
-        if batch_event_ids:
-            try:
-                from app.workers.notification_tasks import _notify_events_batch_async
-                await _notify_events_batch_async(batch_event_ids)
-            except Exception as notify_error:
-                logger.error(f"Failed batch notification for {len(batch_event_ids)} event(s): {notify_error}")
+            await session.commit()
 
-        logger.info(
-            f"Batch scrape complete: {total_new_posts} new posts "
-            f"from {len(batch_results)} societies "
-            f"in {(datetime.now() - start_time).seconds}s"
-        )
-        return {
-            "societies_scraped": len(societies),
-            "societies_with_results": len(batch_results),
-            "total_new_posts": total_new_posts,
-        }
+            # Send one combined email per user for all events found this scrape run
+            if batch_event_ids:
+                try:
+                    from app.workers.notification_tasks import _notify_events_batch_async
+                    await _notify_events_batch_async(batch_event_ids)
+                except Exception as notify_error:
+                    logger.error(f"Failed batch notification for {len(batch_event_ids)} event(s): {notify_error}")
+
+            elapsed = int((datetime.now(timezone.utc) - start_time).total_seconds())
+            logger.info(
+                f"Batch scrape complete: {total_new_posts} new posts "
+                f"from {len(batch_results)} societies in {elapsed}s"
+            )
+            return {
+                "societies_scraped": len(society_id_by_handle),
+                "societies_with_results": len(batch_results),
+                "total_new_posts": total_new_posts,
+            }
+
+    finally:
+        r.delete(LOCK_KEY)
 
 
 @celery_app.task(bind=True, max_retries=3)
@@ -289,7 +387,7 @@ def scrape_society_posts(self, society_id: str):
 
 async def _scrape_society_posts_async(society_id: str):
     """Async implementation of scrape_society_posts."""
-    start_time = datetime.now()
+    start_time = datetime.now(timezone.utc)
 
     async with task_db_session() as session:
         society = await session.get(Society, society_id)
@@ -368,7 +466,7 @@ async def _scrape_society_posts_async(society_id: str):
                     logger.error(f"Skipping malformed post from @{society.instagram_handle}: {post_error}")
 
             # Update last check time
-            society.last_post_check = datetime.now()
+            society.last_post_check = datetime.now(timezone.utc)
 
             # Log scraping activity
             log = ScrapingLog(
@@ -376,7 +474,7 @@ async def _scrape_society_posts_async(society_id: str):
                 scrape_type='post',
                 status='success',
                 items_found=posts_found,
-                duration_ms=int((datetime.now() - start_time).total_seconds() * 1000)
+                duration_ms=int((datetime.now(timezone.utc) - start_time).total_seconds() * 1000)
             )
             session.add(log)
             await session.commit()
@@ -406,7 +504,7 @@ async def _scrape_society_posts_async(society_id: str):
                 status='failed',
                 items_found=0,
                 error_message=str(e),
-                duration_ms=int((datetime.now() - start_time).total_seconds() * 1000)
+                duration_ms=int((datetime.now(timezone.utc) - start_time).total_seconds() * 1000)
             )
             session.add(log)
             await session.commit()
