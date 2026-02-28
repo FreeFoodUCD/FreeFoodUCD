@@ -74,9 +74,12 @@ class TimeParser:
             return f'{h}:45{period}'
         t = re.sub(r'quarter\s+to\s+(\d{1,2})\s*(am|pm)?', _quarter_to, t, flags=re.IGNORECASE)
 
+        # European hNN format: "13h00" → "13:00", "13h30" → "13:30"
+        t = re.sub(r'\b([01]?\d|2[0-3])h([0-5]\d)\b', r'\1:\2', t, flags=re.IGNORECASE)
+
         return t
     
-    def parse_time(self, text: str) -> Optional[Dict[str, int]]:
+    def parse_time(self, text: str, post_timestamp=None) -> Optional[Dict[str, int]]:
         """
         Parse time from text with comprehensive pattern matching.
         
@@ -93,9 +96,9 @@ class TimeParser:
 
         # Pattern 1: Time ranges (extract start time)
         candidates.extend(self._parse_time_ranges(text))
-        
+
         # Pattern 2: Single times
-        candidates.extend(self._parse_single_times(text))
+        candidates.extend(self._parse_single_times(text, post_timestamp))
         
         # Pattern 3: Special keywords
         candidates.extend(self._parse_special_keywords(text))
@@ -167,14 +170,25 @@ class TimeParser:
         for match in re.finditer(pattern, text):
             hour = int(match.group(1))
             period = match.group(2).upper()
-            
+
             hour = self._convert_to_24h(hour, period)
             if hour is not None:
                 candidates.append(('range_no_minutes_single_period', {'hour': hour, 'minute': 0}, 0.85))
-        
+
+        # Pattern 5: H-H:MM AM/PM (no minutes on start, minutes on end)
+        # Examples: "from 2-3:30 PM"
+        pattern = rf'(?:at|from)?\s*(\d{{1,2}})\s*{SEP}\s*\d{{1,2}}\s*[:.]\d{{2}}\s*(am|pm)'
+        for match in re.finditer(pattern, text):
+            hour = int(match.group(1))
+            period = match.group(2).upper()
+
+            hour = self._convert_to_24h(hour, period)
+            if hour is not None:
+                candidates.append(('range_asymmetric', {'hour': hour, 'minute': 0}, 0.92))
+
         return candidates
     
-    def _parse_single_times(self, text: str) -> List[Tuple[str, Dict[str, int], float]]:
+    def _parse_single_times(self, text: str, post_timestamp=None) -> List[Tuple[str, Dict[str, int], float]]:
         """Parse single time mentions."""
         candidates = []
         
@@ -218,19 +232,28 @@ class TimeParser:
         for match in re.finditer(pattern, text):
             hour = int(match.group(1))
             minute = int(match.group(2))
-            
+
             # If hour > 12, it's 24-hour format
             if hour > 12:
                 if hour <= 23:
                     candidates.append(('ambiguous_24hour', {'hour': hour, 'minute': minute}, 0.75))
             else:
-                # Assume PM for events
-                converted_hour = hour + 12 if hour != 12 else 12
+                # Use post_timestamp to disambiguate, fall back to PM
+                converted_hour = self._pick_am_or_pm(hour, minute, post_timestamp)
                 candidates.append(('ambiguous_assume_pm', {'hour': converted_hour, 'minute': minute}, 0.7))
-        
+
+        # Pattern 5: 4-digit compact military time (1830, 0900, 1200)
+        # Must be at a word boundary, not preceded or followed by another digit
+        # Lower confidence (0.75) since it can conflict with room numbers
+        pattern = r'(?<!\d)\b([01]\d|2[0-3])([0-5]\d)\b(?!\d)'
+        for match in re.finditer(pattern, text):
+            hour = int(match.group(1))
+            minute = int(match.group(2))
+            candidates.append(('compact_24hour', {'hour': hour, 'minute': minute}, 0.75))
+
         return candidates
     
-    def parse_time_range(self, text: str) -> Optional[Dict[str, Optional[Dict[str, int]]]]:
+    def parse_time_range(self, text: str, post_timestamp=None) -> Optional[Dict[str, Optional[Dict[str, int]]]]:
         """
         Parse time range from text, returning both start and end times.
 
@@ -308,8 +331,23 @@ class TimeParser:
                 return {'start': {'hour': s_h24, 'minute': 0},
                         'end':   {'hour': e_h24, 'minute': 0}}
 
+        # Pattern 5: H-H:MM AM/PM (asymmetric: no minutes on start)
+        # Examples: "from 2-3:30 PM"
+        pattern = rf'(?:at|from)?\s*(\d{{1,2}})\s*{SEP}\s*(\d{{1,2}})\s*[:.](\d{{2}})\s*(am|pm)'
+        match = re.search(pattern, text)
+        if match:
+            s_hour, e_hour, e_min = int(match.group(1)), int(match.group(2)), int(match.group(3))
+            period = match.group(4).upper()
+
+            s_h24 = self._convert_to_24h(s_hour, period)
+            e_h24 = self._convert_to_24h(e_hour, period)
+            if (s_h24 is not None and e_h24 is not None
+                    and self._validate_time(s_h24, 0) and self._validate_time(e_h24, e_min)):
+                return {'start': {'hour': s_h24, 'minute': 0},
+                        'end':   {'hour': e_h24, 'minute': e_min}}
+
         # No range found — fall back to single time
-        start = self.parse_time(text)
+        start = self.parse_time(text, post_timestamp)
         if start:
             return {'start': start, 'end': None}
 
@@ -325,6 +363,26 @@ class TimeParser:
         
         return candidates
     
+    def _pick_am_or_pm(self, hour_12: int, minute: int, post_timestamp) -> int:
+        """Use post timestamp to pick AM vs PM for ambiguous times. Falls back to PM."""
+        if post_timestamp is None:
+            return (hour_12 + 12) if hour_12 != 12 else 12
+        am_24 = 0 if hour_12 == 12 else hour_12
+        pm_24 = 12 if hour_12 == 12 else hour_12 + 12
+        post_total = post_timestamp.hour * 60 + post_timestamp.minute
+        am_total = am_24 * 60 + minute
+        pm_total = pm_24 * 60 + minute
+        am_future = am_total > post_total
+        pm_future = pm_total > post_total
+        if am_future and not pm_future:
+            return am_24
+        elif pm_future and not am_future:
+            return pm_24
+        elif am_future and pm_future:
+            return am_24  # Both future: pick sooner (AM)
+        else:
+            return pm_24  # Both past: fall back to PM
+
     def _convert_to_24h(self, hour: int, period: str) -> Optional[int]:
         """
         Convert 12-hour format to 24-hour format.

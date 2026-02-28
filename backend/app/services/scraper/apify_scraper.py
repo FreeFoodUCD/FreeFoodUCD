@@ -113,28 +113,31 @@ class ApifyInstagramScraper:
         try:
             # Extract caption
             caption = item.get('caption', '')
-            
-            # Extract image URL (first image if multiple)
-            image_url = None
+
+            # Collect all carousel images (cap at 5 to avoid large photo posts)
+            image_urls = []
             if item.get('displayUrl'):
-                image_url = item['displayUrl']
-            elif item.get('images') and len(item['images']) > 0:
-                image_url = item['images'][0]
-            
+                image_urls.append(item['displayUrl'])
+            if item.get('images'):
+                for img in item['images'][:5]:
+                    if img not in image_urls:
+                        image_urls.append(img)
+
             # Extract timestamp
             timestamp = None
             if item.get('timestamp'):
                 timestamp = datetime.fromisoformat(item['timestamp'].replace('Z', '+00:00'))
-            
+
             # Extract post URL
             post_url = item.get('url', '')
             if not post_url and item.get('shortCode'):
                 post_url = f"https://www.instagram.com/p/{item['shortCode']}/"
-            
+
             return {
                 'url': post_url,
                 'caption': caption,
-                'image_url': image_url,
+                'image_url': image_urls[0] if image_urls else None,   # backwards-compat single field
+                'image_urls': image_urls,                              # new: full carousel list
                 'timestamp': timestamp or datetime.now()
             }
             

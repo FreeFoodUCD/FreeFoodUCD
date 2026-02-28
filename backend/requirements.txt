@@ -31,6 +31,9 @@ httpx==0.26.0
 twilio==8.11.1
 resend==0.8.0
 
+# LLM
+openai>=1.30.0
+
 # Scraping
 apify-client==1.7.1
 pytesseract==0.3.13

@@ -200,7 +200,9 @@ async def _scrape_all_posts_async():
                     society_id=society.id,
                     instagram_post_id=post_id,
                     caption=post_data["caption"],
-                    media_urls=[post_data["image_url"]] if post_data.get("image_url") else [],
+                    media_urls=post_data.get("image_urls") or (
+                        [post_data["image_url"]] if post_data.get("image_url") else []
+                    ),
                     source_url=post_data["url"],
                     detected_at=post_data["timestamp"],
                     processed=False,
@@ -316,7 +318,9 @@ async def _scrape_society_posts_async(society_id: str):
                     society_id=society.id,
                     instagram_post_id=post_id,
                     caption=post_data['caption'],
-                    media_urls=[post_data.get('image_url')] if post_data.get('image_url') else [],
+                    media_urls=post_data.get('image_urls') or (
+                        [post_data['image_url']] if post_data.get('image_url') else []
+                    ),
                     source_url=post_data['url'],
                     detected_at=post_data['timestamp'],
                     processed=False

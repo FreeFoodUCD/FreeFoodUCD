@@ -19,8 +19,8 @@ _FOOD_EMOJI_MAP: Dict[str, str] = {
     '🍔': 'burger',
     '🌭': 'burger',
     '🌮': 'tacos',
-    '🌯': 'wrap',
-    '🥙': 'wrap',
+    '🌯': 'sandwich',
+    '🥙': 'sandwich',
     '🥪': 'sandwich',
     # Mains
     '🍜': 'food',
@@ -143,6 +143,8 @@ class EventExtractor:
         self.village_rooms = {
             'village auditorium': 'Auditorium',
             'auditorium': 'Auditorium',
+            'village kitchen': 'Kitchen',
+            'ucd village kitchen': 'Kitchen',
         }
         self.village_rooms_sorted = sorted(
             self.village_rooms.keys(), key=len, reverse=True
@@ -160,7 +162,7 @@ class EventExtractor:
             'brunch', 'coffee morning',
             'popcorn', 'nachos', 'crisps', 'chips', 'chocolate', 'cake', 'waffles',
             'biscuits', 'donuts', 'doughnuts', 'sweets', 'cupcakes',
-            'sandwich', 'sandwiches', 'wrap', 'wraps', 'sushi', 'curry',
+            'sandwich', 'sandwiches', 'sushi', 'curry',
             'soup', 'pasta', 'tacos', 'burger', 'burgers',
             # Hot drinks & morning events
             'hot chocolate', 'tea morning', 'tea afternoon', 'coffee afternoon',
@@ -172,6 +174,11 @@ class EventExtractor:
             'treats', 'sweet treats', 'ice cream',
             # Snacks (unambiguous in society context)
             'snacks',
+            # Informal food terms common in UCD/Irish society posts
+            'light bites',
+            'food and drinks', 'food and drink', 'food & drinks', 'food & drink',
+            'food on the night',
+            'grub', 'munchies',
         ]
         # Weak food indicators — only count if "free", "provided", or "complimentary"
         # also appears somewhere in the text
@@ -379,6 +386,25 @@ class EventExtractor:
             'roebuck castle': 'Roebuck Hall',
             'roebuck': 'Roebuck Hall',
 
+            # O'Brien Centre for Science — East/West wings (L2)
+            'science east': "O'Brien Centre for Science",
+            'science west': "O'Brien Centre for Science",
+            "o'brien east": "O'Brien Centre for Science",
+            "o'brien west": "O'Brien Centre for Science",
+            'obrien east': "O'Brien Centre for Science",
+            'obrien west': "O'Brien Centre for Science",
+
+            # UCD Village Kitchen (L3) — compound form only, 'kitchen' alone too generic
+            'village kitchen': 'UCD Village',
+            'ucd village kitchen': 'UCD Village',
+
+            # UCD Horticulture Garden / Polytunnel (L4)
+            'polytunnel': 'UCD Horticulture Garden',
+            'horticulture garden': 'UCD Horticulture Garden',
+            'ucd horticulture': 'UCD Horticulture Garden',
+            'rosemount': 'UCD Rosemount',
+            'rosemount complex': 'UCD Rosemount',
+
             # Generic campus keywords (no specific building)
             'belfield': 'UCD Belfield',
             'ucd': 'UCD Belfield',
@@ -493,6 +519,11 @@ class EventExtractor:
             logger.debug("REJECT: No explicit food keyword")
             return False
         
+        # Rule 1.5: NOT a food activity workshop/competition
+        if self._is_food_activity(clean_text):
+            logger.debug("REJECT: Food activity workshop")
+            return False
+
         # Rule 2: MUST NOT be other college
         if self._is_other_college(clean_text):
             logger.debug("REJECT: Other college mentioned")
@@ -502,7 +533,12 @@ class EventExtractor:
         if self._is_off_campus(clean_text):
             logger.debug("REJECT: Off-campus venue mentioned")
             return False
-        
+
+        # Rule 3.5: NOT an online-only event (reject if online signals + no UCD location)
+        if self._is_online_event(clean_text) and not self._has_ucd_location(clean_text):
+            logger.debug("REJECT: Online/virtual event with no UCD location")
+            return False
+
         # Rule 4: MUST NOT be paid (except €2 membership)
         if self._is_paid_event(clean_text):
             logger.debug("REJECT: Paid event indicator")
@@ -534,8 +570,9 @@ class EventExtractor:
         negation_patterns = [
             r'\bno\s+(?:free\s+)?(?:food|pizza|snacks?|refreshments?|lunch|dinner|breakfast|drinks?)\b',
             r'\b(?:food|pizza|snacks?|refreshments?|lunch|dinner|breakfast|drinks?)\s+(?:is\s+|are\s+)?not\s+(?:provided|available|included|served)\b',
-            r'\bbring\s+your\s+own\s+(?:food|lunch|dinner)\b',
+            r'\bbring\s+your\s+own\s+(?:food|lunch|dinner|snacks?|drinks?)\b',
             r'\bbyof?\b',
+            r'\b(?:food|drinks?|coffee|tea|snacks?|refreshments?)\s+(?:available\s+)?for\s+(?:sale|purchase)\b',
             r'\bunfortunately\s+(?:\w+\s+){0,4}no\s+(?:food|pizza|snacks?|refreshments?)\b',
             r'\bno\s+food\s+(?:this\s+time|available|today)\b',
         ]
@@ -568,9 +605,11 @@ class EventExtractor:
         if any(kw in text for kw in self.strong_food_keywords):
             return True
 
-        # Weak keywords only count when "free", "provided", or "complimentary" is present
+        # Weak keywords only count when "free", "provided", "complimentary",
+        # or "we'll bring/have/provide/serve" is present
         has_free_context = (
-            'free' in text or 'provided' in text or 'complimentary' in text
+            'free' in text or 'provided' in text or 'complimentary' in text or
+            bool(re.search(r"\bwe.(?:ll|will)\s+(?:be\s+)?(?:bring(?:ing)?|have|provide|serve|supply)\b", text))
         )
         if has_free_context and any(kw in text for kw in self.weak_food_keywords):
             return True
@@ -649,7 +688,13 @@ class EventExtractor:
             return True
 
         # Reject ticket/entry fee keywords (not 'cost'/'price'/'pay' — too broad)
-        paid_keywords = ['ticket', 'tickets', 'entry fee', 'admission']
+        # Also reject food sale events (bake/cake/cookie sales) — food isn't free
+        # Also reject fundraisers — selling food, not giving it away
+        paid_keywords = [
+            'ticket', 'tickets', 'entry fee', 'admission',
+            'bake sale', 'cake sale', 'cookie sale', 'food sale', 'food stall',
+            'fundraiser', 'charity sale', 'charity bake',
+        ]
         for keyword in paid_keywords:
             if keyword in text:
                 logger.debug(f"Found paid keyword: {keyword}")
@@ -665,6 +710,51 @@ class EventExtractor:
                 return True
         return False
     
+    def _is_food_activity(self, text: str) -> bool:
+        """
+        Reject food-making workshops/competitions where food is the activity
+        material, not something freely provided to attendees.
+        Returns True (reject) unless explicit provision language overrides.
+        """
+        activity_patterns = [
+            r'\b(?:pizza|sushi|cookie|cake|bread|pasta|burger|chocolate|mochi|ramen|biscuit|brownie)\s+(?:making|workshop|class|tutorial|decorating|competition|contest)\b',
+            r'\b(?:baking|cooking|pastry|barista)\s+(?:class|workshop|course|tutorial|competition|contest)\b',
+            r'\bbake.?off\b',
+            r'\bcook.?off\b',
+            r'\bbaking\s+competition\b',
+            r'\bcooking\s+competition\b',
+        ]
+        has_activity = any(re.search(p, text, re.IGNORECASE) for p in activity_patterns)
+        if not has_activity:
+            return False
+
+        # Override: food IS being provided separately from the activity
+        provision_overrides = [
+            r'\bfood\s+(?:provided|included|served|on\s+us)\b',
+            r'\brefreshments\s+(?:provided|available|included)\b',
+            r'\bwe.(?:ll|will)\s+(?:be\s+)?(?:provide|have|serve|bring(?:ing)?)\s+(?:the\s+)?(?:food|refreshments|snacks?|pizza|cookies?|cake|treats?)\b',
+            r'\bfree\s+(?:food|pizza|cookies?|cake|snacks?)\b',
+        ]
+        has_provision = any(re.search(p, text, re.IGNORECASE) for p in provision_overrides)
+        return not has_provision
+
+    def _is_online_event(self, text: str) -> bool:
+        """
+        Return True if the post describes an online/virtual-only event.
+        Hybrid posts that ALSO mention a UCD location are NOT rejected here —
+        the caller checks _has_ucd_location separately.
+        """
+        online_patterns = [
+            r'\bonline\s+event\b',
+            r'\bvirtual\s+(?:event|session|talk|seminar|workshop|class|lecture|info\s+session)\b',
+            r'\bvia\s+zoom\b',
+            r'\bon\s+zoom\b',
+            r'\bzoom\s+(?:call|meeting|link|event)\b',
+            r'\bremote(?:ly)?\s+(?:hosted|held|event)\b',
+            r'\bwatch\s+(?:live\s+)?(?:online|on\s+youtube|on\s+twitch)\b',
+        ]
+        return any(re.search(p, text, re.IGNORECASE) for p in online_patterns)
+
     def _is_members_only(self, text: str) -> bool:
         patterns = [
             r'\bfor\s+members\b',
@@ -701,6 +791,9 @@ class EventExtractor:
         if not self._has_explicit_food(clean_text):
             return "No explicit food keyword found"
 
+        if self._is_food_activity(clean_text):
+            return "Food activity workshop/competition (not free food)"
+
         if self._is_other_college(clean_text):
             for college in self.other_colleges:
                 if college in clean_text:
@@ -710,6 +803,9 @@ class EventExtractor:
             for venue in self.off_campus_venues:
                 if venue in clean_text:
                     return f"Mentions off-campus venue: '{venue}'"
+
+        if self._is_online_event(clean_text) and not self._has_ucd_location(clean_text):
+            return "Online/virtual event with no UCD location"
 
         if self._is_paid_event(clean_text):
             return "Appears to be a paid event (price/ticket mention)"
@@ -743,7 +839,12 @@ class EventExtractor:
             return None
         
         # Extract event details
-        time_range = self.time_parser.parse_time_range(text.lower())
+        local_post_ts = None
+        if post_timestamp:
+            if getattr(post_timestamp, 'tzinfo', None) is None:
+                post_timestamp = pytz.utc.localize(post_timestamp)
+            local_post_ts = post_timestamp.astimezone(self.timezone)
+        time_range = self.time_parser.parse_time_range(text.lower(), post_timestamp=local_post_ts)
         time = time_range['start'] if time_range else None
         end_time_dict = time_range['end'] if time_range else None
         date = self.date_parser.parse_date(text.lower(), post_timestamp)
@@ -816,9 +917,10 @@ class EventExtractor:
                     'full_location': f'{room_name}, UCD Village',
                 }
 
-        # Room regex: optional letter prefix, digits, optional .subdiv, optional suffix
-        # Matches: 321, A5, G01, E1.32, C204A, AD1.01
-        ROOM_RE = r'[A-Za-z]{0,3}\d+(?:[.\-]\d+)?[A-Za-z]?'
+        # Room regex: two alternatives:
+        #   1. LETTER(S)-DIGITS: G-14, AD-101 (hyphenated prefix)
+        #   2. Optional letter prefix + digits + optional .subdiv + optional suffix: E1.32, C204A, AD1.01
+        ROOM_RE = r'[A-Za-z]{1,3}-\d+[A-Za-z]?|[A-Za-z]{0,3}\d+(?:[.]\d+)?[A-Za-z]?'
 
         # Check against known UCD buildings (longest alias first for specificity)
         for alias in self.ucd_buildings:
