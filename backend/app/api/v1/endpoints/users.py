@@ -119,7 +119,7 @@ async def _require_user_token(authorization: Optional[str] = Header(None)) -> st
 
 
 @router.post("/users/signup", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-@limiter.limit("3/10minute")
+@limiter.limit("3 per 10 minutes")
 async def signup_user(
     request: Request,
     user_data: UserSignupRequest,
@@ -303,7 +303,7 @@ async def update_society_preference(
 
 
 @router.post("/users/verify")
-@limiter.limit("5/10minute")
+@limiter.limit("5 per 10 minutes")
 async def verify_user(
     request: Request,
     verify_data: VerifyCodeRequest,
