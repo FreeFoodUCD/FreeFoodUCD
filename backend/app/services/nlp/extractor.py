@@ -960,6 +960,91 @@ class EventExtractor:
 
         return "Accepted"
 
+    def get_classification_details(self, text: str) -> dict:
+        """Return result, reason, and matched keywords for admin display."""
+        clean_text = self._preprocess_text(text)
+
+        # Iftar
+        _iftar_kw = ['iftar', 'iftaar', 'break the fast']
+        for kw in _iftar_kw:
+            if kw in clean_text:
+                return {'result': 'rejected', 'reason': 'Iftar/religious event', 'matched_keywords': [kw]}
+
+        # Past-tense
+        if self._is_past_tense_post(clean_text):
+            past_phrases = [
+                'thanks for coming', 'thank you for coming', 'thanks for joining',
+                'was a great', 'was amazing', 'was fantastic', 'was so great',
+                'hope everyone had', 'hope you had', 'it was great', 'what a night',
+            ]
+            triggers = [p for p in past_phrases if p in clean_text]
+            return {'result': 'rejected', 'reason': 'Past-tense recap post (not an upcoming event)', 'matched_keywords': triggers}
+
+        # Collect food keywords present
+        matched_strong = [kw for kw in self.strong_food_keywords if kw in clean_text]
+        matched_weak   = [kw for kw in self.weak_food_keywords   if kw in clean_text]
+        matched_ctx    = [m  for m  in self.context_modifiers     if m  in clean_text]
+        if 'free' in clean_text and 'free' not in matched_ctx:
+            matched_ctx.append('free')
+
+        # No food keyword
+        if not self._has_explicit_food(clean_text):
+            return {'result': 'rejected', 'reason': 'No explicit food keyword found',
+                    'matched_keywords': matched_weak}
+
+        # Food activity
+        if self._is_food_activity(clean_text):
+            for kw in ['baking workshop', 'cooking class', 'cupcake decorating',
+                       'food competition', 'bake-off', 'bake off', 'food fight']:
+                if kw in clean_text:
+                    return {'result': 'rejected', 'reason': 'Food activity workshop/competition (not free food)',
+                            'matched_keywords': [kw]}
+            return {'result': 'rejected', 'reason': 'Food activity workshop/competition (not free food)',
+                    'matched_keywords': []}
+
+        # Staff only
+        if self._is_staff_only(clean_text):
+            staff_triggers = ['committee only', 'exec only', 'exec meeting', 'exec training',
+                              'volunteers only', 'staff only', 'board meeting']
+            triggers = [t for t in staff_triggers if t in clean_text]
+            return {'result': 'rejected', 'reason': 'Staff/committee-only event (not open to students)',
+                    'matched_keywords': triggers}
+
+        # Other college
+        if self._is_other_college(clean_text):
+            for college in self.other_colleges:
+                if college in clean_text:
+                    return {'result': 'rejected', 'reason': f"Mentions other college: '{college}'",
+                            'matched_keywords': [college]}
+
+        # Off-campus
+        if self._is_off_campus(clean_text):
+            for venue in self.off_campus_venues:
+                if venue in clean_text:
+                    return {'result': 'rejected', 'reason': f"Mentions off-campus venue: '{venue}'",
+                            'matched_keywords': [venue]}
+
+        # Online with no UCD location
+        if self._is_online_event(clean_text) and not self._has_ucd_location(clean_text):
+            return {'result': 'rejected', 'reason': 'Online/virtual event with no UCD location',
+                    'matched_keywords': []}
+
+        # Paid
+        if self._is_paid_event(clean_text):
+            return {'result': 'rejected', 'reason': 'Appears to be a paid event (price/ticket mention)',
+                    'matched_keywords': []}
+
+        # Nightlife
+        if self._is_nightlife_event(clean_text):
+            for kw in self.nightlife_keywords:
+                if kw in clean_text:
+                    return {'result': 'rejected', 'reason': f"Nightlife event keyword: '{kw}'",
+                            'matched_keywords': [kw]}
+
+        # Accepted — surface all food signals found
+        all_food = list(dict.fromkeys(matched_strong + matched_ctx + matched_weak))
+        return {'result': 'accepted', 'reason': 'Accepted', 'matched_keywords': all_food[:8]}
+
     # ========== Event Detail Extraction (called AFTER classification) ==========
     
     def extract_event(self, text: str, source_type: str = 'post', post_timestamp: Optional[datetime] = None) -> Optional[Dict]:

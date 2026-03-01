@@ -72,6 +72,11 @@ interface Post {
   processed: boolean;
   event_created: boolean;
   feedback_submitted: boolean;
+  classification_details?: {
+    result: 'accepted' | 'rejected';
+    reason: string;
+    matched_keywords: string[];
+  };
   event?: {
     id: string;
     title: string;
@@ -80,6 +85,13 @@ interface Post {
     confidence_score: number;
     notified: boolean;
     users_notified: number;
+    extracted_data?: {
+      time_found: boolean;
+      date_found: boolean;
+      location_found: boolean;
+      members_only: boolean;
+      llm_assisted: boolean;
+    };
   };
   feedback?: {
     is_correct: boolean;
@@ -1311,7 +1323,44 @@ export default function AdminDashboard() {
                   )}
 
                   <p className="text-sm text-gray-700 mb-3 line-clamp-3">{post.caption}</p>
-                  
+
+                  {post.classification_details && (
+                    <div className={`rounded-lg p-3 mb-3 text-xs ${
+                      post.classification_details.result === 'accepted'
+                        ? 'bg-green-50 border border-green-200'
+                        : 'bg-amber-50 border border-amber-200'
+                    }`}>
+                      <p className={`font-semibold mb-1 ${
+                        post.classification_details.result === 'accepted' ? 'text-green-800' : 'text-amber-800'
+                      }`}>
+                        {post.classification_details.result === 'accepted' ? '✅' : '⚠️'} {post.classification_details.reason}
+                      </p>
+                      {post.classification_details.matched_keywords.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {post.classification_details.matched_keywords.map((kw) => (
+                            <span key={kw} className={`px-2 py-0.5 rounded-full font-mono ${
+                              post.classification_details!.result === 'accepted'
+                                ? 'bg-green-100 text-green-700'
+                                : 'bg-amber-100 text-amber-700'
+                            }`}>
+                              {kw}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                      {post.event?.extracted_data && (
+                        <div className="flex gap-1 mt-1">
+                          {post.event.extracted_data.llm_assisted && (
+                            <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full">🤖 LLM Assisted</span>
+                          )}
+                          {post.event.extracted_data.members_only && (
+                            <span className="px-2 py-0.5 bg-yellow-100 text-yellow-700 rounded-full">🔒 Members Only</span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {post.event && (
                     <div className="bg-purple-50 rounded-lg p-3 mb-3">
                       <p className="text-sm font-semibold text-purple-900 mb-1">📅 {post.event.title}</p>

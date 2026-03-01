@@ -252,12 +252,10 @@ async def get_recent_posts(
         feedback_result = await db.execute(feedback_query)
         feedback = feedback_result.scalar_one_or_none()
 
-        # Compute rejection reason for rejected posts
-        rejection_reason = None
-        if not post.is_free_food and post.caption:
-            reason = extractor.get_rejection_reason(post.caption)
-            if reason != "Accepted":
-                rejection_reason = reason
+        # Compute classification details
+        classification_details = None
+        if post.caption:
+            classification_details = extractor.get_classification_details(post.caption)
 
         post_data = {
             "id": post_id_str,
@@ -271,7 +269,7 @@ async def get_recent_posts(
             "processed": post.processed,
             "event_created": event is not None,
             "feedback_submitted": feedback is not None,
-            "rejection_reason": rejection_reason,
+            "classification_details": classification_details,
         }
 
         # Add event data if exists
@@ -291,7 +289,8 @@ async def get_recent_posts(
                 "location": event.location,
                 "confidence_score": event.confidence_score,
                 "notified": event.notified,
-                "users_notified": users_notified
+                "users_notified": users_notified,
+                "extracted_data": event.extracted_data or {},
             }
 
         # Add feedback if exists
