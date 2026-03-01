@@ -9,10 +9,11 @@ import {
   getMinutesUntilEnd,
   isEventPast,
   getSocietyColor,
+  shareEvent,
   cn,
 } from '@/lib/utils';
 import { MapPin, Clock, Share2 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface EventCardProps {
   event: Event;
@@ -22,6 +23,8 @@ interface EventCardProps {
 export function EventCard({ event, onClick }: EventCardProps) {
   // Use state to handle time-based values on client side only
   const [mounted, setMounted] = useState(false);
+  const [shareStatus, setShareStatus] = useState<'idle' | 'copied'>('idle');
+  const shareTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [timeState, setTimeState] = useState({
     isLive: false,
     isEndingSoon: false,
@@ -75,16 +78,42 @@ export function EventCard({ event, onClick }: EventCardProps) {
     return '🍕'; // default
   };
 
+  useEffect(() => {
+    return () => {
+      if (shareTimerRef.current) clearTimeout(shareTimerRef.current);
+    };
+  }, []);
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const success = await shareEvent(event);
+    if (success) {
+      setShareStatus('copied');
+      if (shareTimerRef.current) clearTimeout(shareTimerRef.current);
+      shareTimerRef.current = setTimeout(() => setShareStatus('idle'), 2000);
+    }
+  };
+
   return (
     <div
+      role="button"
+      tabIndex={0}
       onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick?.();
+        }
+      }}
       className={cn(
         'bg-white rounded-3xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden',
         'border-2 border-gray-100 hover:border-primary/20',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
         isLive && 'ring-2 ring-primary ring-offset-2 ring-offset-white',
         isEndingSoon && 'ring-2 ring-secondary ring-offset-2 ring-offset-white',
         isPast && 'opacity-60'
       )}
+      aria-label={`${event.title} — ${event.society.name}, ${formatEventTime(event.start_time)}`}
     >
       <div className="p-5 md:p-6">
         {/* Header with food emoji and badges */}
@@ -125,14 +154,14 @@ export function EventCard({ event, onClick }: EventCardProps) {
         </div>
 
         {/* Society */}
-        <div className="flex items-center gap-3 mb-4 p-3 bg-gray-50 rounded-2xl border border-gray-100">
+        <div className="flex items-center gap-3 mb-4 p-3 bg-gray-50 rounded-2xl border border-gray-100 min-w-0">
           <div
-            className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm"
+            className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center text-white font-bold text-sm shadow-sm"
             style={{ backgroundColor: societyColor }}
           >
             {event.society.name.charAt(0)}
           </div>
-          <span className="text-sm font-bold text-text">
+          <span className="text-sm font-bold text-text truncate">
             {event.society.name}
           </span>
         </div>
@@ -167,14 +196,15 @@ export function EventCard({ event, onClick }: EventCardProps) {
             📸 {event.source_type === 'story' ? 'Story' : 'Post'}
           </span>
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              // Share functionality
-            }}
-            className="p-2 text-text-lighter hover:text-primary transition-colors rounded-xl hover:bg-gray-50"
-            aria-label="Share event"
+            onClick={handleShare}
+            className="flex items-center gap-1.5 p-2 text-text-lighter hover:text-primary transition-colors rounded-xl hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            aria-label={shareStatus === 'copied' ? 'Copied to clipboard' : 'Share event'}
           >
-            <Share2 className="w-4 h-4" />
+            {shareStatus === 'copied' ? (
+              <span className="text-xs font-semibold text-accent-text">Copied!</span>
+            ) : (
+              <Share2 className="w-4 h-4" />
+            )}
           </button>
         </div>
       </div>

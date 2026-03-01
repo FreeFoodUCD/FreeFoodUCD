@@ -23,6 +23,7 @@ module.exports = {
           DEFAULT: '#6FC266', // Green from logo - fresh, positive
           light: '#8FD88A',
           dark: '#5AAA52',
+          text: '#2E7D30',   // WCAG AA on white (5.1:1) — use for green text, not accent/accent-dark
         },
         text: {
           DEFAULT: '#1A1A1A', // Deep black
@@ -45,9 +46,9 @@ module.exports = {
         '4xl': '2.5rem',
       },
       boxShadow: {
-        'soft': '0 2px 12px rgba(47, 128, 237, 0.08)',
-        'soft-hover': '0 4px 20px rgba(47, 128, 237, 0.12)',
-        'warm': '0 2px 12px rgba(255, 183, 3, 0.15)',
+        'soft': '0 2px 12px rgba(0, 0, 0, 0.06)',
+        'soft-hover': '0 4px 20px rgba(0, 0, 0, 0.10)',
+        'warm': '0 2px 12px rgba(247, 134, 32, 0.15)',
       },
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',

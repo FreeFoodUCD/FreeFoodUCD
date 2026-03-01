@@ -19,6 +19,7 @@ export default function Home() {
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
 
   // Fetch events from API (next 24 hours)
   const { data, isLoading, error } = useQuery({
@@ -42,6 +43,7 @@ export default function Home() {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus('idle');
+    setErrorMessage('');
 
     try {
       await api.signup({ email });
@@ -52,6 +54,11 @@ export default function Home() {
       }, 2000);
     } catch (err: any) {
       setSubmitStatus('error');
+      if (err.message === 'already_signed_up' || err.message?.includes('already exists')) {
+        setErrorMessage('this email is already signed up — check your inbox for the verification code');
+      } else {
+        setErrorMessage('something went wrong — try again or use the sign-up page');
+      }
       console.error('Signup error:', err);
     } finally {
       setIsSubmitting(false);
@@ -62,6 +69,7 @@ export default function Home() {
     <div className="min-h-screen bg-white relative overflow-hidden">
       <Header />
       
+      <main>
       {/* Hero Section with Email Signup */}
       <section className="pt-24 md:pt-32 pb-20 md:pb-24 px-4 relative z-10">
         <div className="max-w-5xl mx-auto">
@@ -101,7 +109,7 @@ export default function Home() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="sillybilly@gmail.com"
+                    placeholder="your@email.com"
                     required
                     className="w-full pl-14 pr-5 py-5 md:py-6 rounded-2xl border-2 border-gray-200 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 text-lg md:text-xl bg-white transition-all"
                     disabled={isSubmitting || submitStatus === 'success'}
@@ -112,22 +120,22 @@ export default function Home() {
                   disabled={isSubmitting || submitStatus === 'success'}
                   className="px-10 md:px-12 py-5 md:py-6 rounded-2xl bg-accent text-white text-lg md:text-xl font-bold hover:bg-accent-dark transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap shadow-md hover:shadow-lg"
                 >
-                  {isSubmitting ? 'Sending...' : submitStatus === 'success' ? 'Sent ✓' : 'Join Waitlist'}
+                  {isSubmitting ? 'signing up...' : submitStatus === 'success' ? 'done ✓' : 'Join Waitlist'}
                 </button>
               </div>
 
               {/* Status Messages */}
               {submitStatus === 'success' && (
-                <div className="flex items-center gap-3 text-accent-dark bg-accent/10 px-5 py-4 rounded-2xl border-2 border-accent/30">
+                <div className="flex items-center gap-3 text-accent-text bg-accent/10 px-5 py-4 rounded-2xl border-2 border-accent/30">
                   <Check className="w-6 h-6 flex-shrink-0" />
-                  <span className="font-semibold text-lg">Check your email for verification code</span>
+                  <span className="font-semibold text-lg">check your email — we just sent you a 6-digit code</span>
                 </div>
               )}
 
               {submitStatus === 'error' && (
                 <div className="flex items-center gap-3 text-danger-dark bg-danger/10 px-5 py-4 rounded-2xl border-2 border-danger/30">
                   <AlertCircle className="w-6 h-6 flex-shrink-0" />
-                  <span className="font-semibold text-lg">Already signed up or invalid email</span>
+                  <span className="font-semibold text-lg">{errorMessage}</span>
                 </div>
               )}
             </form>
@@ -159,13 +167,16 @@ export default function Home() {
 
           {error && (
             <div className="text-center py-16 bg-white rounded-3xl shadow-soft">
-              <p className="text-lg text-text-light font-semibold">we're working on it :)</p>
+              <p className="text-2xl mb-3">⚠️</p>
+              <p className="text-lg text-text-light font-semibold">couldn't load events — check back in a moment</p>
             </div>
           )}
 
           {!isLoading && !error && events.length === 0 && (
             <div className="text-center py-16 bg-white rounded-3xl shadow-soft">
-              <p className="text-lg text-text-light font-semibold">we're working on it :)</p>
+              <p className="text-2xl mb-3">🍽️</p>
+              <p className="text-lg text-text-light font-semibold">no free food events in the next 24 hours</p>
+              <p className="text-sm text-text-lighter mt-2 font-medium">check back later — we'll email you the moment something drops</p>
             </div>
           )}
 
@@ -182,6 +193,8 @@ export default function Home() {
           )}
         </div>
       </section>
+
+      </main>
 
       {/* About Section */}
       <section className="px-4 pb-16 pt-4">

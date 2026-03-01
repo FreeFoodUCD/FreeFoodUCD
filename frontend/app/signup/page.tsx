@@ -35,10 +35,10 @@ function SignupContent() {
       setUserId(response.id);
       setStep('verify');
     } catch (err: any) {
-      if (err.message === 'already_signed_up' || err.message.includes('already exists')) {
-        setError('already signed up fatty');
+      if (err.message === 'already_signed_up' || err.message?.includes('already exists')) {
+        setError('looks like this email is already registered — check your inbox!');
       } else {
-        setError(err instanceof Error ? err.message : 'something went wrong, try again');
+        setError('something went wrong — try again in a moment');
       }
     } finally {
       setIsSubmitting(false);
@@ -54,7 +54,11 @@ function SignupContent() {
       await api.verify({ email, code: verificationCode });
       setStep('success');
     } catch (err: any) {
-      setError(err instanceof Error ? err.message : 'Invalid code. Please try again.');
+      if (err.message?.includes('expired')) {
+        setError('that code has expired — go back and request a new one');
+      } else {
+        setError('that code didn\'t work — double-check it and try again');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -79,10 +83,10 @@ function SignupContent() {
               <div className="text-6xl mb-6">🍕</div>
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-text mb-4">
-                get started
+                get notified
               </h1>
               <p className="text-lg md:text-xl text-text-light mb-12">
-                enter your email to receive instant notifications
+                enter your email — we'll alert you the moment free food drops on campus
               </p>
 
               <form onSubmit={handleSubmit} className="max-w-md mx-auto">
@@ -102,7 +106,7 @@ function SignupContent() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="your.email@ucd.ie"
+                      placeholder="your@email.com"
                       className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-gray-200 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 text-lg transition-all bg-white"
                       required
                     />
@@ -117,11 +121,11 @@ function SignupContent() {
                   {isSubmitting ? (
                     <>
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      sending...
+                      sending code...
                     </>
                   ) : (
                     <>
-                      continue
+                      send me a code
                       <ArrowRight className="w-5 h-5" />
                     </>
                   )}
@@ -201,7 +205,7 @@ function SignupContent() {
           {step === 'success' && (
             <div className="text-center">
               <div className="w-24 h-24 rounded-3xl bg-accent/10 flex items-center justify-center mx-auto mb-6 border-2 border-accent/20">
-                <Check className="w-12 h-12 text-accent-dark" />
+                <Check className="w-12 h-12 text-accent-text" />
               </div>
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-text mb-4">
@@ -225,7 +229,7 @@ function SignupContent() {
                   </li>
                   <li className="flex items-start gap-3">
                     <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-white text-sm font-bold flex items-center justify-center mt-0.5">3</span>
-                    <span className="text-text-light font-medium">never miss free food again!</span>
+                    <span className="text-text-light font-medium">head to campus and enjoy — that's it!</span>
                   </li>
                 </ul>
               </div>
