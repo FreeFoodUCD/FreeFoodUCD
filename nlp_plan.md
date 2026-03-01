@@ -32,13 +32,26 @@ FreeFoodUCD is a production service that scrapes UCD society Instagram accounts,
 
 ## Current Focus: NLP Classification
 
-The NLP pipeline determines whether an Instagram post is a free food event open to UCD students. This is the highest-leverage improvement area — the audit (707 posts) showed:
+The NLP pipeline determines whether an Instagram post is a free food event open to UCD students.
 
-- Current precision: **88.6%** (101 true positives, 13 false positives)
-- Current recall: **48.3%** (101 true positives, 108 false negatives)
-- Target: **precision ≥ 95%, recall ≥ 70%**
+### Audit History (GPT-4o-mini as silver-standard judge, 707 posts)
 
-The root causes of poor recall: keyword gaps, over-firing paid event filter, no context modifiers, no implied-free event types, missed past-tense recaps, and no LLM fallback for borderline posts.
+| Audit | Date | TP | FP | FN | Precision | Recall | Notes |
+|-------|------|----|----|----|-----------|--------|-------|
+| Baseline | pre-2026-02-28 | 101 | 13 | 108 | **88.6%** | **48.3%** | Rule-based only, original extractor |
+| Phase A | 2026-03-01 | 102 | 13 | 123 | **88.7%** | **45.3%** | See notes below |
+
+**Target: precision ≥ 95%, recall ≥ 70%**
+
+**Phase A audit notes:** Precision held flat (+0.1%). Recall dipped slightly despite Phase A improvements because (a) the LLM judge is more permissive than our rule-based system, labelling many speculative posts as food events, and (b) many of the 123 FNs are legitimately rejected (empty captions, bake-sale-for-charity, past-tense recaps). The biggest genuine miss categories in the FNs:
+- **"food" keyword with no context modifier** (24 posts) — exactly the grey zone B1 targets
+- **"snacks", "breakfast", "dinner", "baked goods", "goodies"** — not in any keyword list yet
+- **Eid/Ramadan posts** — religious event filter over-firing
+- **Posts with empty captions** — OCR missed; scraping issue not NLP
+
+Next audit after 1 week of B1 in production will isolate B1's real contribution.
+
+The root causes of poor recall: keyword gaps, no context modifiers for weak keywords, missed past-tense recaps, and no LLM fallback for borderline posts.
 
 ---
 
@@ -123,7 +136,7 @@ Borderline posts (weak food keyword, no context modifier, no strong keyword) are
 
 ## Next Concrete Steps
 
-1. **Run re-audit** — Phase A + B1 are live. Re-run `audit_classifier.py` against the latest post batch and compare precision/recall to the baseline (88.6% / 48.3%). Target: precision ≥ 95%, recall ≥ 70%.
+1. **Run re-audit in ~1 week** — B1 is now live in production. After a week of scrape runs (~14 cycles), re-run `audit_classifier.py` to measure B1's real contribution. Expect the grey-zone FNs ("food"/"snacks"/"dinner" with no context) to drop.
 
 2. **Implement Phase B2** — add per-post classification decision logging:
    - Log `stage_reached` (which filter fired), `llm_called`, `llm_food` result to `Event.extracted_data` JSONB
