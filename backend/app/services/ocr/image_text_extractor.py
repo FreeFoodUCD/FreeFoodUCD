@@ -67,24 +67,24 @@ class ImageTextExtractor:
             logger.error(f"OCR extraction failed: {e}")
             return None
     
-    def extract_text_from_urls(self, image_urls: list[str]) -> str:
+    def extract_text_from_urls(self, image_urls: list[str]) -> tuple[str, bool]:
         """
         Extract text from multiple images and combine.
-        
-        Args:
-            image_urls: List of image URLs
-            
+
         Returns:
-            Combined extracted text from all images
+            (combined_text, low_yield) where low_yield=True if Tesseract returned
+            fewer than 20 characters total — a signal that a vision LLM should be tried.
         """
         all_text = []
-        
+
         for url in image_urls:
             text = self.extract_text_from_url(url)
             if text:
                 all_text.append(text)
-        
-        return "\n\n".join(all_text)
+
+        combined = "\n\n".join(all_text)
+        low_yield = len(combined.strip()) < 20
+        return combined, low_yield
 
 
 # Made with Bob

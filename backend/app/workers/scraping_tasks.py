@@ -529,25 +529,30 @@ async def _process_scraped_content_async(content_type: str, content_id: str):
         extractor = EventExtractor()
         
         # Get content
+        ocr_low_yield = False
+        post_image_urls = None
         if content_type == 'story':
             content = await session.get(Story, content_id)
             text = content.story_text if content else None
         else:
             content = await session.get(Post, content_id)
             text = content.caption if content else ""
-            
+
             # Extract text from images using OCR
             if content and content.media_urls:
                 from app.services.ocr.image_text_extractor import ImageTextExtractor
                 ocr = ImageTextExtractor()
-                
+
                 logger.info(f"Extracting text from {len(content.media_urls)} images")
-                ocr_text = ocr.extract_text_from_urls(content.media_urls)
-                
+                ocr_text, ocr_low_yield = ocr.extract_text_from_urls(content.media_urls)
+
                 if ocr_text:
                     # Combine caption and OCR text
                     text = f"{text}\n\n[Image Text]\n{ocr_text}"
                     logger.info(f"Combined text length: {len(text)} chars")
+                if ocr_low_yield:
+                    logger.info("OCR low-yield (<20 chars) — vision LLM fallback eligible")
+                    post_image_urls = content.media_urls
         
         if not content or not text:
             logger.warning(f"No text found for {content_type} {content_id}")
@@ -565,7 +570,11 @@ async def _process_scraped_content_async(content_type: str, content_id: str):
         created_this_run_uuids = []
 
         for seg_idx, segment in enumerate(segments):
-            seg_event_data = extractor.extract_event(segment, content_type, post_timestamp)
+            seg_event_data = extractor.extract_event(
+                segment, content_type, post_timestamp,
+                image_urls=post_image_urls,
+                ocr_low_yield=ocr_low_yield,
+            )
             if not seg_event_data:
                 continue
 

@@ -25,6 +25,30 @@ _SYSTEM_PROMPT = (
     "Tierney Building, Roebuck Castle, UCD Village."
 )
 
+_VISION_SYSTEM_PROMPT = (
+    "You read Instagram post images from UCD (University College Dublin) student society accounts. "
+    "Look at the image(s) and caption. Reply with JSON only — no extra text. "
+    "If the image announces an UPCOMING event where free food or drinks will be provided "
+    "for all students, reply: "
+    '{"food": true, "text": "<key text you read from the image>", '
+    '"location": "<canonical UCD building name or null>", "time": "<HH:MM 24h or null>"}. '
+    'If not: {"food": false, "text": ""}. '
+    "Rules: "
+    "- A small society membership fee (€2–€5) is fine — do NOT reject for that alone. "
+    "- Reject if a ticket or admission price is required to attend. "
+    "- Reject if food is sold (bake sale, cake sale, fundraiser). "
+    "- Reject if it is a past-event recap, not an announcement. "
+    "- Reject if it is a social-media giveaway (enter to win, follow to win). "
+    "Known UCD buildings (use these exact names for location, or null): "
+    "Newman Building, Student Centre, Engineering & Materials Science Centre, "
+    "O'Brien Centre for Science, James Joyce Library, Sutherland School of Law, "
+    "Lochlann Quinn School of Business, Agriculture & Food Science Centre, "
+    "Health Sciences Centre, Veterinary Sciences Centre, "
+    "Computer Science & Informatics Centre, Daedalus Building, "
+    "Confucius Institute, Hanna Sheehy-Skeffington Building, "
+    "Tierney Building, Roebuck Castle, UCD Village."
+)
+
 _CACHE_TTL = 7 * 24 * 3600  # 7 days
 
 
@@ -71,6 +95,74 @@ class LLMClassifier:
         except Exception as exc:
             logger.warning(f"LLM classifier unavailable: {exc}")
             return None  # circuit break — caller will apply rule-based reject
+
+        # Cache write (non-fatal)
+        try:
+            self._redis.setex(cache_key, _CACHE_TTL, json.dumps(result))
+        except Exception:
+            pass
+
+        return result
+
+    def classify_with_vision(
+        self, image_urls: list[str], caption_text: str
+    ) -> Optional[dict]:
+        """
+        Vision LLM call for when Tesseract yields <20 chars (styled/decorative images).
+        Uses GPT-4o-mini with image input — same API key, same cost tier.
+
+        Returns {food: bool, text: str, location: str|None, time: str|None}
+        or None on API failure.
+        `text` is what the LLM read from the image; injected back into the extraction
+        pipeline so date/time/location rule-based parsers can use it.
+        """
+        cache_input = caption_text + "|".join(image_urls)
+        cache_key = f"llm_vision:{hashlib.sha256(cache_input.encode()).hexdigest()[:16]}"
+
+        # Cache read
+        try:
+            cached = self._redis.get(cache_key)
+            if cached is not None:
+                logger.debug("LLM vision cache hit")
+                return json.loads(cached)
+        except Exception:
+            pass
+
+        # Build message with up to 3 images (cap to avoid token bloat)
+        image_content = [
+            {
+                "type": "image_url",
+                "image_url": {"url": url, "detail": "high"},
+            }
+            for url in image_urls[:3]
+        ]
+
+        try:
+            response = self._client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "system", "content": _VISION_SYSTEM_PROMPT},
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "text", "text": f"Caption: {caption_text[:300]}"},
+                            *image_content,
+                        ],
+                    },
+                ],
+                max_tokens=120,
+                temperature=0,
+                response_format={"type": "json_object"},
+            )
+            result = json.loads(response.choices[0].message.content)
+            logger.info(
+                f"LLM vision classified post: food={result.get('food')}, "
+                f"text_excerpt={result.get('text', '')[:80]!r}, "
+                f"location={result.get('location')}, time={result.get('time')}"
+            )
+        except Exception as exc:
+            logger.warning(f"LLM vision classifier unavailable: {exc}")
+            return None
 
         # Cache write (non-fatal)
         try:

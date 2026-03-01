@@ -187,6 +187,10 @@ class EventExtractor:
             'kaffeeklatsch',
             # Food sampling events
             'free samples', 'handing out samples',
+            # General treat terms
+            'goodies',
+            # Specific pastries / foods (audit FNs)
+            'madeleines', 'apple strudel', 'acai bowl',
         ]
         # Weak food indicators — only count if "free", "provided", or "complimentary"
         # (or other context modifiers) also appears somewhere in the text
@@ -461,7 +465,14 @@ class EventExtractor:
     def load_nightlife_keywords(self) -> List[str]:
         """Load list of nightlife event keywords to reject."""
         return [
-            'ball', 'gala', 'formal', 'pub crawl',
+            # Ball events — specific compound phrases only ('ball' alone is too broad)
+            'ball tickets', 'ball ticket',
+            'charity ball', 'end of year ball', 'annual ball',
+            'summer ball', 'winter ball', 'freshers ball', "fresher's ball",
+            'halloween ball', 'christmas ball', 'masked ball', 'gala ball',
+            'society ball', 'rag ball', 'sports ball',
+            # Other formal/nightlife events
+            'gala', 'formal', 'pub crawl',
             'nightclub', 'club night', 'bar crawl',
             'pre drinks', 'afters', 'sesh', 'going out'
         ]
@@ -523,10 +534,9 @@ class EventExtractor:
 
         logger.debug(f"Classifying text: {clean_text[:100]}...")
 
-        # Iftar block: exclude regardless of other food keywords
-        _iftar_kw = ['iftar', 'iftaar', 'break the fast']
-        if any(kw in clean_text for kw in _iftar_kw):
-            logger.debug("REJECT: Iftar/religious event")
+        # A12: Religious event hard filter — before food detection
+        if self._is_religious_event(clean_text):
+            logger.debug("REJECT: Religious/faith-community event")
             return False
 
         # A3: Past-tense recap filter — before food detection (cheaper, high precision)
@@ -667,23 +677,33 @@ class EventExtractor:
             return False
         return any(kw in text for kw in self.weak_food_keywords)
 
-    def _try_llm_fallback(self, text: str) -> Optional[dict]:
+    def _try_llm_fallback(
+        self,
+        text: str,
+        image_urls: Optional[list] = None,
+        ocr_low_yield: bool = False,
+    ) -> Optional[dict]:
         """
-        Called when classify_event() returns False. Runs grey-zone check + hard filters,
-        then calls LLM for classification + extraction hints.
-        Returns hint dict {food, location, time} if LLM accepts, else None.
+        Called when classify_event() returns False. Routes to one of two LLM paths:
+
+        Vision path (B6): fires when Tesseract returned <20 chars AND image_urls are
+        available. Calls GPT-4o-mini with the images directly; returns vision-extracted
+        text in hints['_vision_text'] for injection back into the extraction pipeline.
+
+        Text path (existing): fires when text has a weak food keyword but no strong
+        keyword/context modifier (grey-zone post). Calls GPT-4o-mini text-only.
+
+        Hard filters always apply before either path — LLM cannot bypass them.
         """
         if not (settings.USE_SCORING_PIPELINE and settings.OPENAI_API_KEY):
             return None
 
         clean = self._preprocess_text(text)
 
-        if not self._has_weak_food_only(clean):
-            return None  # not even borderline — hard reject
-
-        # Hard filters still run before LLM — no bypassing safety checks
+        # Hard filters always block — no bypass by either LLM path
         if (self._is_food_activity(clean)
                 or self._is_staff_only(clean)
+                or self._is_religious_event(clean)
                 or self._is_other_college(clean)
                 or self._is_off_campus(clean)
                 or (self._is_online_event(clean) and not self._has_ucd_location(clean))
@@ -695,6 +715,20 @@ class EventExtractor:
         llm = get_llm_classifier()
         if llm is None:
             return None
+
+        # B6 Vision path: OCR yielded almost nothing and we have image URLs
+        if ocr_low_yield and image_urls and settings.USE_VISION_FALLBACK:
+            hints = llm.classify_with_vision(image_urls, text[:300])
+            if not hints or not hints.get('food'):
+                return None
+            # Carry vision-extracted text forward for date/time/location extraction
+            if hints.get('text'):
+                hints['_vision_text'] = hints['text']
+            return hints
+
+        # Text path: existing grey-zone behaviour (weak food keyword only)
+        if not self._has_weak_food_only(clean):
+            return None  # not even borderline — hard reject
 
         hints = llm.classify_and_extract(clean)
         if not hints or not hints.get('food'):
@@ -758,6 +792,10 @@ class EventExtractor:
             r"(?:don'?t|do\s+not|doesn'?t|does\s+not)\s+(?:need\s+to\s+)?pay\b",
             r'\bno\s+(?:need\s+to\s+)?pay\b',
             r'\bno\s+charge\b',
+            # A13a: additional explicit free-event declarations
+            r'\bfree\s+(?:event|to\s+attend|for\s+all|for\s+everyone)\b',
+            r'\bcompletely\s+free\b',
+            r'\b(?:this\s+is\s+(?:a\s+)?free|it\s+is\s+free)\b',
         ]
         for pattern in free_overrides:
             if re.search(pattern, text):
@@ -772,9 +810,19 @@ class EventExtractor:
             return False
 
         # Step 3: Explicit ticket / admission language → always paid
-        # (even without a price, registering for "tickets" implies a paid event)
+        # (bare "ticket" alone is too promiscuous; require purchase verbs, price, or availability words)
+        # NOTE: text is already ASCII-stripped so currency symbols (€£$) are gone.
         has_ticket_language = bool(re.search(
-            r'\b(?:tickets?|admission|entry\s+fee|buy\s+(?:your\s+)?tickets?|get\s+(?:your\s+)?tickets?)\b',
+            r'(?:'
+            r'\b(?:buy|get|purchase|book|grab|order)\s+(?:your\s+)?tickets?\b'  # action verbs
+            r'|\btickets?\s+(?:are\s+)?(?:available|on\s+sale|priced|cost)\b'   # ticket availability
+            r'|\btickets?:'                                                       # "Tickets: €5" (€ stripped)
+            r'|\btickets?\s+(?:can\s+be\s+)?(?:purchased|sold|bought)\b'        # "tickets can be purchased"
+            r'|\bticket\s+prices?\b'                                             # "ticket price(s)"
+            r'|\b(?:reduced|early.bird|vip)\s+ticket\b'                         # "reduced ticket"
+            r'|\badmission\b'                                                    # standalone admission
+            r'|\bentry\s+fee\b'                                                  # "entry fee"
+            r')',
             text
         ))
         if has_ticket_language:
@@ -804,9 +852,11 @@ class EventExtractor:
         return False
     
     def _is_nightlife_event(self, text: str) -> bool:
-        """Check if text indicates a nightlife event (ball, pub crawl, etc.)."""
+        """Check if text indicates a nightlife event (ball, pub crawl, etc.).
+        Uses word-boundary regex so 'ball ticket' doesn't match 'sciball ticket'.
+        """
         for keyword in self.nightlife_keywords:
-            if keyword in text:
+            if re.search(r'\b' + re.escape(keyword) + r'\b', text):
                 logger.debug(f"Found nightlife keyword: {keyword}")
                 return True
         return False
@@ -922,6 +972,22 @@ class EventExtractor:
         ]
         return any(re.search(p, text, re.IGNORECASE) for p in patterns)
 
+    def _is_religious_event(self, text: str) -> bool:
+        """
+        A12: Reject religious/faith-community events by policy.
+        These are targeted at specific communities, not general UCD students.
+        The LLM over-infers food from cultural context (Ramadan implies iftar meal, etc.)
+        so this filter must fire BEFORE the LLM gate.
+        """
+        patterns = [
+            r'\bramadan\b',
+            r'\biftaar?\b',          # matches both iftar and iftaar
+            r'\beid\s+mubarak\b',
+            r'\bsuhoor\b',
+            r'\bbreak(?:ing)?\s+the\s+fast\b',
+        ]
+        return any(re.search(p, text) for p in patterns)
+
     def _alias_in_text(self, alias: str, text_lower: str) -> bool:
         """
         Check if an alias appears in text.
@@ -943,9 +1009,8 @@ class EventExtractor:
         """
         clean_text = self._preprocess_text(text)
 
-        _iftar_kw = ['iftar', 'iftaar', 'break the fast']
-        if any(kw in clean_text for kw in _iftar_kw):
-            return "Iftar/religious event"
+        if self._is_religious_event(clean_text):
+            return "Religious event (excluded by policy)"
 
         if self._is_past_tense_post(clean_text):
             return "Past-tense recap post (not an upcoming event)"
@@ -986,11 +1051,9 @@ class EventExtractor:
         """Return result, reason, and matched keywords for admin display."""
         clean_text = self._preprocess_text(text)
 
-        # Iftar
-        _iftar_kw = ['iftar', 'iftaar', 'break the fast']
-        for kw in _iftar_kw:
-            if kw in clean_text:
-                return {'result': 'rejected', 'reason': 'Iftar/religious event', 'matched_keywords': [kw]}
+        # A12: Religious event
+        if self._is_religious_event(clean_text):
+            return {'result': 'rejected', 'reason': 'Religious event (excluded by policy)', 'matched_keywords': []}
 
         # Past-tense
         if self._is_past_tense_post(clean_text):
@@ -1099,28 +1162,42 @@ class EventExtractor:
 
     # ========== Event Detail Extraction (called AFTER classification) ==========
 
-    def extract_event(self, text: str, source_type: str = 'post', post_timestamp: Optional[datetime] = None) -> Optional[Dict]:
+    def extract_event(
+        self,
+        text: str,
+        source_type: str = 'post',
+        post_timestamp: Optional[datetime] = None,
+        image_urls: Optional[list] = None,
+        ocr_low_yield: bool = False,
+    ) -> Optional[Dict]:
         """
         Extract event details from text.
-        
-        This method should be called AFTER classify_event() returns True.
-        It extracts time, date, location, and generates event details.
-        
+
         Args:
             text: Text to extract from (caption + OCR text combined)
             source_type: 'post' or 'story'
             post_timestamp: When the post was made (for date validation)
-            
+            image_urls: Raw image URLs — passed to vision LLM fallback (B6) when
+                        Tesseract yielded low-confidence output.
+            ocr_low_yield: True when Tesseract returned <20 chars for this post.
+
         Returns:
             Dictionary with event details or None if classification fails
         """
         # First, classify the event
         llm_hints = None
         if not self.classify_event(text):
-            llm_hints = self._try_llm_fallback(text)
+            llm_hints = self._try_llm_fallback(
+                text, image_urls=image_urls, ocr_low_yield=ocr_low_yield
+            )
             if llm_hints is None:
                 return None
             logger.info("ACCEPT: LLM fallback approved borderline post")
+            # B6: If vision LLM extracted text from the image, inject it so that
+            # the rule-based date/time/location parsers below can use it.
+            if llm_hints and llm_hints.get('_vision_text'):
+                text = f"{text}\n\n[Vision Text]\n{llm_hints['_vision_text']}"
+                logger.debug(f"Vision text injected: {llm_hints['_vision_text'][:120]!r}")
 
         # B5: Skip posts where time is explicitly TBC/TBA — the society will post again with details
         _tbc_patterns = [r'\btbc\b', r'\btba\b', r'\bto\s+be\s+confirmed\b', r'\bto\s+be\s+announced\b']

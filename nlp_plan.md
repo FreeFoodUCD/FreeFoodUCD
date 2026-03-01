@@ -37,33 +37,44 @@ The NLP pipeline determines whether an Instagram post is a free food event open 
 ### Decision Pipeline (in order)
 
 ```
-Caption + OCR text
+Tesseract OCR(media_urls) → (ocr_text, ocr_low_yield)   ← B6: tuple, low_yield=True if <20 chars
+combined_text = caption + ocr_text
        │
        ▼
-[1]  Past-tense filter       → "thanks for coming", "was amazing" → REJECT
-[2]  _has_explicit_food()    → needs strong keyword OR (weak + context modifier) → REJECT if missing
-[3]  Food-activity filter    → baking class, cooking competition → REJECT
-[4]  Giveaway filter (A7)    → "giveaway", "enter to win", "prize draw" → REJECT
-[5]  Staff-only filter (A5)  → "committee only", "exec meeting" → REJECT
-[6]  Other college filter    → Trinity, DCU, etc. → REJECT
-[7]  Off-campus filter       → Dundrum, pub, bar, named Dublin venues → REJECT
-[8]  Online-only filter      → Zoom + no UCD location → REJECT
-[9]  Paid event filter (A6)  → ticket language, €10+ amounts → REJECT
-[10] Nightlife filter        → "ball", "pub crawl", "nightclub", "club night", etc. → REJECT
+[1]  Religious event filter (A12) → "ramadan", "iftar/iftaar", "eid mubarak", "suhoor", "breaking the fast" → REJECT
+[2]  Past-tense filter       → "thanks for coming", "was amazing" → REJECT
+[3]  _has_explicit_food()    → needs strong keyword OR (weak + context modifier) → REJECT if missing
+[4]  Food-activity filter    → baking class, cooking competition → REJECT
+[5]  Giveaway filter (A7)    → "giveaway", "enter to win", "prize draw" → REJECT
+[6]  Staff-only filter (A5)  → "committee only", "exec meeting" → REJECT
+[7]  Other college filter    → Trinity, DCU, etc. → REJECT
+[8]  Off-campus filter       → Dundrum, pub, bar, named Dublin venues → REJECT
+[9]  Online-only filter      → Zoom + no UCD location → REJECT
+[10] Paid event filter (A6/A13) → ticket language (tightened), €10+ amounts, free overrides (expanded) → REJECT
+[11] Nightlife filter (A14)  → ball compounds, pub crawl, nightclub, club night, etc. (word-boundary matched) → REJECT
        │
        ▼
-    ACCEPT  →  extract_event()
+    ACCEPT  →  extract_event(text, image_urls, ocr_low_yield)
+                  │
+                  ├── classify_event() returned False?
+                  │     └── _try_llm_fallback()  ← hard filters re-run first (no bypass)
+                  │           ├── [B6] ocr_low_yield=True + image_urls?
+                  │           │     → classify_with_vision() (GPT-4o-mini, detail=high)
+                  │           │       food=True → inject _vision_text into extraction text
+                  │           └── weak food keyword only?
+                  │                 → classify_and_extract() (text-only LLM)
                   │
                   ├── B5: TBC detected? → return None (skip post)
                   ├── time_parser, date_parser, location extractor
-                  └── LLM fallback (if OPENAI_API_KEY set): fills gaps
+                  │     (benefit from _vision_text if vision path fired)
+                  └── LLM hints fill time/location gaps if rule-based found nothing
 ```
 
 ### Keyword Tiers
 
 | Tier | Examples | Rule |
 |------|----------|------|
-| **Strong** | pizza, refreshments, cookies, snacks, coffee morning, pancakes, biscuits, chocolate, cake, kaffeeklatsch, free samples, handing out samples, welcome reception, freshers fair… (≈55 terms) | Sufficient alone |
+| **Strong** | pizza, refreshments, cookies, snacks, coffee morning, pancakes, biscuits, chocolate, cake, kaffeeklatsch, free samples, handing out samples, goodies, madeleines, apple strudel, acai bowl, welcome reception, freshers fair… (≈59 terms) | Sufficient alone |
 | **Weak** | food, lunch, dinner, breakfast, drinks, drink, snack, tea, coffee, refreshers | Must be paired with a context modifier |
 | **Context modifiers** | provided, complimentary, included, on us, kindly sponsored, brought to you by, at no cost/charge, for free, on the house | Upgrades a weak keyword to sufficient evidence |
 
@@ -104,9 +115,14 @@ Caption + OCR text
 | A9 | Add `free samples`, `handing out samples` to `strong_food_keywords` | `extractor.py` | **Done** (2026-03-01) |
 | A10 | Remove `night out` from `nightlife_keywords` and `off_campus_venues` | `extractor.py` | **Done** (2026-03-01) |
 | A11 | Multi-event segmentation → multiple Events per Post | `extractor.py`, `scraping_tasks.py` | **Done** (2026-03-01) |
-| A12 | OCR improvement: adaptive thresholding fallback | `image_text_extractor.py` | **Not started** |
+| A12 | Religious event hard filter (`_is_religious_event`) | `extractor.py` | **Done** (2026-03-01) |
+| A13a | Expand paid filter free overrides ("this is a free event", "completely free", "free to attend") | `extractor.py` | **Done** (2026-03-01) |
+| A13b | Tighten ticket language regex (bare `ticket` → require verb/colon/availability) | `extractor.py` | **Done** (2026-03-01) |
+| A14 | Replace `'ball'` with specific compound phrases in nightlife keywords; use word-boundary matching | `extractor.py` | **Done** (2026-03-01) |
+| A15 | Add `goodies`, `madeleines`, `apple strudel`, `acai bowl` to `strong_food_keywords` | `extractor.py` | **Done** (2026-03-01) |
+| A16 | Regression tests for A12–A15 (6 new classify_event fixtures, 2 new nightlife fixtures) | `test_extractor.py` | **Done** (2026-03-01) |
 
-**Phase A (A1–A11) is complete. 90 tests pass: 67 classify_event + 4 B5 + 4 A11 + 15 screenshot-based.**
+**Phase A (A1–A16) is complete. 96 tests pass: 73 classify_event + 4 B5 + 4 A11 + 15 screenshot-based (+ 1 A11 segment-classify check). (4 B6 tests added separately — see Phase B.)**
 
 ---
 
@@ -217,6 +233,7 @@ Borderline posts (weak food keyword, no context modifier, no strong keyword) are
 | B3 | Regression test suite as proper pytest fixtures | `tests/nlp/test_classifier.py` *(new)* | **Not started** |
 | B4 | Admin classification-stats endpoint (`borderline_rate`, `llm_call_count`) | `admin.py` | **Not started** |
 | B5 | TBC/TBA time detection → skip post entirely | `extractor.py` | **Done** (2026-03-01) |
+| B6 | Vision LLM fallback (GPT-4o-mini) when Tesseract yields <20 chars | `llm_classifier.py`, `extractor.py`, `image_text_extractor.py`, `scraping_tasks.py`, `config.py` | **Done** (2026-03-01) |
 
 #### What Phase B1 implemented
 
@@ -239,6 +256,47 @@ Borderline posts (weak food keyword, no context modifier, no strong keyword) are
 
 ---
 
+#### What Phase B6 implemented
+
+**The problem:** Posts where the caption has no food keyword AND Tesseract returns <20 chars (styled Instagram graphics — gradient backgrounds, decorative fonts, coloured text overlays). These posts fail `_has_explicit_food()` and are invisible to the text-only LLM gate (`_has_weak_food_only()` = False → no LLM call at all). The food information exists only in the image, which Tesseract can't read.
+
+**The solution:** Two changes work together:
+
+1. `extract_text_from_urls()` now returns `(str, bool)` — the `bool` (`low_yield`) is `True` when Tesseract produced fewer than 20 characters across all images for this post.
+
+2. `_try_llm_fallback()` gains a new routing branch: if `ocr_low_yield=True` and `image_urls` are available, it calls `classify_with_vision()` instead of `classify_and_extract()`. Hard filters always run first — the vision LLM cannot bypass the paid/nightlife/staff-only/religious/off-campus checks.
+
+**Vision LLM call** — `classify_with_vision(image_urls, caption)`:
+- Model: `gpt-4o-mini` with image input (`detail=high`, up to 3 images)
+- Returns `{food: bool, text: str, location: str|null, time: str|null}`
+- `text` is what the LLM read from the image — this is the key output
+- Redis-cached 7 days (same TTL as text path)
+- Capped at `max_tokens=120` (larger than text-only path to allow for image description)
+- System prompt (`_VISION_SYSTEM_PROMPT`) includes the same hard-gate rules as the rule-based classifier in prose form, plus the canonical UCD building list for location output
+
+**Vision text injection:** When the vision path accepts, `_vision_text` is injected back into the `text` variable in `extract_event()` before the rule-based date/time/location parsers run:
+```python
+text = f"{text}\n\n[Vision Text]\n{hints['_vision_text']}"
+```
+This means if the LLM read `"FREE PIZZA Newman Building 1pm Tuesday"` from the image, the existing `time_parser` and `_extract_location()` code picks up `1pm` and `Newman Building` from that string — no changes to those parsers needed.
+
+**Feature flag:** `USE_VISION_FALLBACK: bool = True` in `config.py`. Set to `false` in Railway to disable the vision path without redeploying.
+
+**Cost:** GPT-4o-mini vision at `detail=high` for a 1080×1080 image ≈ 850 tokens. At ~90 low-yield posts/day: ~$0.35/month. Negligible.
+
+**B6 interaction with B1 (text path):** The two paths are mutually exclusive in the same call — `ocr_low_yield=True` routes to vision; `ocr_low_yield=False` routes to the weak-keyword text check. A post can't trigger both.
+
+**B6 interaction with A11 (segmentation):** Each segment is passed to `extract_event()` with the same `ocr_low_yield` and `image_urls` — so if a schedule post has thin OCR output, each food segment independently gets a vision LLM shot.
+
+**Integration test (`test_b6_integration.py`, 13/13 pass):**
+- Test 1: `classify_with_vision()` hits real OpenAI API, returns correct `{food, text, location, time}` schema
+- Test 2: `extract_event()` with `ocr_low_yield=True` routes to vision; `_vision_text` injection enables time/location extraction from vision output; `confidence_score=0.7`
+- Test 3: `classify_with_vision` NOT called when `ocr_low_yield=False`
+- Test 4: Hard filter (paid event caption) blocks before vision LLM — no API call
+- Test 5: `USE_VISION_FALLBACK=False` disables the path entirely
+
+---
+
 ### Phase C — Long-Term
 
 | # | Change | Status |
@@ -250,6 +308,16 @@ Borderline posts (weak food keyword, no context modifier, no strong keyword) are
 ---
 
 ## Known Failures & Limitations
+
+### Policy: Religious Events Should Not Pass
+
+Religious or faith-society events (Ramadan iftars, Eid celebrations, Diwali events, etc.) are **intentionally excluded** even when food is explicitly mentioned.
+
+**Rationale:** These events are typically targeted at specific faith communities, not general UCD students. Sending notifications for them would mislead subscribers and erode trust.
+
+**Status (2026-03-01): FIXED by A12.** `_is_religious_event()` added to `extractor.py` — fires at step [1] before food detection AND is included in the LLM hard-filter block. Patterns: `ramadan`, `iftaar?`, `eid mubarak`, `suhoor`, `break(ing)? the fast`.
+
+**Audit note:** Phase A LLM audit flagged 3+ Ramadan/Eid posts as FNs. These should not count toward our FN rate — they are correct rejects under policy.
 
 ### Production False Positives Found
 
@@ -346,12 +414,12 @@ After ~14 scrape cycles with A8/A9/A10/A11/B5 in production, re-run `audit_class
 
 Re-audit output should be saved as a new entry in the audit table above with date, metrics, and notes.
 
-### 2. A12 — OCR Improvement
+### 2. OCR Improvement (adaptive thresholding — lower priority post-B6)
 
-Add adaptive thresholding fallback in `image_text_extractor.py`:
+B6 now handles the primary consequence of low OCR yield (the food announcement in the image is read by the vision LLM instead). Adaptive thresholding in `image_text_extractor.py` would still be useful to improve segmentation accuracy for multi-event schedule posts (A11), since `segment_post_text()` relies on Tesseract preserving newlines:
 - When first Tesseract pass returns < 20 chars → re-run with `PIL.ImageOps.autocontrast` + binary threshold
-- Targets: styled schedule graphics on gradient/photo backgrounds (Arts Soc Week 6 IMG_3966 style)
-- Zero regression risk: only activates on low-yield images
+- Only activates on low-yield images (zero regression risk)
+- Priority: lower now that B6 handles the classification gap; only needed if schedule segmentation is found to be the next recall bottleneck in the re-audit
 
 ### 3. Phase B2 — Decision Logging
 
@@ -382,17 +450,18 @@ Low-risk additions worth making before next audit:
 | File | Role |
 |------|------|
 | `backend/app/services/nlp/extractor.py` | Main classifier + structured extractor. `classify_event()`, `extract_event()`, `segment_post_text()`, `get_classification_details()` |
-| `backend/app/services/ocr/image_text_extractor.py` | Tesseract OCR — accepts list of URLs, merges output, PSM 11 |
+| `backend/app/services/ocr/image_text_extractor.py` | Tesseract OCR — accepts list of URLs, merges output, PSM 11. Returns `(str, low_yield: bool)` |
 | `backend/app/services/nlp/date_parser.py` | Regex date extraction |
 | `backend/app/services/nlp/time_parser.py` | Regex time extraction (no TBC handling — B5 in extractor.py handles skip) |
-| `backend/app/services/nlp/llm_classifier.py` | GPT-4o-mini fallback, Redis-cached 7 days |
+| `backend/app/services/nlp/llm_classifier.py` | GPT-4o-mini text fallback (`classify_and_extract`) + vision fallback (`classify_with_vision`), both Redis-cached 7 days |
 | `backend/app/workers/scraping_tasks.py` | Celery task: scrape → OCR → NLP → multi-event loop → save → notify |
 | `backend/app/workers/notification_tasks.py` | Celery task: email eligible users, batch per scrape run |
 | `backend/app/services/notifications/brevo.py` | Brevo email service |
 | `backend/app/core/config.py` | Env-var settings, feature flags |
 | `backend/app/db/models.py` | SQLAlchemy models |
 | `backend/app/api/v1/endpoints/admin.py` | Admin API — note: uses own NLP path (does not use segmentation yet) |
-| `backend/test_extractor.py` | 90-test regression suite (67 classify_event + 4 B5 + 4 A11 + 15 screenshot). Run: `cd backend && venv/bin/python test_extractor.py` |
+| `backend/test_extractor.py` | 100-test regression suite (73 classify_event + 4 B5 + 4 A11 + 15 screenshot + 4 B6 mocked). Run: `cd backend && venv/bin/python test_extractor.py` |
+| `backend/test_b6_integration.py` | 13-test B6 integration suite using real OpenAI API. Run: `cd backend && venv/bin/python test_b6_integration.py` |
 | `backend/audit_classifier.py` | LLM-based audit of full post history (silver-standard eval, GPT-4o-mini as judge) |
 | `backend/audit_report.txt` | Last audit results (Phase A, 707 posts) |
 | `backend/Important posts/` | 17 reference screenshots (IMG_3965–3991) used to build real-world regression tests |

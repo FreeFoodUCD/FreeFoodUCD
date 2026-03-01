@@ -65,6 +65,9 @@ class Settings(BaseSettings):
     USE_SCORING_PIPELINE: bool = True
     # OpenAI key for Phase B LLM fallback (optional; Phase A does not require it)
     OPENAI_API_KEY: Optional[str] = None
+    # B6: Vision LLM fallback — fires when Tesseract yields <20 chars and images are available.
+    # Set USE_VISION_FALLBACK=false in Railway env vars to disable without redeploying.
+    USE_VISION_FALLBACK: bool = True
     
     @model_validator(mode='after')
     def check_admin_key(self):
