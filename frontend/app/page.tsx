@@ -55,7 +55,7 @@ export default function Home() {
     } catch (err: any) {
       setSubmitStatus('error');
       if (err.message === 'already_signed_up' || err.message?.includes('already exists')) {
-        setErrorMessage('this email is already signed up — check your inbox for the verification code');
+        setErrorMessage("you're already signed up! check your inbox for event notifications.");
       } else {
         setErrorMessage('something went wrong — try again or use the sign-up page');
       }
