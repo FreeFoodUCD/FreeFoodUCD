@@ -1,6 +1,6 @@
 from app.workers.celery_app import celery_app
 from app.db.base import task_db_session
-from app.db.models import Story, Event, ScrapingLog
+from app.db.models import Story, Event, Post, ScrapingLog
 from sqlalchemy import select, delete
 from datetime import datetime, timedelta, timezone
 import logging
@@ -137,5 +137,58 @@ async def _health_check_async():
             "error": str(e),
             "timestamp": datetime.now(timezone.utc).isoformat()
         }
+
+@celery_app.task
+def reprocess_nlp_failed_posts():
+    """
+    F6: Re-queue posts that failed NLP processing due to API errors.
+    Only retries posts where nlp_failed=True AND processed=False
+    (processed=True means it was a data error, not an API error — don't retry).
+    Processes in batches of 50 to avoid overwhelming the Gemini API.
+    """
+    return asyncio.run(_reprocess_nlp_failed_posts_async())
+
+
+async def _reprocess_nlp_failed_posts_async():
+    """Async implementation of reprocess_nlp_failed_posts."""
+    from app.workers.scraping_tasks import _process_scraped_content_async
+
+    async with task_db_session() as session:
+        # Find posts that failed NLP and haven't been processed yet
+        result = await session.execute(
+            select(Post)
+            .where(Post.nlp_failed == True, Post.processed == False)
+            .order_by(Post.detected_at.desc())
+            .limit(50)
+        )
+        failed_posts = result.scalars().all()
+
+        if not failed_posts:
+            logger.info("reprocess_nlp_failed_posts: no failed posts to retry")
+            return {"requeued": 0}
+
+        requeued = 0
+        for post in failed_posts:
+            try:
+                # Reset the failure flag before retrying
+                post.nlp_failed = False
+                post.nlp_error = None
+                await session.flush()
+
+                nlp_result = await _process_scraped_content_async("post", str(post.id))
+                logger.info(
+                    f"Reprocessed post {post.id}: "
+                    f"event_created={nlp_result.get('event_created')}"
+                )
+                requeued += 1
+            except Exception as exc:
+                logger.error(f"Reprocess failed again for post {post.id}: {exc}")
+                post.nlp_failed = True
+                post.nlp_error = str(exc)[:500]
+                post.processed = False
+
+        await session.commit()
+        logger.info(f"reprocess_nlp_failed_posts: requeued {requeued} posts")
+        return {"requeued": requeued}
 
 # Made with Bob

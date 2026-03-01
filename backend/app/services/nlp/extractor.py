@@ -1,117 +1,88 @@
+"""
+EventExtractor — Phase E (Gemini-first, dual-source cross-check)
+
+Architecture:
+  1. Hard filters (fast regex) — paid/nightlife/off-campus/religious/other-college
+  2. Gemini classify_and_extract() — primary classifier + full extraction
+  3. _reconcile_datetime() — cross-check Gemini datetime against regex evidence
+  4. _extract_location() — canonicalize Gemini's location string via alias dict
+  5. Past-date validation + TBC skip
+
+Deleted from Phase D:
+  - classify_event() (11-gate rule-based classifier)
+  - _try_llm_fallback() (grey-zone routing logic)
+  - _has_explicit_food() / _has_weak_food_only() / _food_is_negated()
+  - _is_past_tense_post() / _is_food_activity() / _is_giveaway_contest()
+  - _is_staff_only() / _is_online_event()
+  - _generate_title() (Gemini returns title directly)
+  - _is_members_only() (Gemini returns members_only directly)
+  - _preprocess_text() (Gemini handles raw text natively)
+  - _combine_datetime() (replaced by ISO parse)
+  - _FOOD_EMOJI_MAP (Gemini understands emojis natively)
+  - All strong/weak food keyword lists
+  - TimeParser (Gemini returns time; regex used only as cross-check)
+  - DateParser (Gemini resolves dates; regex used only as cross-check)
+"""
+
 import re
-import unicodedata
-from datetime import datetime, timedelta
-from typing import Optional, Dict, List, Tuple
-import pytz
 import logging
-from app.services.nlp.date_parser import DateParser
-from app.services.nlp.time_parser import TimeParser
+from datetime import datetime, timedelta, timezone
+from typing import Optional, Dict, List, Tuple
+
+import pytz
+
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
-# Map food/drink emojis to the text keyword they represent.
-# Applied in _preprocess_text before ASCII stripping so that a caption like
-# "🍕🍕 provided tonight" becomes "pizza pizza provided tonight" and is caught
-# by the strong-keyword classifier.
-_FOOD_EMOJI_MAP: Dict[str, str] = {
-    # Pizza / burgers / handheld
-    '🍕': 'pizza',
-    '🍔': 'burger',
-    '🌭': 'burger',
-    '🌮': 'tacos',
-    '🌯': 'sandwich',
-    '🥙': 'sandwich',
-    '🥪': 'sandwich',
-    # Mains
-    '🍜': 'food',
-    '🍛': 'curry',
-    '🍝': 'pasta',
-    '🍲': 'soup',
-    '🍣': 'sushi',
-    '🍱': 'food',
-    '🍟': 'food',
-    '🍖': 'food',
-    '🍗': 'food',
-    '🥘': 'food',
-    '🥗': 'food',
-    '🥩': 'food',
-    '🥓': 'food',
-    '🧆': 'food',
-    # Bread / pastries
-    '🍞': 'food',
-    '🥖': 'food',
-    '🥐': 'croissant',
-    '🥯': 'food',
-    '🥨': 'snacks',
-    # Breakfast
-    '🧇': 'waffles',
-    '🥞': 'pancakes',
-    '🥚': 'food',
-    '🧀': 'food',
-    # Sweet / dessert
-    '🍰': 'cake',
-    '🎂': 'cake',
-    '🧁': 'cupcakes',
-    '🍩': 'donuts',
-    '🍪': 'cookies',
-    '🍫': 'chocolate',
-    '🍿': 'popcorn',
-    '🍭': 'sweets',
-    '🍬': 'sweets',
-    '🍦': 'ice cream',
-    '🍨': 'ice cream',
-    '🍧': 'ice cream',
-    '🍮': 'food',
-    # Snacks
-    '🥜': 'snacks',
-    '🧂': 'food',
-    # Hot drinks
-    '☕': 'coffee',
-    '🫖': 'tea',
-    '🍵': 'tea',
-    # Cold drinks
-    '🧋': 'drinks',
-    '🥛': 'drinks',
-    '🥤': 'drinks',
-    '🧃': 'drinks',
-    # Alcoholic (maps to drinks so weak-keyword + "free"/"provided" still fires)
-    '🍷': 'drinks',
-    '🍸': 'drinks',
-    '🍹': 'drinks',
-    '🍺': 'drinks',
-    '🍻': 'drinks',
-    '🥂': 'drinks',
-}
+UTC = timezone.utc
+
+# ---------------------------------------------------------------------------
+# Regex patterns for cross-check validation
+# ---------------------------------------------------------------------------
+
+# Evidence that a specific date is mentioned in the text.
+# Must be a concrete day/date reference — NOT vague words like "soon", "this week".
+_DATE_EVIDENCE_RE = re.compile(
+    r'\b('
+    r'monday|tuesday|wednesday|thursday|friday|saturday|sunday|'
+    r'mon|tue|tues|wed|thu|thur|thurs|fri|sat|sun|'
+    r'today|tomorrow|tonight|'
+    r'\d{1,2}(?:st|nd|rd|th)\b'         # ordinal day numbers (must have suffix)
+    r'|\d{1,2}[/\-]\d{1,2}'             # DD/MM or DD-MM
+    r'|\d{1,2}\s+(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*'  # "17 Feb"
+    r')\b',
+    re.IGNORECASE,
+)
+
+# Evidence that a specific time is mentioned in the text
+_TIME_EVIDENCE_RE = re.compile(
+    r'\b\d{1,2}(?::\d{2})?\s*(?:am|pm)\b'   # 1pm, 1:30pm
+    r'|\b\d{1,2}:\d{2}\b'                    # 13:00
+    r'|\b(?:noon|midnight)\b'
+    r'|\bhalf\s+(?:past\s+)?\d{1,2}\b'       # half five, half past 5
+    r'|\bquarter\s+(?:past|to)\s+\d{1,2}\b', # quarter past 3
+    re.IGNORECASE,
+)
 
 
 class EventExtractor:
     """
-    Strict TRUE/FALSE classifier for free food events at UCD.
-    
-    Returns TRUE only if:
-    - Free food is explicitly mentioned
-    - Event is at UCD Belfield campus (or assumed on-campus)
-    - NOT at another college
-    - NOT off-campus venue
-    - NOT a paid event (except €2 membership)
-    - NOT a nightlife event (ball, pub crawl, etc.)
+    Gemini-first event extractor.
+    Gemini is the primary classifier and extractor.
+    Regex parsers are used only as cross-check validators for datetime.
     """
-    
+
     def __init__(self):
         self.timezone = pytz.timezone('Europe/Dublin')
-        self.date_parser = DateParser(self.timezone)
-        self.time_parser = TimeParser()
-        # building_aliases: lowercase alias -> official display name
-        self.building_aliases = self.load_building_aliases()
-        # sorted longest-first so specific matches beat short ones (e.g. "engineering building" before "engineering")
+        self.building_aliases = self._load_building_aliases()
+        # sorted longest-first so specific matches beat short ones
         self.ucd_buildings = sorted(self.building_aliases.keys(), key=len, reverse=True)
-        self.other_colleges = self.load_other_colleges()
-        self.off_campus_venues = self.load_off_campus_venues()
-        self.nightlife_keywords = self.load_nightlife_keywords()
-        
-        # Named rooms within Student Centre: lowercase alias -> canonical display name
-        # Checked first in _extract_location so "Blue Room" → "Blue Room, Student Centre"
+        self.other_colleges = self._load_other_colleges()
+        self.off_campus_venues = self._load_off_campus_venues()
+        self.nightlife_keywords = self._load_nightlife_keywords()
+
+        # Named rooms within Student Centre
         self.student_centre_rooms = {
             'blue room': 'Blue Room',
             'red room': 'Red Room',
@@ -135,7 +106,6 @@ class EventExtractor:
             'newman basement': 'Newman Basement',
             'newstead atrium': 'Newstead Atrium',
         }
-        # Sorted longest-first so "clubhouse bar" matches before "clubhouse", etc.
         self.student_centre_rooms_sorted = sorted(
             self.student_centre_rooms.keys(), key=len, reverse=True
         )
@@ -151,68 +121,574 @@ class EventExtractor:
             self.village_rooms.keys(), key=len, reverse=True
         )
 
-        # Strong food indicators — sufficient on their own
-        self.strong_food_keywords = [
-            'free food', 'free pizza', 'free lunch', 'free dinner',
-            'free breakfast', 'free snacks', 'free snack',
-            'pizza', 'refreshments', 'catering', 'buffet', 'nibbles',
-            'cookies', 'cookie', 'dessert', 'protein bar', 'protein bars',
-            'kombucha', 'potluck', 'banquet',
-            'food provided', 'refreshments provided', 'food will be provided',
-            'complimentary food', 'italian food', 'barbeque', 'bbq',
-            'brunch', 'coffee morning',
-            'popcorn', 'nachos', 'crisps', 'chips', 'chocolate', 'cake', 'waffles',
-            'biscuits', 'donuts', 'doughnuts', 'sweets', 'cupcakes',
-            'sandwich', 'sandwiches', 'sushi', 'curry',
-            'soup', 'pasta', 'tacos', 'burger', 'burgers',
-            # Hot drinks & morning events
-            'hot chocolate', 'tea morning', 'tea afternoon', 'coffee afternoon',
-            'fika',
-            # Baked goods & pastries
-            'croissant', 'croissants', 'pastries', 'pastry', 'baked goods',
-            'gingerbread', 'pancakes',
-            # General treats
-            'treats', 'sweet treats', 'ice cream',
-            # Snacks (unambiguous in society context)
-            'snacks',
-            # Informal food terms common in UCD/Irish society posts
-            'light bites',
-            'food and drinks', 'food and drink', 'food & drinks', 'food & drink',
-            'food on the night',
-            'grub', 'munchies',
-            # Implied-free event types (cultural norm at UCD — these events always have food)
-            'welcome reception', 'freshers fair', "fresher's fair",
-            'open evening',
-            # German/international social terms
-            'kaffeeklatsch',
-            # Food sampling events
-            'free samples', 'handing out samples',
-            # Specific pastries / foods (audit FNs)
-            'madeleines', 'apple strudel',
-        ]
-        # Weak food indicators — only count if "free", "provided", or "complimentary"
-        # (or other context modifiers) also appears somewhere in the text
-        self.weak_food_keywords = [
-            'food', 'lunch', 'dinner', 'breakfast', 'drinks', 'drink',
-            'snack', 'tea', 'coffee',
-            'refreshers',   # demoted: "Refreshers Week" posts have no food mention
-            # Specific food items that need free-provision context
-            'goodies', 'acai bowl', 'açaí bowl',
-        ]
-        # Context modifiers that make weak food keywords count as sufficient evidence.
-        # Extends the original {"free", "provided", "complimentary"} set.
-        self.context_modifiers = [
-            'provided', 'complimentary', 'included', 'on us', 'on the house',
-            'kindly sponsored', 'brought to you by', 'at no cost', 'at no charge',
-            'for free',
-        ]
-        
-    
-    def load_building_aliases(self) -> Dict[str, str]:
+    # ── Hard filters ─────────────────────────────────────────────────────────
+
+    # Soft-filter hints: patterns that don't hard-reject but inject a clarifying
+    # note into the Gemini prompt so it can make a more informed decision.
+    _SOFT_FILTER_HINTS: dict = {
+        r'\bbake\s+sale\b': (
+            "Note: post mentions 'bake sale' — only accept if free food is ALSO "
+            "explicitly offered alongside the sale (e.g. 'free pizza for volunteers')."
+        ),
+        r'\bcake\s+sale\b': (
+            "Note: post mentions 'cake sale' — only accept if free samples or free "
+            "food are explicitly offered in addition to the sale."
+        ),
+    }
+
+    def _passes_hard_filters(self, text: str) -> tuple:
         """
-        Map every known alias / abbreviation (lowercase) to the official building name.
-        Sorted longest-first in __init__ so specific matches win over short ones.
+        Fast pre-filter before calling Gemini.
+        Returns (passes: bool, rejection_reason: str).
+        rejection_reason is '' when the post passes.
+
+        These are high-precision, low-recall checks — they only fire on
+        unambiguous signals (explicit ticket language, named off-campus venues, etc.)
+        Audit-logged at INFO level so rejections are queryable in Railway logs.
         """
+        text_lower = text.lower()
+        if self._is_paid_event(text_lower):
+            logger.info(f"HARD_FILTER_REJECT:paid_event | {text[:80]!r}")
+            return False, "paid_event"
+        if self._is_nightlife_event(text_lower):
+            logger.info(f"HARD_FILTER_REJECT:nightlife | {text[:80]!r}")
+            return False, "nightlife"
+        if self._is_off_campus(text_lower):
+            logger.info(f"HARD_FILTER_REJECT:off_campus | {text[:80]!r}")
+            return False, "off_campus"
+        if self._is_other_college(text_lower):
+            logger.info(f"HARD_FILTER_REJECT:other_college | {text[:80]!r}")
+            return False, "other_college"
+        if self._is_religious_event(text_lower):
+            logger.info(f"HARD_FILTER_REJECT:religious | {text[:80]!r}")
+            return False, "religious"
+        return True, ""
+
+    def _is_paid_event(self, text: str) -> bool:
+        """
+        Return True only if the event is clearly a paid-access event.
+        Small amounts (≤€5) without explicit ticket language are NOT rejected.
+        Membership context with reasonable price (≤€5) is always allowed.
+        """
+        # Free overrides
+        free_overrides = [
+            r'\bfree\s+(?:of\s+)?(?:charge|cost|entry|admission)\b',
+            r'\bno\s+(?:entry\s+)?(?:fee|cost|charge)\b',
+            r'\bno\s+tickets?\s+(?:needed|required)\b',
+            r"(?:don'?t|do\s+not|doesn'?t|does\s+not)\s+(?:need\s+to\s+)?pay\b",
+            r'\bno\s+(?:need\s+to\s+)?pay\b',
+            r'\bno\s+charge\b',
+            r'\bfree\s+(?:event|to\s+attend|for\s+all|for\s+everyone)\b',
+            r'\bcompletely\s+free\b',
+            r'\b(?:this\s+is\s+(?:a\s+)?free|it\s+is\s+free)\b',
+        ]
+        for pattern in free_overrides:
+            if re.search(pattern, text):
+                return False
+
+        # Membership context — allow any price ≤€5
+        is_member_context = bool(re.search(r'\b(?:membership|ucard)\b', text))
+        euro_amounts = [int(x) for x in re.findall(r'€(\d+)', text)]
+        if is_member_context and euro_amounts and all(a <= 5 for a in euro_amounts):
+            return False
+
+        # Explicit ticket / admission language → always paid
+        has_ticket_language = bool(re.search(
+            r'(?:'
+            r'\b(?:buy|get|purchase|book|grab|order)\s+(?:your\s+)?tickets?\b'
+            r'|\btickets?\s+(?:are\s+)?(?:available|on\s+sale|priced|cost)\b'
+            r'|\btickets?:'
+            r'|\btickets?\s+(?:can\s+be\s+)?(?:purchased|sold|bought)\b'
+            r'|\bticket\s+prices?\b'
+            r'|\b(?:reduced|early.bird|vip)\s+ticket\b'
+            r'|\badmission\b'
+            r'|\bentry\s+fee\b'
+            r')',
+            text
+        ))
+        if has_ticket_language:
+            return True
+
+        # Large price (≥€10) without explicit free-food statement → paid
+        if euro_amounts and max(euro_amounts) >= 10:
+            has_free_food_stated = bool(re.search(
+                r'\bfree\s+(?:food|pizza|lunch|dinner|snacks?|refreshments?|drinks?|coffee|tea|breakfast)\b',
+                text
+            ))
+            if not has_free_food_stated:
+                return True
+
+        # Food-sale keywords — 'bake sale' and 'cake sale' moved to soft filters
+        # (they can co-exist with free food; Gemini decides with a hint injected)
+        food_sale_keywords = [
+            'cookie sale', 'food sale', 'food stall',
+            'fundraiser', 'charity sale', 'charity bake',
+        ]
+        for keyword in food_sale_keywords:
+            if keyword in text:
+                return True
+
+        return False
+
+    def _is_nightlife_event(self, text: str) -> bool:
+        """Check if text indicates a nightlife event."""
+        for keyword in self.nightlife_keywords:
+            if re.search(r'\b' + re.escape(keyword) + r'\b', text):
+                return True
+        return False
+
+    # Venues that need word-boundary matching (short words that appear in other contexts).
+    # 'bar' removed — too many false positives: "chocolate bar", "granola bar", "bar of soap".
+    # 'bar' is only rejected when it appears as a standalone venue word via _is_off_campus logic.
+    _BOUNDARY_VENUES = {'pub', 'grill', 'diner', 'tavern', 'brewery'}
+
+    def _is_off_campus(self, text: str) -> bool:
+        """
+        Check if text mentions off-campus venues.
+        Skip check if a known UCD building is already mentioned — on-campus wins.
+        """
+        if self._has_ucd_location(text):
+            return False
+        for venue in self.off_campus_venues:
+            if venue in self._BOUNDARY_VENUES:
+                if re.search(r'\b' + re.escape(venue) + r'\b', text):
+                    return True
+            else:
+                if venue in text:
+                    return True
+        return False
+
+    def _is_other_college(self, text: str) -> bool:
+        """Check if text mentions other Irish colleges."""
+        for college in self.other_colleges:
+            if len(college) <= 4:
+                if re.search(r'\b' + re.escape(college) + r'\b', text):
+                    return True
+            else:
+                if college in text:
+                    return True
+        return False
+
+    def _is_religious_event(self, text: str) -> bool:
+        """Reject religious/faith-community events."""
+        patterns = [
+            r'\biftar\b', r'\brahman\b', r'\bramadan\b',
+            r'\beid\b', r'\bsuhoor\b', r'\bsahoor\b',
+            r'\bfriday\s+prayer\b', r'\bjumu\'?ah\b',
+            r'\bchurch\s+service\b',
+            # "mass" alone is too broad — blocks "mass catering", "en masse", "mass email".
+            # Only reject when used in a clearly religious context:
+            #   "sunday mass", "going to mass", "attend mass", "after mass"
+            r'\bsunday\s+mass\b',
+            r'\b(?:going\s+to|attend(?:ing)?|after|before|at)\s+mass\b',
+        ]
+        for pattern in patterns:
+            if re.search(pattern, text, re.IGNORECASE):
+                return True
+        return False
+
+    def _has_ucd_location(self, text: str) -> bool:
+        """Return True if text contains a known UCD building name."""
+        for alias in self.ucd_buildings:
+            if len(alias) <= 4:
+                if re.search(r'\b' + re.escape(alias) + r'\b', text):
+                    return True
+            else:
+                if alias in text:
+                    return True
+        return False
+
+    # ── Datetime reconciliation ───────────────────────────────────────────────
+
+    def _reconcile_datetime(
+        self,
+        gemini_start: Optional[str],
+        gemini_end: Optional[str],
+        text: str,
+        post_timestamp: Optional[datetime],
+    ) -> Tuple[Optional[datetime], Optional[datetime], float]:
+        """
+        Cross-check Gemini's datetime against text evidence.
+
+        Returns (start_dt, end_dt, confidence_modifier).
+
+        Rules:
+        1. Parse Gemini's ISO datetime strings
+        2. Reject if in the past (>1h grace)
+        3. Reject if >30 days in the future (suspiciously far)
+        4. Reject date component if no date evidence in text
+        5. Strip time component if no time evidence in text (use noon as default)
+        6. Cross-check with regex parsers; if they agree → confidence 1.0
+        """
+        now_utc = datetime.now(UTC)
+        now_local = datetime.now(self.timezone)
+        ref = post_timestamp or now_utc
+
+        has_date_evidence = bool(_DATE_EVIDENCE_RE.search(text))
+        has_time_evidence = bool(_TIME_EVIDENCE_RE.search(text))
+
+        def _parse_iso(s: Optional[str]) -> Optional[datetime]:
+            if not s:
+                return None
+            try:
+                dt = datetime.fromisoformat(s)
+                if dt.tzinfo is None:
+                    dt = self.timezone.localize(dt)
+                return dt
+            except (ValueError, TypeError):
+                return None
+
+        # Use the config value; fall back to 30 if settings is mocked or misconfigured.
+        # NOTE: int(MagicMock()) returns 1 (MagicMock.__int__ default), so we must
+        # check isinstance before casting.
+        _raw = getattr(settings, 'GEMINI_MAX_FUTURE_DAYS', 30)
+        max_future_days = _raw if isinstance(_raw, int) else 30
+
+        # Track whether Gemini's datetime was explicitly in the past.
+        # If so, the post is about a past event — do NOT fall back to regex
+        # (DateParser resolves bare weekday names like "Friday" to the *next*
+        # occurrence, which would create a false future event).
+        gemini_raw_dt = _parse_iso(gemini_start)
+        gemini_is_past = (
+            gemini_raw_dt is not None
+            and gemini_raw_dt < now_utc - timedelta(hours=1)
+        )
+
+        def _validate(dt: Optional[datetime]) -> Optional[datetime]:
+            if dt is None:
+                return None
+            # Reject past events (>1h grace for "happening now")
+            if dt < now_utc - timedelta(hours=1):
+                logger.debug(f"Datetime {dt} is in the past — rejected")
+                return None
+            # Reject suspiciously far future
+            if dt > now_utc + timedelta(days=max_future_days):
+                logger.debug(f"Datetime {dt} is >{max_future_days} days out — rejected")
+                return None
+            # Reject if no date evidence in text
+            if not has_date_evidence:
+                logger.debug("Gemini returned datetime but no date evidence in text — rejected")
+                return None
+            # Strip time if no time evidence
+            if not has_time_evidence:
+                dt = dt.replace(hour=12, minute=0, second=0, microsecond=0)
+            return dt
+
+        gemini_start_dt = _validate(_parse_iso(gemini_start))
+        gemini_end_dt = _validate(_parse_iso(gemini_end))
+
+        # If Gemini explicitly returned a past datetime, reject entirely.
+        # Don't fall back to regex — the post is about a past event.
+        # Use confidence=-1.0 as a sentinel so extract_event() can distinguish
+        # "past event" (reject whole post) from "no datetime found" (keep post, start_time=None).
+        if gemini_is_past:
+            logger.debug("Gemini datetime was past — rejecting post entirely (no regex fallback)")
+            return None, None, -1.0
+
+        # Cross-check with regex parsers (use same window as Gemini validation)
+        regex_date = self._regex_parse_date(text, ref, max_future_days=max_future_days)
+        regex_time = self._regex_parse_time(text)
+
+        # Determine confidence
+        if gemini_start_dt and regex_date:
+            # Both found a date — check agreement (within 1 day)
+            if abs((gemini_start_dt.date() - regex_date.date()).days) <= 1:
+                confidence = 1.0  # agreement
+            else:
+                # Disagreement — trust regex date, use Gemini's time if available
+                logger.debug(
+                    f"Date disagreement: Gemini={gemini_start_dt.date()}, "
+                    f"regex={regex_date.date()} — trusting regex"
+                )
+                if regex_time and has_time_evidence:
+                    gemini_start_dt = self.timezone.localize(
+                        regex_date.replace(
+                            hour=regex_time['hour'],
+                            minute=regex_time['minute'],
+                            second=0, microsecond=0,
+                            tzinfo=None,
+                        )
+                    )
+                else:
+                    gemini_start_dt = self.timezone.localize(
+                        regex_date.replace(tzinfo=None)
+                    )
+                gemini_end_dt = None
+                confidence = 0.85
+        elif gemini_start_dt:
+            confidence = 0.75  # Gemini only
+        elif regex_date and has_date_evidence:
+            # Regex found date, Gemini didn't — use regex only if text has evidence
+            # Also apply the same plausibility window as Gemini validation
+            regex_dt_candidate = self.timezone.localize(regex_date.replace(tzinfo=None))
+            if regex_dt_candidate > now_utc + timedelta(days=max_future_days):
+                logger.debug(f"Regex date {regex_dt_candidate.date()} is >{max_future_days} days out — rejected")
+                confidence = 0.0
+            else:
+                if regex_time and has_time_evidence:
+                    gemini_start_dt = self.timezone.localize(
+                        regex_date.replace(
+                            hour=regex_time['hour'],
+                            minute=regex_time['minute'],
+                            second=0, microsecond=0,
+                            tzinfo=None,
+                        )
+                    )
+                else:
+                    gemini_start_dt = self.timezone.localize(
+                        regex_date.replace(tzinfo=None)
+                    )
+                gemini_end_dt = None
+                confidence = 0.85
+        else:
+            confidence = 0.0  # no datetime found
+
+        return gemini_start_dt, gemini_end_dt, confidence
+
+    def _regex_parse_date(
+        self, text: str, post_timestamp: Optional[datetime], max_future_days: int = 30
+    ) -> Optional[datetime]:
+        """Thin wrapper — use DateParser for cross-check.
+        max_future_days is passed through so DateParser uses the same plausibility
+        window as _reconcile_datetime (default 30 days, matching GEMINI_MAX_FUTURE_DAYS).
+        """
+        try:
+            from app.services.nlp.date_parser import DateParser
+            dp = DateParser(self.timezone, max_future_days=max_future_days)
+            return dp.parse_date(text.lower(), post_timestamp)
+        except Exception:
+            return None
+
+    def _regex_parse_time(self, text: str) -> Optional[Dict]:
+        """Thin wrapper — use TimeParser for cross-check."""
+        try:
+            from app.services.nlp.time_parser import TimeParser
+            tp = TimeParser()
+            result = tp.parse_time_range(text.lower())
+            return result['start'] if result else None
+        except Exception:
+            return None
+
+    # ── Location extraction ───────────────────────────────────────────────────
+
+    def _extract_location(self, text: str) -> Optional[Dict]:
+        """
+        Extract and canonicalize location from text.
+        Checks Student Centre rooms first, then building aliases.
+        Returns {building, room, full_location} or None.
+        """
+        if not text:
+            return None
+        text_lower = text.lower().strip()
+
+        # Named Student Centre rooms — check before generic building scan
+        for room_key in self.student_centre_rooms_sorted:
+            if self._alias_in_text(room_key, text_lower):
+                room_name = self.student_centre_rooms[room_key]
+                return {
+                    'building': 'Student Centre',
+                    'room': room_name,
+                    'full_location': f'{room_name}, Student Centre',
+                }
+
+        # Named UCD Village rooms
+        for room_key in self.village_rooms_sorted:
+            if self._alias_in_text(room_key, text_lower):
+                room_name = self.village_rooms[room_key]
+                return {
+                    'building': 'UCD Village',
+                    'room': room_name,
+                    'full_location': f'{room_name}, UCD Village',
+                }
+
+        # Generic building scan (longest-first)
+        for alias in self.ucd_buildings:
+            if self._alias_in_text(alias, text_lower):
+                building = self.building_aliases[alias]
+                # Try to find a room code (e.g. E1.32, C204A, AD1.01, G01)
+                room = self._extract_room_code(text_lower)
+                if room:
+                    return {
+                        'building': building,
+                        'room': room,
+                        'full_location': f'{room}, {building}',
+                    }
+                return {
+                    'building': building,
+                    'room': None,
+                    'full_location': building,
+                }
+
+        return None
+
+    def _alias_in_text(self, alias: str, text: str) -> bool:
+        """Match alias in text; use word boundaries for short aliases (≤4 chars)."""
+        if len(alias) <= 4:
+            return bool(re.search(r'\b' + re.escape(alias) + r'\b', text))
+        return alias in text
+
+    def _extract_room_code(self, text: str) -> Optional[str]:
+        """
+        Extract room codes like E1.32, C204A, AD1.01, G01, LG18, etc.
+        Returns the room code string or None.
+        """
+        pattern = r'\b([A-Z]{1,3}\d{1,2}(?:\.\d{1,2})?[A-Z]?)\b'
+        match = re.search(pattern, text, re.IGNORECASE)
+        if match:
+            return match.group(1).upper()
+        return None
+
+    def segment_post_text(self, text: str) -> list:
+        """
+        Phase E stub — segmentation removed; Gemini handles multi-event posts natively.
+        Returns the full text as a single segment (zero regression risk).
+        Called by scraping_tasks.py for backwards compatibility.
+        """
+        return [text]
+
+    # ── Main entry point ──────────────────────────────────────────────────────
+
+    def extract_event(
+        self,
+        text: str,
+        source_type: str = 'post',
+        post_timestamp: Optional[datetime] = None,
+        image_urls: Optional[list] = None,
+        ocr_low_yield: bool = False,
+    ) -> Optional[Dict]:
+        """
+        Extract event details from text using Gemini as primary classifier.
+
+        Args:
+            text: Combined Instagram caption + OCR text
+            source_type: 'post' or 'story'
+            post_timestamp: When the post was published (for date context)
+            image_urls: Raw image URLs — passed to Gemini for vision analysis
+            ocr_low_yield: Unused in Phase E (Gemini handles vision natively)
+
+        Returns:
+            Dictionary with event details or None if rejected
+        """
+        from app.services.nlp.llm_classifier import get_llm_classifier
+
+        # Step 1: Hard filters — fast, high-precision, no LLM needed
+        passes, reject_reason = self._passes_hard_filters(text)
+        if not passes:
+            return None
+
+        # Step 2: TBC/TBA skip — society will post again with details
+        _tbc_patterns = [r'\btbc\b', r'\btba\b', r'\bto\s+be\s+confirmed\b', r'\bto\s+be\s+announced\b']
+        if any(re.search(p, text, re.IGNORECASE) for p in _tbc_patterns):
+            logger.info("SKIP: Time/details TBC — deferred pending follow-up")
+            return None
+
+        # Step 2b: Soft filter hints — inject clarifying notes into Gemini prompt
+        # for borderline patterns (bake sale, cake sale) rather than hard-rejecting.
+        soft_hints = []
+        for pattern, hint in self._SOFT_FILTER_HINTS.items():
+            if re.search(pattern, text, re.IGNORECASE):
+                soft_hints.append(hint)
+        text_for_gemini = text
+        if soft_hints:
+            text_for_gemini = text + "\n\n[Classifier Hints]\n" + "\n".join(soft_hints)
+            logger.info(f"Soft filter hints injected ({len(soft_hints)}): {soft_hints}")
+
+        # Step 3: Gemini classify + extract
+        if not settings.USE_GEMINI:
+            logger.debug("USE_GEMINI=False — LLM disabled, rejecting post")
+            return None
+
+        llm = get_llm_classifier()
+        if llm is None:
+            logger.warning("No LLM classifier available — rejecting post")
+            return None
+
+        gemini_result = llm.classify_and_extract(
+            text=text_for_gemini,
+            image_urls=image_urls or [],
+            post_timestamp=post_timestamp,
+        )
+
+        if not gemini_result or not gemini_result.get('food'):
+            logger.debug("Gemini rejected post (food=false or API failure)")
+            return None
+
+        logger.info("ACCEPT: Gemini approved post")
+
+        # Step 4: Inject image_text BEFORE datetime reconciliation so that
+        # _DATE_EVIDENCE_RE and _TIME_EVIDENCE_RE can match dates/times from the image.
+        # (e.g. caption is vague but flyer says "Thursday 5th March, 6pm")
+        image_text = gemini_result.get('image_text')
+        if image_text:
+            text = f"{text}\n\n[Image Text]\n{image_text}"
+
+        # Step 5: Reconcile datetime (Gemini + regex cross-check — now has image text)
+        start_dt, end_dt, dt_confidence = self._reconcile_datetime(
+            gemini_start=gemini_result.get('start_datetime'),
+            gemini_end=gemini_result.get('end_datetime'),
+            text=text,
+            post_timestamp=post_timestamp,
+        )
+
+        # dt_confidence == -1.0 is a sentinel meaning Gemini returned an explicitly
+        # past datetime — the post is a past-event recap, reject the whole event.
+        if dt_confidence < 0:
+            logger.debug("Past-event sentinel from _reconcile_datetime — rejecting post")
+            return None
+
+        # Step 6: Location — canonicalize Gemini's location string
+        gemini_location_str = gemini_result.get('location')
+        location = None
+        if gemini_location_str:
+            location = (
+                self._extract_location(gemini_location_str)
+                or {'building': gemini_location_str, 'room': None, 'full_location': gemini_location_str}
+            )
+        # Also try extracting from full text (catches room codes Gemini might miss)
+        if location is None:
+            location = self._extract_location(text)
+
+        # Step 7: Title (from Gemini, truncated to 60 chars)
+        title = (gemini_result.get('title') or 'Free Food Event')[:60].strip()
+
+        # Step 8: Members-only (from Gemini)
+        members_only = bool(gemini_result.get('members_only', False))
+
+        # Step 9: Confidence score
+        base_confidence = 1.0 if location else 0.8
+        if dt_confidence > 0:
+            confidence = base_confidence * ((1.0 + dt_confidence) / 2)
+        else:
+            confidence = base_confidence * 0.7  # no datetime found
+
+        return {
+            'title': title,
+            'description': text[:500] if len(text) > 500 else text,
+            'location': location.get('full_location') if location else None,
+            'location_building': location.get('building') if location else None,
+            'location_room': location.get('room') if location else None,
+            'start_time': start_dt,
+            'end_time': end_dt,
+            'confidence_score': round(confidence, 2),
+            'raw_text': text,
+            'extracted_data': {
+                'time_found': start_dt is not None,
+                'date_found': start_dt is not None,
+                'location_found': location is not None,
+                'members_only': members_only,
+                'llm_assisted': True,
+                'llm_provider': 'gemini',
+                'stage_reached': 'gemini',
+                'llm_called': True,
+                'llm_food': True,
+                'dt_confidence': dt_confidence,
+            }
+        }
+
+    # ── Data loaders ──────────────────────────────────────────────────────────
+
+    def _load_building_aliases(self) -> Dict[str, str]:
+        """Map every known alias (lowercase) to the official building name."""
         return {
             # Newman Building
             'newman building': 'Newman Building',
@@ -316,7 +792,6 @@ class EventExtractor:
             # Student Centre
             'the student centre': 'Student Centre',
             'student centre': 'Student Centre',
-            # Named rooms — also listed so _has_ucd_location fires on room-only mentions
             'harmony studio': 'Student Centre',
             'harmony': 'Student Centre',
             'blue room': 'Student Centre',
@@ -335,6 +810,9 @@ class EventExtractor:
             'clubhouse': 'Student Centre',
             "o'neill lounge": 'Student Centre',
             'oneill lounge': 'Student Centre',
+            'global lounge': 'Student Centre',
+            'newman basement': 'Student Centre',
+            'newstead atrium': 'Student Centre',
 
             # UCD Village
             'ucd village': 'UCD Village',
@@ -405,7 +883,7 @@ class EventExtractor:
             'roebuck castle': 'Roebuck Hall',
             'roebuck': 'Roebuck Hall',
 
-            # O'Brien Centre for Science — East/West wings (L2)
+            # O'Brien Centre wings
             'science east': "O'Brien Centre for Science",
             'science west': "O'Brien Centre for Science",
             "o'brien east": "O'Brien Centre for Science",
@@ -413,1007 +891,54 @@ class EventExtractor:
             'obrien east': "O'Brien Centre for Science",
             'obrien west': "O'Brien Centre for Science",
 
-            # UCD Village Kitchen (L3) — compound form only, 'kitchen' alone too generic
+            # UCD Village Kitchen
             'village kitchen': 'UCD Village',
             'ucd village kitchen': 'UCD Village',
 
-            # UCD Horticulture Garden / Polytunnel (L4)
+            # UCD Horticulture
             'polytunnel': 'UCD Horticulture Garden',
             'horticulture garden': 'UCD Horticulture Garden',
             'ucd horticulture': 'UCD Horticulture Garden',
             'rosemount': 'UCD Rosemount',
             'rosemount complex': 'UCD Rosemount',
 
-            # Generic campus keywords (no specific building)
+            # Generic campus keywords
             'belfield': 'UCD Belfield',
             'ucd': 'UCD Belfield',
             'campus': 'UCD Belfield',
         }
-    
-    def load_other_colleges(self) -> List[str]:
-        """Load list of other Irish colleges to reject."""
+
+    def _load_other_colleges(self) -> List[str]:
         return [
             'dcu', 'trinity', 'tcd', 'maynooth', 'mu', 'nuig', 'ucc', 'ul',
             'dublin city university', 'trinity college', 'maynooth university'
         ]
-    
-    def load_off_campus_venues(self) -> List[str]:
-        """
-        Load list of off-campus venues to reject.
-        Keep entries specific — avoid generic words that appear in on-campus contexts.
-        Short words (bar, pub, grill) are matched with word boundaries in _is_off_campus.
-        """
+
+    def _load_off_campus_venues(self) -> List[str]:
         return [
-            # Named pubs/bars (specific — safe to substring-match)
             'kennedys', 'doyles', 'sinnotts', 'johnnie foxs',
             'blue light', 'taylors three rock', 'pub crawl',
-            # Generic venue words — matched with word boundaries
-            'brewery', 'tavern', 'pub', 'bar', 'grill', 'diner',
-            # Named fast-food/restaurants
+            'brewery', 'tavern', 'pub', 'grill', 'diner',
+            # 'bar' removed from simple list — too many false positives.
+            # It's still caught via _BOUNDARY_VENUES word-boundary matching
+            # when used as a standalone venue word (e.g. "the bar", "at a bar").
+            # But "chocolate bar", "granola bar", "bar of soap" won't match.
             'nandos', 'supermacs', 'eddie rockets',
-            # Dublin off-campus areas
             'temple bar', 'grafton street', 'oconnell street',
             'rathmines', 'ranelagh', 'dundrum', 'city centre',
             'dublin 2', 'dublin 4', 'dublin mountains',
-            # Social outings
-            'pub crawl',
         ]
 
-    # Words in off_campus_venues that need word-boundary matching (too short/generic otherwise)
-    _BOUNDARY_VENUES = {'pub', 'bar', 'grill', 'diner', 'tavern', 'brewery'}
-    
-    def load_nightlife_keywords(self) -> List[str]:
-        """Load list of nightlife event keywords to reject."""
+    def _load_nightlife_keywords(self) -> List[str]:
         return [
-            # Ball events — specific compound phrases only ('ball' alone is too broad)
             'ball tickets', 'ball ticket',
             'charity ball', 'end of year ball', 'annual ball',
             'summer ball', 'winter ball', 'freshers ball', "fresher's ball",
             'halloween ball', 'christmas ball', 'masked ball', 'gala ball',
             'society ball', 'rag ball', 'sports ball',
-            # Other formal/nightlife events
             'gala', 'formal', 'pub crawl',
             'nightclub', 'club night', 'bar crawl',
             'pre drinks', 'afters', 'sesh', 'going out'
         ]
-    
-    def _preprocess_text(self, text: str) -> str:
-        """
-        Clean and normalize text before classification.
-        
-        - Remove URLs
-        - Remove @mentions
-        - Remove emojis
-        - Normalize unicode (é → e)
-        - Clean whitespace
-        - Lowercase
-        """
-        # Remove URLs
-        text = re.sub(r'http\S+|www\.\S+', '', text)
 
-        # Remove @mentions
-        text = re.sub(r'@\w+', '', text)
-
-        # Replace food/drink emojis with their text equivalents BEFORE ASCII
-        # stripping so "🍕 provided" → "pizza provided" (caught by classifier)
-        for emoji, keyword in _FOOD_EMOJI_MAP.items():
-            text = text.replace(emoji, f' {keyword} ')
-
-        # Normalize unicode (é → e, ñ → n)
-        text = unicodedata.normalize('NFKD', text)
-        
-        # Remove non-ASCII characters (emojis, special chars)
-        text = text.encode('ascii', 'ignore').decode('ascii')
-        
-        # Clean whitespace
-        text = ' '.join(text.split())
-        
-        # Lowercase
-        return text.lower()
-    
-    def classify_event(self, text: str) -> bool:
-        """
-        Strict TRUE/FALSE classifier for free food events.
-        
-        Returns TRUE only if ALL conditions met:
-        1. Explicit food keyword present
-        2. NOT other college
-        3. NOT off-campus venue (explicit rejection)
-        4. NOT paid event (except €2 membership)
-        5. NOT nightlife event
-        6. UCD location is OPTIONAL (assume on-campus if not mentioned)
-        
-        Args:
-            text: Combined Instagram caption + OCR text
-            
-        Returns:
-            True if free food event at UCD, False otherwise
-        """
-        # Preprocess text
-        clean_text = self._preprocess_text(text)
-
-        logger.debug(f"Classifying text: {clean_text[:100]}...")
-
-        # A12: Religious event hard filter — before food detection
-        if self._is_religious_event(clean_text):
-            logger.debug("REJECT: Religious/faith-community event")
-            return False
-
-        # A3: Past-tense recap filter — before food detection (cheaper, high precision)
-        if self._is_past_tense_post(clean_text):
-            logger.debug("REJECT: Past-tense recap post")
-            return False
-
-        # Rule 1: MUST have explicit food keyword (A2: now uses richer context modifiers)
-        if not self._has_explicit_food(clean_text):
-            logger.debug("REJECT: No explicit food keyword")
-            return False
-
-        # Rule 1.5: NOT a food activity workshop/competition
-        if self._is_food_activity(clean_text):
-            logger.debug("REJECT: Food activity workshop")
-            return False
-
-        # A7: NOT a social-media giveaway/contest
-        if self._is_giveaway_contest(clean_text):
-            logger.debug("REJECT: Giveaway/contest")
-            return False
-
-        # A5: Staff/committee-only filter
-        if self._is_staff_only(clean_text):
-            logger.debug("REJECT: Staff/committee-only event")
-            return False
-
-        # Rule 2: MUST NOT be other college
-        if self._is_other_college(clean_text):
-            logger.debug("REJECT: Other college mentioned")
-            return False
-
-        # Rule 3: MUST NOT be off-campus (EXPLICIT rejection)
-        if self._is_off_campus(clean_text):
-            logger.debug("REJECT: Off-campus venue mentioned")
-            return False
-
-        # Rule 3.5: NOT an online-only event (reject if online signals + no UCD location)
-        if self._is_online_event(clean_text) and not self._has_ucd_location(clean_text):
-            logger.debug("REJECT: Online/virtual event with no UCD location")
-            return False
-
-        # Rule 4: MUST NOT be paid (A6: score-based, not purely binary)
-        if self._is_paid_event(clean_text):
-            logger.debug("REJECT: Paid event indicator")
-            return False
-
-        # Rule 5: MUST NOT be nightlife event
-        if self._is_nightlife_event(clean_text):
-            logger.debug("REJECT: Nightlife event")
-            return False
-        
-        # UCD location is OPTIONAL
-        # If mentioned → great
-        # If not mentioned → assume on-campus (UCD society default)
-        # If off-campus → already rejected in Rule 3
-        
-        has_ucd_location = self._has_ucd_location(clean_text)
-        if has_ucd_location:
-            logger.info("ACCEPT: Free food event at UCD (explicit location)")
-        else:
-            logger.info("ACCEPT: Free food event at UCD (assumed on-campus)")
-        
-        return True
-    
-    def _food_is_negated(self, text: str) -> bool:
-        """
-        Return True if food is explicitly negated in the text.
-        Catches: "no food", "food not provided", "bring your own food", etc.
-        """
-        negation_patterns = [
-            r'\bno\s+(?:free\s+)?(?:food|pizza|snacks?|refreshments?|lunch|dinner|breakfast|drinks?)\b',
-            r'\b(?:food|pizza|snacks?|refreshments?|lunch|dinner|breakfast|drinks?)\s+(?:is\s+|are\s+)?not\s+(?:provided|available|included|served)\b',
-            r'\bbring\s+your\s+own\s+(?:food|lunch|dinner|snacks?|drinks?)\b',
-            r'\bbyof?\b',
-            r'\b(?:food|drinks?|coffee|tea|snacks?|refreshments?)\s+(?:available\s+)?for\s+(?:sale|purchase)\b',
-            r'\bunfortunately\s+(?:\w+\s+){0,4}no\s+(?:food|pizza|snacks?|refreshments?)\b',
-            r'\bno\s+food\s+(?:this\s+time|available|today)\b',
-        ]
-        for pattern in negation_patterns:
-            if re.search(pattern, text, re.IGNORECASE):
-                logger.debug(f"Food negation matched: {pattern}")
-                return True
-        return False
-
-    def _has_explicit_food(self, text: str) -> bool:
-        """
-        Two-tier food detection with negation check.
-
-        Strong keywords: sufficient on their own (pizza, refreshments, etc.)
-        Weak keywords: only count if "free" / "provided" / "complimentary" is also in the text.
-        """
-        # Negation check first
-        if self._food_is_negated(text):
-            logger.debug("REJECT: food keyword is negated")
-            return False
-
-        # "free entry" alone is NOT enough — must also have a food keyword
-        if 'free entry' in text:
-            has_food = any(kw in text for kw in self.strong_food_keywords + self.weak_food_keywords)
-            if not has_food:
-                logger.debug("REJECT: 'free entry' without food mention")
-                return False
-
-        # Strong keywords are always sufficient
-        if any(kw in text for kw in self.strong_food_keywords):
-            return True
-
-        # Weak keywords only count when a free/provision context modifier is present
-        has_free_context = (
-            'free' in text
-            or any(mod in text for mod in self.context_modifiers)
-            or bool(re.search(r"\bwe.(?:ll|will)\s+(?:be\s+)?(?:bring(?:ing)?|have|provide|serve|supply)\b", text))
-        )
-        if has_free_context and any(kw in text for kw in self.weak_food_keywords):
-            return True
-
-        return False
-
-    def _has_weak_food_only(self, text: str) -> bool:
-        """
-        True when text has a weak food keyword but NO strong keyword and NO free context.
-        Identifies grey-zone posts for LLM fallback (Phase B).
-        text must already be preprocessed (lowercased, emoji-mapped).
-        """
-        if self._food_is_negated(text):
-            return False
-        if any(kw in text for kw in self.strong_food_keywords):
-            return False
-        has_free_context = (
-            'free' in text
-            or any(mod in text for mod in self.context_modifiers)
-            or bool(re.search(
-                r"\bwe.(?:ll|will)\s+(?:be\s+)?(?:bring(?:ing)?|have|provide|serve|supply)\b", text
-            ))
-        )
-        if has_free_context:
-            return False
-        return any(kw in text for kw in self.weak_food_keywords)
-
-    def _try_llm_fallback(
-        self,
-        text: str,
-        image_urls: Optional[list] = None,
-        ocr_low_yield: bool = False,
-    ) -> Optional[dict]:
-        """
-        Called when classify_event() returns False. Routes to one of two LLM paths:
-
-        Vision path (B6): fires when Tesseract returned <20 chars AND image_urls are
-        available. Calls GPT-4o-mini with the images directly; returns vision-extracted
-        text in hints['_vision_text'] for injection back into the extraction pipeline.
-
-        Text path (existing): fires when text has a weak food keyword but no strong
-        keyword/context modifier (grey-zone post). Calls GPT-4o-mini text-only.
-
-        Hard filters always apply before either path — LLM cannot bypass them.
-        """
-        if not (settings.USE_SCORING_PIPELINE and settings.OPENAI_API_KEY):
-            return None
-
-        clean = self._preprocess_text(text)
-
-        # Hard filters always block — no bypass by either LLM path
-        if (self._is_food_activity(clean)
-                or self._is_staff_only(clean)
-                or self._is_religious_event(clean)
-                or self._is_other_college(clean)
-                or self._is_off_campus(clean)
-                or (self._is_online_event(clean) and not self._has_ucd_location(clean))
-                or self._is_paid_event(clean)
-                or self._is_nightlife_event(clean)):
-            return None
-
-        from app.services.nlp.llm_classifier import get_llm_classifier
-        llm = get_llm_classifier()
-        if llm is None:
-            return None
-
-        # B6 Vision path: OCR yielded almost nothing and we have image URLs
-        if ocr_low_yield and image_urls and settings.USE_VISION_FALLBACK:
-            hints = llm.classify_with_vision(image_urls, text[:300])
-            if not hints or not hints.get('food'):
-                return None
-            # Carry vision-extracted text forward for date/time/location extraction
-            if hints.get('text'):
-                hints['_vision_text'] = hints['text']
-            hints['_stage'] = 'vision_llm'
-            return hints
-
-        # Text path: existing grey-zone behaviour (weak food keyword only)
-        if not self._has_weak_food_only(clean):
-            return None  # not even borderline — hard reject
-
-        hints = llm.classify_and_extract(clean)
-        if not hints or not hints.get('food'):
-            return None
-
-        hints['_stage'] = 'llm_text'
-        return hints
-
-    def _is_other_college(self, text: str) -> bool:
-        """Check if text mentions other Irish colleges.
-        Short abbreviations (<=4 chars) use word boundaries to avoid false matches
-        (e.g. 'ul' in 'full', 'mu' in 'music', 'dcu' in 'educational').
-        """
-        for college in self.other_colleges:
-            if len(college) <= 4:
-                if re.search(r'\b' + re.escape(college) + r'\b', text):
-                    logger.debug(f"Found other college: {college}")
-                    return True
-            else:
-                if college in text:
-                    logger.debug(f"Found other college: {college}")
-                    return True
-        return False
-    
-    def _is_off_campus(self, text: str) -> bool:
-        """
-        Check if text mentions off-campus venues.
-        Short/generic venue words use word boundaries to avoid false matches
-        (e.g. 'bar' in 'candy bar', 'pub' in 'publication').
-        Skip check if a known UCD building is already mentioned — on-campus wins.
-        """
-        if self._has_ucd_location(text):
-            return False
-        for venue in self.off_campus_venues:
-            if venue in self._BOUNDARY_VENUES:
-                if re.search(r'\b' + re.escape(venue) + r'\b', text):
-                    logger.debug(f"Found off-campus venue (boundary): {venue}")
-                    return True
-            else:
-                if venue in text:
-                    logger.debug(f"Found off-campus venue: {venue}")
-                    return True
-        return False
-    
-    def _is_paid_event(self, text: str) -> bool:
-        """
-        Return True only if the event is clearly a paid-access event.
-
-        Improvements over original binary approach:
-        - Small amounts (≤€5) without explicit ticket/admission language are NOT
-          rejected — catches "€5 registration, refreshments provided" cases.
-        - Membership context with reasonable price (≤€5) is always allowed.
-        - Hard reject only for: explicit ticket language + any price, OR amounts ≥€10
-          without an explicit free-food override.
-        - Food-sale keywords (bake sale, fundraiser) are always hard-rejected.
-        """
-        # Step 1: Free overrides — explicit "free" / "no ticket needed" etc.
-        free_overrides = [
-            r'\bfree\s+(?:of\s+)?(?:charge|cost|entry|admission)\b',
-            r'\bno\s+(?:entry\s+)?(?:fee|cost|charge)\b',
-            r'\bno\s+tickets?\s+(?:needed|required)\b',
-            r"(?:don'?t|do\s+not|doesn'?t|does\s+not)\s+(?:need\s+to\s+)?pay\b",
-            r'\bno\s+(?:need\s+to\s+)?pay\b',
-            r'\bno\s+charge\b',
-            # A13a: additional explicit free-event declarations
-            r'\bfree\s+(?:event|to\s+attend|for\s+all|for\s+everyone)\b',
-            r'\bcompletely\s+free\b',
-            r'\b(?:this\s+is\s+(?:a\s+)?free|it\s+is\s+free)\b',
-        ]
-        for pattern in free_overrides:
-            if re.search(pattern, text):
-                logger.debug(f"Free override matched: {pattern}")
-                return False
-
-        # Step 2: Membership context — allow any price ≤€5 (UCD membership fees vary)
-        is_member_context = bool(re.search(r'\b(?:membership|ucard)\b', text))
-        euro_amounts = [int(x) for x in re.findall(r'€(\d+)', text)]
-        if is_member_context and euro_amounts and all(a <= 5 for a in euro_amounts):
-            logger.debug("Found membership price ≤€5 — allowed")
-            return False
-
-        # Step 3: Explicit ticket / admission language → always paid
-        # (bare "ticket" alone is too promiscuous; require purchase verbs, price, or availability words)
-        # NOTE: text is already ASCII-stripped so currency symbols (€£$) are gone.
-        has_ticket_language = bool(re.search(
-            r'(?:'
-            r'\b(?:buy|get|purchase|book|grab|order)\s+(?:your\s+)?tickets?\b'  # action verbs
-            r'|\btickets?\s+(?:are\s+)?(?:available|on\s+sale|priced|cost)\b'   # ticket availability
-            r'|\btickets?:'                                                       # "Tickets: €5" (€ stripped)
-            r'|\btickets?\s+(?:can\s+be\s+)?(?:purchased|sold|bought)\b'        # "tickets can be purchased"
-            r'|\bticket\s+prices?\b'                                             # "ticket price(s)"
-            r'|\b(?:reduced|early.bird|vip)\s+ticket\b'                         # "reduced ticket"
-            r'|\badmission\b'                                                    # standalone admission
-            r'|\bentry\s+fee\b'                                                  # "entry fee"
-            r')',
-            text
-        ))
-        if has_ticket_language:
-            logger.debug("Found ticket/admission language")
-            return True
-
-        # Step 4: Large price (≥€10) without an explicit free-food statement → paid
-        if euro_amounts and max(euro_amounts) >= 10:
-            has_free_food_stated = bool(re.search(
-                r'\bfree\s+(?:food|pizza|lunch|dinner|snacks?|refreshments?|drinks?|coffee|tea|breakfast)\b',
-                text
-            ))
-            if not has_free_food_stated:
-                logger.debug(f"Found large price €{max(euro_amounts)} with no free-food override")
-                return True
-
-        # Step 5: Food-sale keywords — food is sold, not given away
-        food_sale_keywords = [
-            'bake sale', 'cake sale', 'cookie sale', 'food sale', 'food stall',
-            'fundraiser', 'charity sale', 'charity bake',
-        ]
-        for keyword in food_sale_keywords:
-            if keyword in text:
-                logger.debug(f"Found food-sale keyword: {keyword}")
-                return True
-
-        return False
-    
-    def _is_nightlife_event(self, text: str) -> bool:
-        """Check if text indicates a nightlife event (ball, pub crawl, etc.).
-        Uses word-boundary regex so 'ball ticket' doesn't match 'sciball ticket'.
-        """
-        for keyword in self.nightlife_keywords:
-            if re.search(r'\b' + re.escape(keyword) + r'\b', text):
-                logger.debug(f"Found nightlife keyword: {keyword}")
-                return True
-        return False
-
-    def _is_giveaway_contest(self, text: str) -> bool:
-        """Reject social-media giveaway/contest posts.
-        These are entry-based competitions, not free food provision at an event.
-        """
-        patterns = [
-            r'\bgiveaway\b',
-            r'\benter\s+to\s+win\b',
-            r'\bchance\s+to\s+win\b',
-            r'\bprize\s+draw\b',
-            r'\bsweepstakes?\b',
-        ]
-        return any(re.search(p, text, re.IGNORECASE) for p in patterns)
-
-    def _is_food_activity(self, text: str) -> bool:
-        """
-        Reject food-making workshops/competitions where food is the activity
-        material, not something freely provided to attendees.
-        Returns True (reject) unless explicit provision language overrides.
-        """
-        activity_patterns = [
-            r'\b(?:pizza|sushi|cookie|cake|bread|pasta|burger|chocolate|mochi|ramen|biscuit|brownie)\s+(?:making|workshop|class|tutorial|decorating|competition|contest)\b',
-            r'\b(?:baking|cooking|pastry|barista)\s+(?:class|workshop|course|tutorial|competition|contest)\b',
-            r'\bbake.?off\b',
-            r'\bcook.?off\b',
-            r'\bbaking\s+competition\b',
-            r'\bcooking\s+competition\b',
-        ]
-        has_activity = any(re.search(p, text, re.IGNORECASE) for p in activity_patterns)
-        if not has_activity:
-            return False
-
-        # Override: food IS being provided separately from the activity
-        provision_overrides = [
-            r'\bfood\s+(?:provided|included|served|on\s+us)\b',
-            r'\brefreshments\s+(?:provided|available|included)\b',
-            r'\bwe.(?:ll|will)\s+(?:be\s+)?(?:provide|have|serve|bring(?:ing)?)\s+(?:the\s+)?(?:food|refreshments|snacks?|pizza|cookies?|cake|treats?)\b',
-            r'\bfree\s+(?:food|pizza|cookies?|cake|snacks?)\b',
-        ]
-        has_provision = any(re.search(p, text, re.IGNORECASE) for p in provision_overrides)
-        return not has_provision
-
-    def _is_online_event(self, text: str) -> bool:
-        """
-        Return True if the post describes an online/virtual-only event.
-        Hybrid posts that ALSO mention a UCD location are NOT rejected here —
-        the caller checks _has_ucd_location separately.
-        """
-        online_patterns = [
-            r'\bonline\s+event\b',
-            r'\bvirtual\s+(?:event|session|talk|seminar|workshop|class|lecture|info\s+session)\b',
-            r'\bvia\s+zoom\b',
-            r'\bon\s+zoom\b',
-            r'\bzoom\s+(?:call|meeting|link|event)\b',
-            r'\bremote(?:ly)?\s+(?:hosted|held|event)\b',
-            r'\bwatch\s+(?:live\s+)?(?:online|on\s+youtube|on\s+twitch)\b',
-        ]
-        return any(re.search(p, text, re.IGNORECASE) for p in online_patterns)
-
-    def _is_members_only(self, text: str) -> bool:
-        patterns = [
-            r'\bfor\s+members\b',
-            r'\bmembers\s+only\b',
-            r'\bonly\s+for\s+members\b',
-            r'\bmembers\s+welcome\b',
-            r'\bjoin.*\bmember\b.*\battend\b',
-        ]
-        return any(re.search(p, text, re.IGNORECASE) for p in patterns)
-
-    def _is_past_tense_post(self, text: str) -> bool:
-        """
-        Return True if the post is a recap of a PAST event rather than a future
-        announcement — e.g. "Thanks for coming — pizza was amazing!"
-
-        Only fires on patterns that clearly indicate a past-event framing, so as not
-        to reject posts that use incidental past-tense ("we've been hosting...").
-        """
-        past_patterns = [
-            # Explicit thank-you for attending
-            r'\b(?:thanks|thank\s+you)\s+(?:to\s+(?:all|everyone)\s+)?(?:who\s+)?(?:came|joined|attended|turned\s+up|showed\s+up|came\s+out)\b',
-            # Positive recap phrasing
-            r'\bwhat\s+a\s+(?:great|amazing|wonderful|brilliant|fantastic)\s+(?:night|evening|day|event|time)\b',
-            r'\bhope\s+(?:everyone|you\s+all)\s+(?:had|enjoyed)\b',
-            r'\bgreat\s+(?:to\s+see|seeing)\s+(?:everyone|you\s+all)\b',
-            # Food described in past tense as having been consumed
-            r'\b(?:food|pizza|snacks?|refreshments?|coffee|tea|cake|sandwiches?)\s+(?:were?|was)\s+(?:amazing|great|delicious|lovely|tasty|so\s+good|perfect|a\s+hit)\b',
-            r'\bwe\s+(?:had|served|enjoyed)\s+(?:some\s+)?(?:amazing|great|delicious|lovely)?\s*(?:food|pizza|snacks?|refreshments?|coffee|tea|cake|sandwiches?)\b',
-        ]
-        return any(re.search(p, text, re.IGNORECASE) for p in past_patterns)
-
-    def _is_staff_only(self, text: str) -> bool:
-        """
-        Return True if the event is restricted to committee/exec/volunteers/staff
-        only — i.e. NOT open to general students.
-
-        Distinct from _is_members_only: 'members' = society members = open students;
-        'committee/exec/volunteers' = closed internal group.
-
-        Keeps false-positive risk low by requiring explicit "only" or activity-specific
-        words alongside the committee/exec identifier.
-        """
-        patterns = [
-            r'\b(?:committee|exec(?:utive)?)\s+(?:members?\s+)?only\b',
-            r'\bfor\s+(?:committee|exec(?:utive)?)\s+members?\s+only\b',
-            r'\bvolunteers?\s+only\b',
-            r'\bstaff\s+only\b',
-            r'\bboard\s+(?:of\s+(?:directors|trustees)\s+)?(?:meeting|only)\b',
-            r'\bexec(?:utive)?\s+(?:meeting|training|session)\b',
-            r'\bcommittee\s+training\b',
-        ]
-        return any(re.search(p, text, re.IGNORECASE) for p in patterns)
-
-    def _is_religious_event(self, text: str) -> bool:
-        """
-        A12: Reject religious/faith-community events by policy.
-        These are targeted at specific communities, not general UCD students.
-        The LLM over-infers food from cultural context (Ramadan implies iftar meal, etc.)
-        so this filter must fire BEFORE the LLM gate.
-        """
-        patterns = [
-            r'\bramadan\b',
-            r'\biftaar?\b',          # matches both iftar and iftaar
-            r'\beid\s+mubarak\b',
-            r'\bsuhoor\b',
-            r'\bbreak(?:ing)?\s+the\s+fast\b',
-        ]
-        return any(re.search(p, text) for p in patterns)
-
-    def _alias_in_text(self, alias: str, text_lower: str) -> bool:
-        """
-        Check if an alias appears in text.
-        Aliases ≤ 4 chars use word boundaries to avoid false substring matches
-        (e.g. 'eng' in 'england', 'vet' in 'veteran', 'jj' in 'hajj').
-        """
-        if len(alias) <= 4:
-            return bool(re.search(r'\b' + re.escape(alias) + r'\b', text_lower))
-        return alias in text_lower
-
-    def _has_ucd_location(self, text: str) -> bool:
-        """Check if text mentions UCD campus location."""
-        return any(self._alias_in_text(alias, text) for alias in self.ucd_buildings)
-
-    def get_rejection_reason(self, text: str) -> str:
-        """
-        Return a human-readable reason why a post was rejected (or 'Accepted').
-        Runs the same checks as classify_event but surfaces which rule fired.
-        """
-        clean_text = self._preprocess_text(text)
-
-        if self._is_religious_event(clean_text):
-            return "Religious event (excluded by policy)"
-
-        if self._is_past_tense_post(clean_text):
-            return "Past-tense recap post (not an upcoming event)"
-
-        if not self._has_explicit_food(clean_text):
-            return "No explicit food keyword found"
-
-        if self._is_food_activity(clean_text):
-            return "Food activity workshop/competition (not free food)"
-
-        if self._is_staff_only(clean_text):
-            return "Staff/committee-only event (not open to students)"
-
-        if self._is_other_college(clean_text):
-            for college in self.other_colleges:
-                if college in clean_text:
-                    return f"Mentions other college: '{college}'"
-
-        if self._is_off_campus(clean_text):
-            for venue in self.off_campus_venues:
-                if venue in clean_text:
-                    return f"Mentions off-campus venue: '{venue}'"
-
-        if self._is_online_event(clean_text) and not self._has_ucd_location(clean_text):
-            return "Online/virtual event with no UCD location"
-
-        if self._is_paid_event(clean_text):
-            return "Appears to be a paid event (price/ticket mention)"
-
-        if self._is_nightlife_event(clean_text):
-            for keyword in self.nightlife_keywords:
-                if keyword in clean_text:
-                    return f"Nightlife event keyword: '{keyword}'"
-
-        return "Accepted"
-
-    def get_classification_details(self, text: str) -> dict:
-        """Return result, reason, and matched keywords for admin display."""
-        clean_text = self._preprocess_text(text)
-
-        # A12: Religious event
-        if self._is_religious_event(clean_text):
-            return {'result': 'rejected', 'reason': 'Religious event (excluded by policy)', 'matched_keywords': []}
-
-        # Past-tense
-        if self._is_past_tense_post(clean_text):
-            past_phrases = [
-                'thanks for coming', 'thank you for coming', 'thanks for joining',
-                'was a great', 'was amazing', 'was fantastic', 'was so great',
-                'hope everyone had', 'hope you had', 'it was great', 'what a night',
-            ]
-            triggers = [p for p in past_phrases if p in clean_text]
-            return {'result': 'rejected', 'reason': 'Past-tense recap post (not an upcoming event)', 'matched_keywords': triggers}
-
-        # Collect food keywords present
-        matched_strong = [kw for kw in self.strong_food_keywords if kw in clean_text]
-        matched_weak   = [kw for kw in self.weak_food_keywords   if kw in clean_text]
-        matched_ctx    = [m  for m  in self.context_modifiers     if m  in clean_text]
-        if 'free' in clean_text and 'free' not in matched_ctx:
-            matched_ctx.append('free')
-
-        # No food keyword
-        if not self._has_explicit_food(clean_text):
-            return {'result': 'rejected', 'reason': 'No explicit food keyword found',
-                    'matched_keywords': matched_weak}
-
-        # Food activity
-        if self._is_food_activity(clean_text):
-            for kw in ['baking workshop', 'cooking class', 'cupcake decorating',
-                       'food competition', 'bake-off', 'bake off', 'food fight']:
-                if kw in clean_text:
-                    return {'result': 'rejected', 'reason': 'Food activity workshop/competition (not free food)',
-                            'matched_keywords': [kw]}
-            return {'result': 'rejected', 'reason': 'Food activity workshop/competition (not free food)',
-                    'matched_keywords': []}
-
-        # Giveaway/contest
-        if self._is_giveaway_contest(clean_text):
-            return {'result': 'rejected', 'reason': 'Social media giveaway or contest', 'matched_keywords': []}
-
-        # Staff only
-        if self._is_staff_only(clean_text):
-            staff_triggers = ['committee only', 'exec only', 'exec meeting', 'exec training',
-                              'volunteers only', 'staff only', 'board meeting']
-            triggers = [t for t in staff_triggers if t in clean_text]
-            return {'result': 'rejected', 'reason': 'Staff/committee-only event (not open to students)',
-                    'matched_keywords': triggers}
-
-        # Other college
-        if self._is_other_college(clean_text):
-            for college in self.other_colleges:
-                if college in clean_text:
-                    return {'result': 'rejected', 'reason': f"Mentions other college: '{college}'",
-                            'matched_keywords': [college]}
-
-        # Off-campus
-        if self._is_off_campus(clean_text):
-            for venue in self.off_campus_venues:
-                if venue in clean_text:
-                    return {'result': 'rejected', 'reason': f"Mentions off-campus venue: '{venue}'",
-                            'matched_keywords': [venue]}
-
-        # Online with no UCD location
-        if self._is_online_event(clean_text) and not self._has_ucd_location(clean_text):
-            return {'result': 'rejected', 'reason': 'Online/virtual event with no UCD location',
-                    'matched_keywords': []}
-
-        # Paid
-        if self._is_paid_event(clean_text):
-            return {'result': 'rejected', 'reason': 'Appears to be a paid event (price/ticket mention)',
-                    'matched_keywords': []}
-
-        # Nightlife
-        if self._is_nightlife_event(clean_text):
-            for kw in self.nightlife_keywords:
-                if kw in clean_text:
-                    return {'result': 'rejected', 'reason': f"Nightlife event keyword: '{kw}'",
-                            'matched_keywords': [kw]}
-
-        # Accepted — surface all food signals found
-        all_food = list(dict.fromkeys(matched_strong + matched_ctx + matched_weak))
-        return {'result': 'accepted', 'reason': 'Accepted', 'matched_keywords': all_food[:8]}
-
-    # ========== Multi-event Segmentation (A11) ==========
-
-    def segment_post_text(self, text: str) -> List[str]:
-        """
-        Split a multi-event schedule post into individual event segments.
-
-        Splits on blank lines followed by an ALL-CAPS heading (≥5 chars) or a
-        day-of-week name.  Guards:
-        - Each segment must be ≥ 50 characters (filters line-noise)
-        - Maximum 6 segments per post
-        - Falls back to [text] if 0 or 1 segment produced (no regression)
-        """
-        # Pattern: blank line(s) followed by ALL-CAPS word (≥5 chars) or day-of-week
-        _SEG_PATTERN = re.compile(
-            r'\n\n+(?=[A-Z][A-Z\s]{4,}\n|'
-            r'(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday))',
-            re.IGNORECASE,
-        )
-        parts = _SEG_PATTERN.split(text)
-        # Filter noise and cap (50 chars: enough to remove 1-word OCR fragments
-        # while keeping real schedule entries like "COFFEE MORNING\nNewman 8:30-9:30am")
-        segments = [p.strip() for p in parts if len(p.strip()) >= 50][:6]
-        if len(segments) <= 1:
-            return [text]
-        return segments
-
-    # ========== Event Detail Extraction (called AFTER classification) ==========
-
-    def extract_event(
-        self,
-        text: str,
-        source_type: str = 'post',
-        post_timestamp: Optional[datetime] = None,
-        image_urls: Optional[list] = None,
-        ocr_low_yield: bool = False,
-    ) -> Optional[Dict]:
-        """
-        Extract event details from text.
-
-        Args:
-            text: Text to extract from (caption + OCR text combined)
-            source_type: 'post' or 'story'
-            post_timestamp: When the post was made (for date validation)
-            image_urls: Raw image URLs — passed to vision LLM fallback (B6) when
-                        Tesseract yielded low-confidence output.
-            ocr_low_yield: True when Tesseract returned <20 chars for this post.
-
-        Returns:
-            Dictionary with event details or None if classification fails
-        """
-        # First, classify the event
-        _stage = None
-        _llm_called = False
-        _llm_food = None
-        llm_hints = None
-        if self.classify_event(text):
-            _stage = 'rule_based'
-        else:
-            _llm_called = True
-            llm_hints = self._try_llm_fallback(
-                text, image_urls=image_urls, ocr_low_yield=ocr_low_yield
-            )
-            if llm_hints is None:
-                return None
-            _stage = llm_hints.pop('_stage', 'llm_text')
-            _llm_food = llm_hints.get('food', True)
-            logger.info("ACCEPT: LLM fallback approved borderline post")
-            # B6: If vision LLM extracted text from the image, inject it so that
-            # the rule-based date/time/location parsers below can use it.
-            if llm_hints and llm_hints.get('_vision_text'):
-                text = f"{text}\n\n[Vision Text]\n{llm_hints['_vision_text']}"
-                logger.debug(f"Vision text injected: {llm_hints['_vision_text'][:120]!r}")
-
-        # B5: Skip posts where time is explicitly TBC/TBA — the society will post again with details
-        _tbc_patterns = [r'\btbc\b', r'\btba\b', r'\bto\s+be\s+confirmed\b', r'\bto\s+be\s+announced\b']
-        if any(re.search(p, text, re.IGNORECASE) for p in _tbc_patterns):
-            logger.info("SKIP: Time/details TBC — post deferred pending follow-up from society")
-            return None
-
-        # Extract event details
-        local_post_ts = None
-        if post_timestamp:
-            if getattr(post_timestamp, 'tzinfo', None) is None:
-                post_timestamp = pytz.utc.localize(post_timestamp)
-            local_post_ts = post_timestamp.astimezone(self.timezone)
-        time_range = self.time_parser.parse_time_range(text.lower(), post_timestamp=local_post_ts)
-        time = time_range['start'] if time_range else None
-        end_time_dict = time_range['end'] if time_range else None
-        date = self.date_parser.parse_date(text.lower(), post_timestamp)
-        location = self._extract_location(text)
-
-        # Fill time gap with LLM hint if rule-based found nothing
-        if time is None and llm_hints and llm_hints.get('time'):
-            try:
-                h, m = map(int, llm_hints['time'].split(':'))
-                time = {'hour': h, 'minute': m}
-                time_range = {'start': time, 'end': None}
-            except Exception:
-                pass
-
-        # Fill location gap with LLM hint if rule-based found nothing
-        if location is None and llm_hints and llm_hints.get('location'):
-            loc_str = llm_hints['location']
-            location = {'building': loc_str, 'room': None, 'full_location': loc_str}
-            logger.debug(f"Location filled by LLM hint: {loc_str}")
-
-        # Validate date is not in the past
-        if date:
-            now = datetime.now(self.timezone)
-            if date < now - timedelta(days=1):
-                logger.warning(f"Extracted date {date} is in the past, rejecting event")
-                return None
-
-        # Combine date and time
-        start_time = self._combine_datetime(date, time)
-        end_time = self._combine_datetime(date, end_time_dict) if end_time_dict else None
-
-        # Generate title
-        title = self._generate_title(text, location)
-
-        # Calculate confidence
-        if llm_hints:
-            confidence = 0.7 if (time and location) else 0.5
-        else:
-            confidence = 1.0 if (time and location) else 0.8
-
-        return {
-            'title': title,
-            'description': text[:500] if len(text) > 500 else text,
-            'location': location.get('full_location') if location else None,
-            'location_building': location.get('building') if location else None,
-            'location_room': location.get('room') if location else None,
-            'start_time': start_time,
-            'end_time': end_time,
-            'confidence_score': confidence,
-            'raw_text': text,
-            'extracted_data': {
-                'time_found': time is not None,
-                'date_found': date is not None,
-                'location_found': location is not None,
-                'members_only': self._is_members_only(text),
-                'llm_assisted': llm_hints is not None,
-                'stage_reached': _stage,
-                'llm_called': _llm_called,
-                'llm_food': _llm_food,
-            }
-        }
-    
-    def _extract_location(self, text: str) -> Optional[Dict]:
-        """
-        Extract location from text.
-
-        Improvements over original:
-        - Short aliases (≤4 chars) use word boundaries via _alias_in_text
-        - Room format expanded: handles E1.32, C204A, AD1.01, G01 etc.
-        - Global room scan: finds room even when it's in a separate sentence
-        """
-        text_lower = text.lower()
-
-        # Named Student Centre rooms — check before generic building scan so
-        # "Blue Room" → "Blue Room, Student Centre" rather than just "Student Centre"
-        for alias in self.student_centre_rooms_sorted:
-            if self._alias_in_text(alias, text_lower):
-                room_name = self.student_centre_rooms[alias]
-                return {
-                    'building': 'Student Centre',
-                    'room': room_name,
-                    'full_location': f'{room_name}, Student Centre',
-                }
-
-        # Named UCD Village rooms — e.g. "auditorium" → "Auditorium, UCD Village"
-        for alias in self.village_rooms_sorted:
-            if self._alias_in_text(alias, text_lower):
-                room_name = self.village_rooms[alias]
-                return {
-                    'building': 'UCD Village',
-                    'room': room_name,
-                    'full_location': f'{room_name}, UCD Village',
-                }
-
-        # Room regex: two alternatives:
-        #   1. LETTER(S)-DIGITS: G-14, AD-101 (hyphenated prefix)
-        #   2. Optional letter prefix + digits + optional .subdiv + optional suffix: E1.32, C204A, AD1.01
-        ROOM_RE = r'[A-Za-z]{1,3}-\d+[A-Za-z]?|[A-Za-z]{0,3}\d+(?:[.]\d+)?[A-Za-z]?'
-
-        # Check against known UCD buildings (longest alias first for specificity)
-        for alias in self.ucd_buildings:
-            if not self._alias_in_text(alias, text_lower):
-                continue
-
-            official = self.building_aliases[alias]
-
-            # 1. Try room adjacent to building name
-            adjacent_patterns = [
-                rf'{re.escape(alias)}\s+(?:room\s+)?({ROOM_RE})',   # "engineering room 321" / "engineering E1.32"
-                rf'room\s+({ROOM_RE})\s+(?:in\s+)?{re.escape(alias)}',  # "room 321 in engineering"
-            ]
-            for pattern in adjacent_patterns:
-                match = re.search(pattern, text_lower)
-                if match:
-                    room = match.group(1).upper()
-                    return {
-                        'building': official,
-                        'room': room,
-                        'full_location': f"{official}, Room {room}"
-                    }
-
-            # 2. Global room scan — room in a separate sentence/clause
-            global_room = re.search(
-                rf'\b(?:room|rm\.?)\s*({ROOM_RE})', text_lower
-            )
-            if global_room:
-                room = global_room.group(1).upper()
-                return {
-                    'building': official,
-                    'room': room,
-                    'full_location': f"{official}, Room {room}"
-                }
-
-            return {
-                'building': official,
-                'room': None,
-                'full_location': official
-            }
-
-        # Fallback: generic location-like text
-        for pattern in [
-            r'(?:at|in|@)\s+([A-Z][a-zA-Z\s]+(?:Building|Centre|Hall|Room))',
-            r'(?:at|in|@)\s+([A-Z][a-zA-Z\s]+\d+)',
-        ]:
-            match = re.search(pattern, text)
-            if match:
-                return {
-                    'building': None,
-                    'room': None,
-                    'full_location': match.group(1).strip()
-                }
-
-        return None
-    
-    def _combine_datetime(self, date: Optional[datetime], time: Optional[Dict]) -> datetime:
-        """Combine date and time into single datetime."""
-        if not date:
-            date = datetime.now(self.timezone)
-        
-        if time:
-            # Validate hour and minute
-            hour = time.get('hour', 18)
-            minute = time.get('minute', 0)
-            
-            if not (0 <= hour <= 23):
-                logger.warning(f"Invalid hour {hour}, defaulting to 18:00")
-                hour = 18
-                minute = 0
-            
-            if not (0 <= minute <= 59):
-                logger.warning(f"Invalid minute {minute}, defaulting to 0")
-                minute = 0
-            
-            return date.replace(hour=hour, minute=minute, second=0, microsecond=0)
-        else:
-            # Default to 6 PM if no time specified
-            return date.replace(hour=18, minute=0, second=0, microsecond=0)
-    
-    def _generate_title(self, text: str, location: Optional[Dict]) -> str:
-        """Generate event title from text."""
-        # Try to extract a meaningful title
-        lines = text.split('\n')
-        first_line = lines[0].strip()
-        
-        # If first line is short and descriptive, use it
-        if len(first_line) < 100 and len(first_line) > 5:
-            return first_line
-        
-        # Otherwise, generate generic title
-        if location and location.get('building'):
-            return f"Free Food at {location['building']}"
-        
-        return "Free Food Event"
-    
 # Made with Bob

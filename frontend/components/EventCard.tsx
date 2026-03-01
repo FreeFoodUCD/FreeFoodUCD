@@ -138,6 +138,13 @@ export function EventCard({ event, onClick }: EventCardProps) {
                 </span>
               )}
 
+              {/* Members Only Badge */}
+              {event.members_only && (
+                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">
+                  🔒 Members only
+                </span>
+              )}
+
               {/* Time ago */}
               {mounted && !isLive && (
                 <span className="text-xs font-medium text-text-lighter">

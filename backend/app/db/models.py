@@ -40,6 +40,9 @@ class Post(Base):
     detected_at = Column(DateTime(timezone=True), server_default=func.now(), index=True)
     is_free_food = Column(Boolean, default=False, index=True)
     processed = Column(Boolean, default=False, index=True)
+    # F6: NLP failure tracking — set when Gemini API fails so posts can be re-queued
+    nlp_failed = Column(Boolean, default=False, index=True)
+    nlp_error = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     # Relationships

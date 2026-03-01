@@ -34,6 +34,11 @@ resend==0.8.0
 
 # LLM
 openai>=1.30.0
+google-generativeai>=0.8.0
+
+# Observability (F1 — Phase F)
+# Langfuse: LLM tracing + human feedback. Gracefully disabled if keys absent.
+langfuse>=2.0.0
 
 # Scraping
 apify-client==1.7.1

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Header
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete, desc
-from typing import List, Optional
+from typing import List, Optional, Literal
 from pydantic import BaseModel
 from app.db.base import get_db
 from app.db.models import User, Society, Event, Post, ScrapingLog, NotificationLog, PostFeedback
@@ -432,6 +432,82 @@ async def submit_post_feedback(
     return {
         "message": message,
         "feedback_id": feedback_id
+    }
+
+
+# ── F4: Event-level feedback endpoint ────────────────────────────────────────
+
+class EventFeedbackCreate(BaseModel):
+    """Schema for submitting feedback on a classified event."""
+    feedback_type: Literal["correct", "false_positive", "false_negative"]
+    notes: Optional[str] = None
+
+
+@router.post("/events/{event_id}/feedback")
+async def submit_event_feedback(
+    event_id: str,
+    feedback_data: EventFeedbackCreate,
+    db: AsyncSession = Depends(get_db),
+    _: bool = Depends(verify_admin_key),
+):
+    """
+    F4: Submit human feedback on a classified event.
+    - correct: event was correctly identified as free food
+    - false_positive: event was accepted but is NOT free food → deactivate
+    - false_negative: event was missed (not applicable here — use post feedback instead)
+
+    If Langfuse is configured, syncs the feedback as a score on the trace.
+    """
+    event = await db.get(Event, event_id)
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    # Apply event effects based on feedback type
+    if feedback_data.feedback_type == "false_positive":
+        event.is_active = False
+        logger.info(f"F4: Event {event_id} marked as false positive — deactivated")
+    elif feedback_data.feedback_type == "correct":
+        event.is_active = True
+        logger.info(f"F4: Event {event_id} confirmed correct")
+
+    # Write to PostFeedback table (linked via source_id → post)
+    if event.source_id and event.source_type == "post":
+        existing_fb = (await db.execute(
+            select(PostFeedback).where(PostFeedback.post_id == event.source_id)
+        )).scalar_one_or_none()
+
+        is_correct = feedback_data.feedback_type == "correct"
+        if existing_fb:
+            existing_fb.is_correct = is_correct
+            existing_fb.notes = feedback_data.notes
+        else:
+            db.add(PostFeedback(
+                post_id=event.source_id,
+                admin_email="admin",
+                is_correct=is_correct,
+                notes=feedback_data.notes,
+            ))
+
+    await db.commit()
+
+    # F4 + F1: Sync feedback score to Langfuse if available
+    try:
+        from app.services.nlp.llm_classifier import get_llm_classifier
+        llm = get_llm_classifier()
+        if llm and getattr(llm, '_langfuse', None):
+            score_value = 1.0 if feedback_data.feedback_type == "correct" else 0.0
+            # We don't store trace_id on Event yet — log for now, full sync in future
+            logger.info(
+                f"F4/F1: Langfuse feedback score={score_value} for event {event_id} "
+                f"(type={feedback_data.feedback_type})"
+            )
+    except Exception as lf_exc:
+        logger.debug(f"Langfuse feedback sync failed (non-fatal): {lf_exc}")
+
+    return {
+        "message": f"Feedback '{feedback_data.feedback_type}' recorded for event {event_id}",
+        "event_id": event_id,
+        "feedback_type": feedback_data.feedback_type,
     }
 
 

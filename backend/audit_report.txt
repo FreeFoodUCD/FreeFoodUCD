@@ -16,7 +16,7 @@ Running LLM audit on 707 posts (this takes a few minutes)...
 CLASSIFIER AUDIT REPORT  —  707 posts analysed
 ======================================================================
 
-✅ ACCEPTED (114 posts)
+✅ ACCEPTED (115 posts)
 
   @ucdafricasociety  [16 Feb]
   Caption: 'Brunch & Vibes is callingggg 🥞☕️\nA well deserved treat from us to you come down and bring a friend too 🤍\n📅 17th Feb (Tue'
@@ -188,6 +188,15 @@ CLASSIFIER AUDIT REPORT  —  707 posts analysed
   Caption: 'Join us for a relaxing evening of film and fun! 🍿\n📍 Village Auditorium\n📅 26 Feb 2026\n⏰ 18:00 – 21:00\nSee you there!'
   https://www.instagram.com/p/DVHGtCtglDg/
 
+  @ucdisoc  [28 Feb]
+  Caption: '🌟 Giveaway Time!!! 🌟\n\nTo start Bake4Charity Ireland off with a bang, we are doing a Giveaway for a box of chocolate fudg'
+  → Title:    🌟 Giveaway Time!!! 🌟
+  → Location: Not found
+  → Time:     01:00 PM
+  → Date:     Monday 02 Mar
+  → Members:  False
+  https://www.instagram.com/p/DVUUCl5iB0p/
+
   @ucditaliansoc  [17 Feb]
   Caption: 'Ciao! 🇮🇹✨\n\nThis Wednesday we’re bringing a taste of Italy to the International Market! Come support Società Italiana and'
   https://www.instagram.com/p/DU29YL1jQ10/
@@ -220,10 +229,6 @@ CLASSIFIER AUDIT REPORT  —  707 posts analysed
   Caption: 'Tomorrow is another Language class and we will be going over how to count things. Like in english, we have *sheets* of p'
   https://www.instagram.com/p/DU6XrUlCJuO/
 
-  @ucdjsoc  [17 Feb]
-  Caption: 'We will be having a table at the International Festival Stalls in the Atrium! We will be selling matcha cheesecake and m'
-  https://www.instagram.com/p/DU2t1eCiJZK/
-
   @ucdjuggling  [08 Feb]
   Caption: "Missed Midlands' convention but still want to hear all about it? Then our post convention pizza will be perfect for you!"
   https://www.instagram.com/p/DUhAtUCCIic/
@@ -241,9 +246,9 @@ CLASSIFIER AUDIT REPORT  —  707 posts analysed
   Caption: 'FLOAT EU DEBATE TUESDAY 24TH IN THE FITZGERALD CHAMBER!! \n\nWith guests:\nCllr. Michael Clark\nDean of Law Imelda Maher\nBar'
   https://www.instagram.com/p/DVHOEIlDZ55/
 
-  @ucdlawsoc  [18 Feb]
-  Caption: 'Join us for an insightful career panel discussion regarding careers in Law which differ from the usual\n\nWe will be joine'
-  https://www.instagram.com/p/DU53U9WjQda/
+  @ucdlawsoc  [23 Feb]
+  Caption: 'We were delighted to honour Joe Duffy with honorary life membership\n\n‘Never lose the run of yourself’ was the advice he'
+  https://www.instagram.com/p/DVGipoOjKNW/
 
   @ucd_lgbtqplus  [01 Feb]
   Caption: 'Howdy, my friends 🫡\nAre we feeling creative yet? \nAre we avant-garding?\nAre we arting?\n\nWell, you will be this week, for'
@@ -282,6 +287,10 @@ CLASSIFIER AUDIT REPORT  —  707 posts analysed
   → Members:  False
   https://www.instagram.com/p/DUhEULsiI-M/
 
+  @ucdlitsoc  [26 Jan]
+  Caption: '✨ 𝚁𝙴𝙵𝚁𝙴𝚂𝙷𝙴𝚁𝚂 𝚆𝙴𝙴𝙺! ✨ \n📅 𝙼𝚘𝚗 𝟸𝟼 𝙹𝚊𝚗 — 𝙵𝚛𝚒 𝟹𝟶 𝙹𝚊𝚗 𝙲𝚘𝚖𝚎 𝚐𝚎𝚝 𝚒𝚗𝚟𝚘𝚕𝚟𝚎𝚍 𝚊𝚗𝚍 𝚓𝚘𝚒𝚗 𝚝𝚑𝚎 𝚜𝚘𝚌𝚒𝚎𝚝𝚢! \n\n📍 𝚃𝚄𝙴𝚂𝙳𝙰𝚈\n • 𝚁𝚎𝚏𝚛𝚎𝚜𝚑𝚎𝚛𝚜’ 𝙵𝚊𝚒𝚛'
+  https://www.instagram.com/p/DT-MFrNCDdQ/
+
   @ucdlitsoc  [19 Jan]
   Caption: '🗞️ 𝚆𝙴𝙴𝙺 𝟷 𝚆𝙸𝚃𝙷 𝙻𝙸𝚃𝚂𝙾𝙲\n\n 🗞️ 𝚆𝚎𝚕𝚌𝚘𝚖𝚎 𝚋𝚊𝚌𝚔!! 📚\n\n✨ 𝚆𝚎’𝚛𝚎 𝚜𝚝𝚊𝚛𝚝𝚒𝚗𝚐 𝚝𝚑𝚎 𝚜𝚎𝚖𝚎𝚜𝚝𝚎𝚛 𝚠𝚒𝚝𝚑 𝚝𝚠𝚘 𝚟𝚎𝚛𝚢 𝚒𝚖𝚙𝚘𝚛𝚝𝚊𝚗𝚝 𝚎𝚟𝚎𝚗𝚝𝚜: \n\n𝙼𝙾𝙽𝙳𝙰𝚈 🍕 𝙰𝚛'
   https://www.instagram.com/p/DTrz4DgiKKz/
@@ -296,16 +305,15 @@ CLASSIFIER AUDIT REPORT  —  707 posts analysed
 
   @ucdlivingstones  [19 Feb]
   Caption: 'For the ladies.. 💐💐\nFebruary may be known as the month of love…\nBut God’s love doesn’t fade when the calendar turns.\n\nJo'
-  → Title:    For the ladies.. 💐💐
-  → Location: Harmony Studio, Student Centre
-  → Time:     07:00 PM
-  → Date:     Friday 27 Feb
-  → Members:  False
   https://www.instagram.com/p/DU8BicujALr/
 
   @ucdlivingstones  [08 Feb]
   Caption: "Join us for a special Valentine's Day event this Wednesday at 6:15 pm in  Room FS-G01 in the Agriculture Building. We'll"
   https://www.instagram.com/p/DUg649JjAYO/
+
+  @ucdmathsoc  [27 Jan]
+  Caption: "We're hosting a refreshers mixer this Thursday! Come celebrate (or commiserate) exam results with us upstairs in the clu"
+  https://www.instagram.com/p/DUBRAZ-CO6Y/
 
   @ucdmechsoc  [13 Feb]
   Caption: 'Dear 3rd Years!!\nChoosing your Masters? 🤔🎓\n\nJoin Mech Soc for our Masters Stream Information Night - hear from current m'
@@ -314,6 +322,10 @@ CLASSIFIER AUDIT REPORT  —  707 posts analysed
   @ucdmechsoc  [09 Feb]
   Caption: '💻CAD Workshop this Thursday!\n\nJoin Master’s student Luke Dunne for a Fusion 360 masterclass! Whether you’re new to CAD o'
   https://www.instagram.com/p/DUjfda-DEYw/
+
+  @ucdmechsoc  [27 Jan]
+  Caption: 'Fresh semester, fresh opportunities 💥\nMeet UCD Mech Soc at the Refreshers Fair!\nOpen to all – don’t miss it 🔧⚙️'
+  https://www.instagram.com/p/DUAhqbaDGD2/
 
   @ucdmechsoc  [18 Nov]
   Caption: '🚀 Careers Talk Alert!\nWe’re excited to welcome Tritech and IPS to UCD MechSoc for a special careers session! 🤝\n\nThey’ll'
@@ -383,6 +395,10 @@ CLASSIFIER AUDIT REPORT  —  707 posts analysed
   Caption: 'COME JOIN US FOR FREE COOKIES ON THE 4TH OF FEBUARY IN HARMONY💙💙💙💙\n\n@ucdsocieties @snmhs.official @scoopsandhoops.ie'
   https://www.instagram.com/p/DUUHMiCiNo6/
 
+  @pharmtoxucd  [10 Feb]
+  Caption: 'Meet the 25/26 pharmtox team! Yes I know we’re late but better late than never! Four in the frame, a whole committee beh'
+  https://www.instagram.com/p/DUlemrrjM8W/
+
   @pharmtoxucd  [25 Oct]
   Caption: '💃🏽 🪩 Big love to everyone who pulled up to Pharmtox Mixer! Y’all ate (literally and socially) 🙂\u200d↕️\nThe vibes were immacu'
   https://www.instagram.com/p/DQPbfpLDSMS/
@@ -435,10 +451,6 @@ CLASSIFIER AUDIT REPORT  —  707 posts analysed
   Caption: 'You know it, you love it! 🙌\n\nPolsoc is BACK with our weekly coffee morning tomorrow, Wednesday the 21st from 10am to 12p'
   https://www.instagram.com/p/DU2z_yMCEhk/
 
-  @ucdpolsoc  [15 Feb]
-  Caption: 'Week 5 with Polsoc is HERE! 💥\n\nWe have a jam packed week of events for you guys, from our MEP panel with Aodhan O’Riorda'
-  https://www.instagram.com/p/DUyvKzpCFKv/
-
   @psychsocietyucd  [24 Feb]
   Caption: 'GAMES DAY GAMES DAY ‼️‼️🗣️🗣️🗣️\n\nGuys come to some chillaxed game time where to get to play your favourite board games an'
   https://www.instagram.com/p/DVIseNViMcG/
@@ -463,10 +475,6 @@ CLASSIFIER AUDIT REPORT  —  707 posts analysed
   Caption: 'Apolo-cheese everyone, we have an updated more flourished week coming this week ✨\n\nWe got the casual games where we gath'
   https://www.instagram.com/p/DUz4sYaiCfH/
 
-  @psychsocietyucd  [12 Feb]
-  Caption: "Valentine's day is coming our way 💘\nIn Harmony studio @ 1pm (come before all is gone!!) \n\nIn order to celebrate this sea"
-  https://www.instagram.com/p/DUpt2DWCIwF/
-
   @ucdsocdems  [21 Jan]
   Caption: '🟣‼️🟣JOIN US TODAY🟣‼️🟣\n\nWe have lots of unreal activities planned for semester 2! More information shall be released in t'
   https://www.instagram.com/p/DTyeedAgAk5/
@@ -482,10 +490,6 @@ CLASSIFIER AUDIT REPORT  —  707 posts analysed
   @ucdvnsoc  [18 Feb]
   Caption: 'IVNA talk on Thursday the 20th!\nEveryone is welcome and we could love to see you all there!💚💚 Thursday the 20th at 6pm i'
   https://www.instagram.com/p/DGNbt9CMQbZ/
-
-  @ucdvetsoc  [15 Feb]
-  Caption: '🥞🥞🥞'
-  https://www.instagram.com/p/DUyrxkajhRw/
 
   @womeninstem_ucd  [19 Feb]
   Caption: '📣Important and exciting news!📣\n\nThis International Women’s Day, we’re hosting a special Lunch & Learn in collaboration w'
@@ -510,16 +514,17 @@ CLASSIFIER AUDIT REPORT  —  707 posts analysed
   https://www.instagram.com/p/DUk435Jgtdw/
 
 
-❌ REJECTED (593 posts)
+❌ REJECTED (592 posts)
 
   Rejection reasons:
-    545x  No explicit food keyword found
+    532x  No explicit food keyword found
     25x  Appears to be a paid event (price/ticket mention)
-    5x  Iftar/religious event
+    10x  Past-tense recap post (not an upcoming event)
+    6x  Iftar/religious event
     3x  Nightlife event keyword: 'ball'
+    3x  Mentions off-campus venue: 'pub'
     3x  Nightlife event keyword: 'night out'
     2x  Nightlife event keyword: 'pub crawl'
-    2x  Mentions off-campus venue: 'pub'
     1x  Nightlife event keyword: 'formal'
     1x  Mentions off-campus venue: 'dundrum'
     1x  Mentions other college: 'maynooth'
@@ -529,7 +534,7 @@ CLASSIFIER AUDIT REPORT  —  707 posts analysed
     1x  Food activity workshop/competition (not free food)
     1x  Mentions off-campus venue: 'night out'
 
-  ⚠️  POSSIBLE FALSE NEGATIVES (134 posts — food mentioned but rejected):
+  ⚠️  POSSIBLE FALSE NEGATIVES (127 posts — food mentioned but rejected):
 
     @belfield.fm  [25 Feb]
     Caption: 'Games and Drinks at Token!\nCome join us on the 25th March from 7 - 10pm!\n\n#ucd #belfieldfm #studentradio'
@@ -623,10 +628,6 @@ CLASSIFIER AUDIT REPORT  —  707 posts analysed
     Caption: 'We are happy to announce that we will have three top Irish chess players competing in the UCD Chess Charity Rapidplay 2026 for Focus Ireland.  From le'
     https://www.instagram.com/p/DUgt9t4DlBD/
 
-    @ucdchess  [25 Jan]
-    Caption: 'Hey everyone! Hope everyone had a great holiday and first week back!\n\nHere is what UCD Chess has planned for Refreshers. This Wednesday (28th of Janua'
-    https://www.instagram.com/p/DT8ntmNALFY/
-
     @ucdchess  [11 Jan]
     Caption: 'Hey everyone! We hope that everyone had a great break! \n\nWe have a very exciting charity event coming up in a few weeks ... our Charity Rapidplay Tour'
     https://www.instagram.com/p/DTXzVAvicav/
@@ -650,10 +651,6 @@ CLASSIFIER AUDIT REPORT  —  707 posts analysed
     @chinesesoc.ucd  [19 Nov]
     Caption: '🎓 Career Night\n\nConsidering postgraduate studies? Hunting for a job? Still confused about your professional path?\nYour future starts with a single con'
     https://www.instagram.com/p/DRPGqv_CHHd/
-
-    @ucd_civil_structural  [05 Feb]
-    Caption: 'Find that chicken! 🐥\n\nChicken chase is back! Meet at Kehoe’s Pub next Tuesday, 10/2/26, at 8:00pm and wait for the possible locations to drop! \n\nSame'
-    https://www.instagram.com/p/DUYNK_MDGzg/
 
     @ucd_civil_structural  [26 Jan]
     Caption: 'Refreshers night out 🪩\n\nTo welcome you all back for a new semester please join us in Smyths of Ranelagh this Tuesday the 27th from 7:30pm 🕺🏻\nDrink tok'
@@ -771,10 +768,6 @@ CLASSIFIER AUDIT REPORT  —  707 posts analysed
     Caption: 'Join us next Monday for our food and fellowship session✨🥳We’ll have games, food, and deep meaningful conversations(DMC’s)✨Looking forward to seeing yo'
     https://www.instagram.com/p/DRAIVDiDHBc/
 
-    @ucdpottersoc  [25 Jan]
-    Caption: 'Week 2 events are here\nWith it being Refreshers Week we have brought back the sorting ceremony for this week (rumour has it there may be food at this'
-    https://www.instagram.com/p/DT8prRDDWFs/
-
     @ucdhistorysoc  [10 Feb]
     Caption: '🌟 HONORARY LIFETIME MEMBERSHIP SERIES 🌟\n\nThe History Society are excited to announce that over the next three weeks we will be welcoming an amazing se'
     https://www.instagram.com/p/DUlLt8jiF_x/
@@ -802,10 +795,6 @@ CLASSIFIER AUDIT REPORT  —  707 posts analysed
     @ucdhistorysoc  [01 Feb]
     Caption: '🗣️ HISTORY SOCIETY LEGACY DEBATE 🗣️\n\nNext Wednesday we will be hosting our first debate of the semester… \n\n‘WAS DEVALERA THE VILLAIN’ \n\nOur speakers w'
     https://www.instagram.com/p/DUN6pyYDNi1/
-
-    @ucdhistorysoc  [31 Jan]
-    Caption: '🕺🏻 HISTORY SOC 80s NIGHT 🕺🏻\n\nThank you to everyone who came along! What a great night and a great start to the semester 🌟\n\nWe can’t wait to show you w'
-    https://www.instagram.com/p/DUMC6vZDO5c/
 
     @ucdhrs  [23 Feb]
     Caption: '✨Cheltenham Preview Night Raffle Prizes✨\n\nA huge thank you to all of the generous companies and organisations who have kindly donated some fantastic p'
@@ -872,10 +861,6 @@ CLASSIFIER AUDIT REPORT  —  707 posts analysed
     https://www.instagram.com/p/DVFJoQhiLN3/
 
     @ucdjsoc  [18 Feb]
-    Caption: 'Thanks so much to everyone who came to the Asian Market Crawl. We hope you all had a great time. ✨\n\nTo hear about more fun events keep up-to-date with'
-    https://www.instagram.com/p/DU6lIrMiDGK/
-
-    @ucdjsoc  [18 Feb]
     Caption: 'For fluent Japanese speakers 🗾🇯🇵\n\n📢 ＜いよいよ 2/21（土）– 22（日）開催！ロンキャリ2026＞\n＼37社がロンドンに集結！／\n\nアイルランドの日英バイリンガルのみなさんへ\nCFNの吉田麻衣子です。\n\nいよいよ今週末、ロンドンキャリアフォーラムが開催です！'
     https://www.instagram.com/p/DU58FNLCC7k/
 
@@ -895,9 +880,9 @@ CLASSIFIER AUDIT REPORT  —  707 posts analysed
     Caption: 'The Law Society is proud to present Ms. Brittany Broski with Honorary Life Membership. The event will involve a Q&A with Brittany herself. \n\nAn iconic'
     https://www.instagram.com/p/DU6UU-mjXxK/
 
-    @ucdlnh  [21 Feb]
-    Caption: '💥🇺🇸 This House DOES Believe that the US is the Biggest Threat to Global Stability 🇺🇸💥\n\nThank you to all of our fantastic speakers last Thursday night,'
-    https://www.instagram.com/p/DVBVh61jXT8/
+    @ucdlnh  [28 Feb]
+    Caption: 'We are so excited to announce our events for Finlay Week this year! From a Journalling Workshop ✍ to Açai Breakfast 🍓, we are gearing up to have a fan'
+    https://www.instagram.com/p/DVT4jorjFlA/
 
     @ucdlnh  [19 Feb]
     Caption: "Wifi? Yeah a WGM created that, CCTV? a WGM too, Taiwan's first digital minister? WGM, Birth Control? obviously a WGM. \n\nWant your chance to speak in a"
@@ -918,14 +903,6 @@ CLASSIFIER AUDIT REPORT  —  707 posts analysed
     @ucdmathsoc  [16 Feb]
     Caption: "Join us tomorrow evening for another intervarsity skills workshop with Gary McGuire!\n\nThe worksop will feature intervarsity style questions. It'll fea"
     https://www.instagram.com/p/DU0bdeFiBIW/
-
-    @ucdmathsoc  [27 Jan]
-    Caption: "We're hosting a refreshers mixer this Thursday! Come celebrate (or commiserate) exam results with us upstairs in the clubhouse\n\n....first 🍸 on us😉..."
-    https://www.instagram.com/p/DUBRAZ-CO6Y/
-
-    @ucdmechsoc  [27 Jan]
-    Caption: 'Fresh semester, fresh opportunities 💥\nMeet UCD Mech Soc at the Refreshers Fair!\nOpen to all – don’t miss it 🔧⚙️'
-    https://www.instagram.com/p/DUAhqbaDGD2/
 
     @ucdmechsoc  [25 Nov]
     Caption: '💙 Movember Week 3 Update\n\nWith just under a week of fundraising to go, our beautiful team are back showing off their beautiful mo’s 🤩 \n\nWe have recent'
@@ -1068,7 +1045,7 @@ CLASSIFIER AUDIT REPORT  —  707 posts analysed
     https://www.instagram.com/p/DU095FBjbcU/
 
 
-  ⚠️  ACCEPTED BUT INCOMPLETE EXTRACTION (109 posts):
+  ⚠️  ACCEPTED BUT INCOMPLETE EXTRACTION (111 posts):
 
     @ucdafricasociety  missing: location, time
     Caption: 'Brunch & Vibes is callingggg 🥞☕️\nA well deserved treat from us to you come down and bring a friend too 🤍\n📅 17th Feb (Tuesday) \n⏰ 10AM–1PM\n📍 Meeting Ro'
@@ -1187,6 +1164,9 @@ CLASSIFIER AUDIT REPORT  —  707 posts analysed
     @ucdindsoc  missing: location, time
     Caption: 'Join us for a relaxing evening of film and fun! 🍿\n📍 Village Auditorium\n📅 26 Feb 2026\n⏰ 18:00 – 21:00\nSee you there!'
 
+    @ucdisoc  missing: location
+    Caption: '🌟 Giveaway Time!!! 🌟\n\nTo start Bake4Charity Ireland off with a bang, we are doing a Giveaway for a box of chocolate fudge brownies for collection or d'
+
     @ucditaliansoc  missing: location, time
     Caption: 'Ciao! 🇮🇹✨\n\nThis Wednesday we’re bringing a taste of Italy to the International Market! Come support Società Italiana and explore our stand filled with'
 
@@ -1211,9 +1191,6 @@ CLASSIFIER AUDIT REPORT  —  707 posts analysed
     @ucdjsoc  missing: location, time
     Caption: 'Tomorrow is another Language class and we will be going over how to count things. Like in english, we have *sheets* of paper or *slices* of cake. Japa'
 
-    @ucdjsoc  missing: location, time
-    Caption: 'We will be having a table at the International Festival Stalls in the Atrium! We will be selling matcha cheesecake and matcha latte if you missed them'
-
     @ucdjuggling  missing: location, time
     Caption: "Missed Midlands' convention but still want to hear all about it? Then our post convention pizza will be perfect for you!! \nOr join us for your usual w"
 
@@ -1221,7 +1198,7 @@ CLASSIFIER AUDIT REPORT  —  707 posts analysed
     Caption: 'FLOAT EU DEBATE TUESDAY 24TH IN THE FITZGERALD CHAMBER!! \n\nWith guests:\nCllr. Michael Clark\nDean of Law Imelda Maher\nBarry Ward TD\nPaul Gogarty TD\n\nFr'
 
     @ucdlawsoc  missing: location, time
-    Caption: 'Join us for an insightful career panel discussion regarding careers in Law which differ from the usual\n\nWe will be joined by:\n\nNiamh McCormack from Ir'
+    Caption: 'We were delighted to honour Joe Duffy with honorary life membership\n\n‘Never lose the run of yourself’ was the advice he (fittingly) bestowed upon us l'
 
     @ucd_lgbtqplus  missing: location, time
     Caption: 'Howdy, my friends 🫡\nAre we feeling creative yet? \nAre we avant-garding?\nAre we arting?\n\nWell, you will be this week, for creativity is back in the clu'
@@ -1248,6 +1225,9 @@ CLASSIFIER AUDIT REPORT  —  707 posts analysed
     Caption: '𝚆𝚎𝚎𝚔 𝟺 𝚠𝚒𝚝𝚑 𝙻𝚒𝚝𝚜𝚘𝚌 🎞️📔\n\n☕️ 𝙼𝚘𝚗𝚍𝚊𝚢 — 𝙹𝚘𝚒𝚗 𝚞𝚜 𝚏𝚘𝚛 𝚊 𝚌𝚘𝚏𝚏𝚎𝚎 𝚖𝚘𝚛𝚗𝚒𝚗𝚐 𝚝𝚘 𝚜𝚝𝚊𝚛𝚝 𝚘𝚏𝚏 𝚝𝚑𝚎 𝚠𝚎𝚎𝚔. 𝙷𝚊𝚛𝚖𝚘𝚗𝚢 𝚂𝚝𝚞𝚍𝚒𝚘, 𝟷𝟶𝚊𝚖. \u200b\n\n🖋️ 𝚃𝚑𝚞𝚛𝚜𝚍𝚊𝚢 — 𝙳𝚃𝙰𝚆𝙲 𝚒𝚗 𝚁𝚘𝚘𝚖𝚜 𝟺/𝟻/𝟼, 𝟷'
 
     @ucdlitsoc  missing: location, time
+    Caption: '✨ 𝚁𝙴𝙵𝚁𝙴𝚂𝙷𝙴𝚁𝚂 𝚆𝙴𝙴𝙺! ✨ \n📅 𝙼𝚘𝚗 𝟸𝟼 𝙹𝚊𝚗 — 𝙵𝚛𝚒 𝟹𝟶 𝙹𝚊𝚗 𝙲𝚘𝚖𝚎 𝚐𝚎𝚝 𝚒𝚗𝚟𝚘𝚕𝚟𝚎𝚍 𝚊𝚗𝚍 𝚓𝚘𝚒𝚗 𝚝𝚑𝚎 𝚜𝚘𝚌𝚒𝚎𝚝𝚢! \n\n📍 𝚃𝚄𝙴𝚂𝙳𝙰𝚈\n • 𝚁𝚎𝚏𝚛𝚎𝚜𝚑𝚎𝚛𝚜’ 𝙵𝚊𝚒𝚛 𝚂𝚝𝚊𝚕𝚕 — 𝟿𝚊𝚖–𝟺𝚙𝚖, 𝙰𝚜𝚝𝚛𝚊 𝙷𝚊𝚕𝚕 𝚂𝚒'
+
+    @ucdlitsoc  missing: location, time
     Caption: '🗞️ 𝚆𝙴𝙴𝙺 𝟷 𝚆𝙸𝚃𝙷 𝙻𝙸𝚃𝚂𝙾𝙲\n\n 🗞️ 𝚆𝚎𝚕𝚌𝚘𝚖𝚎 𝚋𝚊𝚌𝚔!! 📚\n\n✨ 𝚆𝚎’𝚛𝚎 𝚜𝚝𝚊𝚛𝚝𝚒𝚗𝚐 𝚝𝚑𝚎 𝚜𝚎𝚖𝚎𝚜𝚝𝚎𝚛 𝚠𝚒𝚝𝚑 𝚝𝚠𝚘 𝚟𝚎𝚛𝚢 𝚒𝚖𝚙𝚘𝚛𝚝𝚊𝚗𝚝 𝚎𝚟𝚎𝚗𝚝𝚜: \n\n𝙼𝙾𝙽𝙳𝙰𝚈 🍕 𝙰𝚛𝚝𝚜 & 𝙷𝚞𝚖𝚊𝚗𝚒𝚝𝚒𝚎𝚜 𝙼𝚒𝚡𝚎𝚛 \n📍 𝙶𝚕𝚘𝚋𝚊'
 
     @ucdlitsoc  missing: location, time
@@ -1257,13 +1237,22 @@ CLASSIFIER AUDIT REPORT  —  707 posts analysed
     Caption: '✨ This Week at Livingstones ✨\nHello everyone, welcome back to a new week! We’ve got some exciting events coming up and we’d love to see you there 🤍'
 
     @ucdlivingstones  missing: location, time
+    Caption: 'For the ladies.. 💐💐\nFebruary may be known as the month of love…\nBut God’s love doesn’t fade when the calendar turns.\n\nJoin us for a beautiful evening'
+
+    @ucdlivingstones  missing: location, time
     Caption: "Join us for a special Valentine's Day event this Wednesday at 6:15 pm in  Room FS-G01 in the Agriculture Building. We'll be having a special word on G"
+
+    @ucdmathsoc  missing: location, time
+    Caption: "We're hosting a refreshers mixer this Thursday! Come celebrate (or commiserate) exam results with us upstairs in the clubhouse\n\n....first 🍸 on us😉..."
 
     @ucdmechsoc  missing: location, time
     Caption: 'Dear 3rd Years!!\nChoosing your Masters? 🤔🎓\n\nJoin Mech Soc for our Masters Stream Information Night - hear from current masters students about the modu'
 
     @ucdmechsoc  missing: location, time
     Caption: '💻CAD Workshop this Thursday!\n\nJoin Master’s student Luke Dunne for a Fusion 360 masterclass! Whether you’re new to CAD or looking to sharpen your skil'
+
+    @ucdmechsoc  missing: location, time
+    Caption: 'Fresh semester, fresh opportunities 💥\nMeet UCD Mech Soc at the Refreshers Fair!\nOpen to all – don’t miss it 🔧⚙️'
 
     @ucdmechsoc  missing: location, time
     Caption: '🚀 Careers Talk Alert!\nWe’re excited to welcome Tritech and IPS to UCD MechSoc for a special careers session! 🤝\n\nThey’ll be speaking about internship a'
@@ -1317,6 +1306,9 @@ CLASSIFIER AUDIT REPORT  —  707 posts analysed
     Caption: 'COME JOIN US FOR FREE COOKIES ON THE 4TH OF FEBUARY IN HARMONY💙💙💙💙\n\n@ucdsocieties @snmhs.official @scoopsandhoops.ie'
 
     @pharmtoxucd  missing: location, time
+    Caption: 'Meet the 25/26 pharmtox team! Yes I know we’re late but better late than never! Four in the frame, a whole committee behind PharmTox 🧠💥\nTeamwork looks'
+
+    @pharmtoxucd  missing: location, time
     Caption: '💃🏽 🪩 Big love to everyone who pulled up to Pharmtox Mixer! Y’all ate (literally and socially) 🙂\u200d↕️\nThe vibes were immaculate, the games were chaotic ('
 
     @ucdphdsociety  missing: location, time
@@ -1355,9 +1347,6 @@ CLASSIFIER AUDIT REPORT  —  707 posts analysed
     @ucdpolsoc  missing: location, time
     Caption: 'You know it, you love it! 🙌\n\nPolsoc is BACK with our weekly coffee morning tomorrow, Wednesday the 21st from 10am to 12pm! Join us outside Theatre L,'
 
-    @ucdpolsoc  missing: location, time
-    Caption: 'Week 5 with Polsoc is HERE! 💥\n\nWe have a jam packed week of events for you guys, from our MEP panel with Aodhan O’Riordan, Regina Doherty and Barry An'
-
     @psychsocietyucd  missing: location, time
     Caption: "GAMES DAY GAMES DAY ‼️‼️🗣️🗣️🗣️\n\nGuys come to some chillaxed game time where to get to play your favourite board games and it's lots of fun 😼💜 and snac"
 
@@ -1376,9 +1365,6 @@ CLASSIFIER AUDIT REPORT  —  707 posts analysed
     @psychsocietyucd  missing: location, time
     Caption: 'Apolo-cheese everyone, we have an updated more flourished week coming this week ✨\n\nWe got the casual games where we gather and socialise with friends'
 
-    @psychsocietyucd  missing: location, time
-    Caption: "Valentine's day is coming our way 💘\nIn Harmony studio @ 1pm (come before all is gone!!) \n\nIn order to celebrate this season, we'd like to bring your a"
-
     @ucdsocdems  missing: location, time
     Caption: '🟣‼️🟣JOIN US TODAY🟣‼️🟣\n\nWe have lots of unreal activities planned for semester 2! More information shall be released in the next week :)\n\nIn the meanti'
 
@@ -1391,693 +1377,765 @@ CLASSIFIER AUDIT REPORT  —  707 posts analysed
     @ucdvnsoc  missing: location, time
     Caption: 'IVNA talk on Thursday the 20th!\nEveryone is welcome and we could love to see you all there!💚💚 Thursday the 20th at 6pm in Vet 101B✨✨ Free pizza and IV'
 
-    @ucdvetsoc  missing: location, time
-    Caption: '🥞🥞🥞'
-
     @womeninstem_ucd  missing: location, time
     Caption: 'Calling all gals 💕✨\n\nWe’re hosting a Galentine’s Brunch with @ucdwib and it’s going to be so much fun 💖\n\nExpect photobooth moments, cotton candy, refr'
 
 
 ======================================================================
-LLM COMPARISON  —  101 true-pos | 108 false-neg | 13 false-pos
+LLM COMPARISON  —  102 true-pos | 123 false-neg | 13 false-pos
 ======================================================================
 
-🔴 FALSE NEGATIVES (108) — classifier rejected, LLM says food event
+🔴 FALSE NEGATIVES (123) — classifier rejected, LLM says food event
 
-  Keyword: "food"  (16 posts) ← consider adding to extractor
-    @ucdafricasociety  [16 Feb]  reason: No explicit food keyword found
-    LLM: The event will provide food for attendees after the activities.
-    Caption: '👀 IMPOSTER NIGHT is happening… but who’s really who? 🤨 How well can you lie and how well can you detect a liar? Loyalty'
-    https://www.instagram.com/p/DU0e8DXiBtc/
+  Keyword: "food"  (24 posts) ← consider adding to extractor
+    @ucd.aclsoc  [24 Feb]  reason: No explicit food keyword found
+    LLM: The event is likely to offer food during the celebration of Eid, which typically includes communal meals.
+    Caption: 'We are excited to announce that this year’s Eid event will be held in Astra Hall! Keep an eye out on our social media fo'
+    https://www.instagram.com/p/DVKEJYrDc8R/
 
-    @ucd.aclsoc  [12 Feb]  reason: No explicit food keyword found
-    LLM: The post implies a warning about not attending an event that may involve free food, suggesting it is an enticing offer.
-    Caption: 'Make sure this isnt you next week !'
-    https://www.instagram.com/p/DUqrXk8DUZ_/
+    @ucd.aclsoc  [18 Feb]  reason: No explicit food keyword found
+    LLM: The event celebrates Ramadan and is likely to include food as part of the festivities.
+    Caption: 'Ramadan Mubarak! 🌙'
+    https://www.instagram.com/p/DU6NedljRT-/
 
-    @ucddramasoc  [27 Feb]  reason: No explicit food keyword found
-    LLM: The post clearly mentions that food will be provided for free.
+    @chinesesoc.ucd  [24 Feb]  reason: No explicit food keyword found
+    LLM: The gala is celebratory and typically includes festive food, suggesting offerings likely provided for free.
+    Caption: '🀄️Happy Chinese New Year!!! 🧧 Share some moments from the amazing CNY Gala💃'
+    https://www.instagram.com/p/DVHwk7JCNlp/
+
+    @ucdclassicssoc  [28 Feb]  reason: No explicit food keyword found
+    LLM: The post indicates that free food is being provided during the event.
     Caption: ''
-    https://www.instagram.com/ucddramasoc
+    https://www.instagram.com/ucdclassicssoc
 
     @ucddrawsoc  [10 Feb]  reason: No explicit food keyword found
-    LLM: The event offers food for free as part of the celebration.
+    LLM: The caption mentions food being provided for attendees of the event.
     Caption: 'Surprise!!! To celebrate over 15 years of Drawsoc, and to build excitement for the Old Hollywood Ball the following nigh'
     https://www.instagram.com/p/DUkpjXpjHDC/
 
     @ucd.elecsoc  [13 Aug]  reason: No explicit food keyword found
-    LLM: The event clearly offers free food as indicated in the post.
+    LLM: The event is providing free food as stated.
     Caption: ''
-    https://www.instagram.com/p/DNTPjITMHK8/
+    https://www.instagram.com/p/DNTPme9sgI3/
 
-    @ucdengineering  [27 Feb]  reason: No explicit food keyword found
-    LLM: The event is offering free food to attendees.
+    @ucdengineering  [28 Feb]  reason: No explicit food keyword found
+    LLM: The event explicitly mentions free food being provided.
     Caption: ''
     https://www.instagram.com/ucdengineering
 
     @ucdfoodsoc  [03 Oct]  reason: No explicit food keyword found
-    LLM: The post invites committee members to join, implying food-related activities without any mention of cost.
+    LLM: The post invites members to join through a fun committee that revolves around food-related activities, suggesting a social aspect with possible free food.
     Caption: 'ladies nd gents, we want YOU! we’re currently looking for some fresh faces for a few positions on our committee. if you'
     https://www.instagram.com/p/DPXUfkPCIbl/
 
-    @ucdfoodsoc  [14 Sep]  reason: No explicit food keyword found
-    LLM: The mention of 'food' indicates that items are being offered, and there is no indication of payment required.
-    Caption: 'no i didn’t post this a few days ago and notice a mistake and take it down, ur crazy.\n\nthese are our freshers week event'
-    https://www.instagram.com/p/DOmNE4oDY4d/
+    @ucdfoodsoc  [22 Sep]  reason: No explicit food keyword found
+    LLM: The caption mentions a collaboration with foodsoc, indicating food-related activities that are likely free.
+    Caption: "another exciting week of events coming up! stay tuned for more information on our collab with foodsoc, and thursday's 'd"
+    https://www.instagram.com/p/DO6bBx-iLKk/
 
     @ucdfoodsoc  [12 Sep]  reason: No explicit food keyword found
-    LLM: The mention of food in the context of meeting society members at the freshers stand indicates that free food or snacks are likely being offered.
+    LLM: The post indicates a Freshers stand where food is implied to be offered, likely for free, as they invite people to come by and say hi.
     Caption: 'took a while but it’s done now, i proof read ts like 5 times. if there’s a mistake in here im calling it a day and going'
     https://www.instagram.com/p/DOfta3nDd_H/
 
-    @ucdgermansoc  [27 Feb]  reason: No explicit food keyword found
-    LLM: The event explicitly offers free food to attendees.
+    @ucdgermansoc  [28 Feb]  reason: No explicit food keyword found
+    LLM: The post indicates that free food is being provided at the event.
     Caption: ''
     https://www.instagram.com/ucdgermansoc
 
     @ucdgospelchoir  [13 Nov]  reason: No explicit food keyword found
-    LLM: The event includes food and is described as a fellowship session, which implies that the food is provided for attendees.
+    LLM: The event includes food and does not indicate any costs associated with it.
     Caption: 'Join us next Monday for our food and fellowship session✨🥳We’ll have games, food, and deep meaningful conversations(DMC’s'
     https://www.instagram.com/p/DRAIVDiDHBc/
 
     @ucdpottersoc  [22 Feb]  reason: No explicit food keyword found
-    LLM: The event offers food for free.
+    LLM: The event clearly states that food is being provided at no cost.
     Caption: ''
     https://www.instagram.com/p/DVEpOlsDeGz/
 
-    @ucdpottersoc  [25 Jan]  reason: No explicit food keyword found
-    LLM: The event mentions that there may be food available, suggesting it is offered for free.
-    Caption: 'Week 2 events are here\nWith it being Refreshers Week we have brought back the sorting ceremony for this week (rumour has'
-    https://www.instagram.com/p/DT8prRDDWFs/
+    @issucd  [24 Feb]  reason: No explicit food keyword found
+    LLM: The gala is celebratory and typically includes festive food, suggesting offerings likely provided for free.
+    Caption: '🀄️Happy Chinese New Year!!! 🧧 Share some moments from the amazing CNY Gala💃'
+    https://www.instagram.com/p/DVHwk7JCNlp/
+
+    @ucdjsoc  [18 Feb]  reason: Past-tense recap post (not an upcoming event)
+    LLM: The event implies that food was involved given the name 'Asian Market Crawl', which suggests a food exploration theme.
+    Caption: 'Thanks so much to everyone who came to the Asian Market Crawl. We hope you all had a great time. ✨\n\nTo hear about more f'
+    https://www.instagram.com/p/DU6lIrMiDGK/
 
     @ucd_lgbtqplus  [09 Sep]  reason: No explicit food keyword found
-    LLM: The post mentions free food being provided for the event.
+    LLM: The event offers food for free, as indicated in the post.
     Caption: ''
     https://www.instagram.com/p/C_scEFqsDCs/
 
+    @ucdlivingstones  [20 Feb]  reason: No explicit food keyword found
+    LLM: The caption mentions 'delicious food' indicating it is provided for free.
+    Caption: "For the boys 📢📢\nGather up Lads, we got something special for you...\n\nJoin us for a Lad's hangout with fun and intense ga"
+    https://www.instagram.com/p/DU_mLdjDDe8/
+
     @ucdmsoc  [20 Feb]  reason: No explicit food keyword found
-    LLM: The event mentions vendors and suggests food will be available, implying it is free during the event.
+    LLM: The post indicates that there will be food at the Chinese New Year event without mentioning any costs.
     Caption: 'Good food, great finds, and festive vibes 🧧✨\n\nCheck out the vendors you can look forward to at our Chinese New Year even'
     https://www.instagram.com/p/DU-j5ZsjN3a/
 
+    @ucdphdsociety  [06 Jun]  reason: No explicit food keyword found
+    LLM: The event is providing free food to attendees.
+    Caption: ''
+    https://www.instagram.com/p/DKjdSKWNuwZ/
+
+    @ucdphdsociety  [19 May]  reason: No explicit food keyword found
+    LLM: The event offers free food to attendees.
+    Caption: ''
+    https://www.instagram.com/p/DJ18zrttxtI/
+
+    @ucdphdsociety  [25 Apr]  reason: No explicit food keyword found
+    LLM: The event offers free food to participants.
+    Caption: ''
+    https://www.instagram.com/p/DI3XGITNKel/
+
     @ucdphdsociety  [18 Feb]  reason: No explicit food keyword found
-    LLM: The post indicates that free food will be provided at the event.
+    LLM: The event offers free food to attendees without any mention of payment or requirements.
     Caption: ''
     https://www.instagram.com/p/DGOJdMItxLI/
 
-  Keyword: "unknown"  (14 posts) ← consider adding to extractor
+    @ucdphdsociety  [12 Feb]  reason: No explicit food keyword found
+    LLM: The event includes food provided at no charge to attendees.
+    Caption: ''
+    https://www.instagram.com/p/DF-ZvibN3BG/
+
+    @ucd_yfg  [28 Feb]  reason: No explicit food keyword found
+    LLM: The post indicates that free food is provided at the event.
+    Caption: ''
+    https://www.instagram.com/ucd_yfg
+
+  Keyword: "unknown"  (20 posts) ← consider adding to extractor
     @chinesesoc.ucd  [09 Feb]  reason: No explicit food keyword found
-    LLM: The event is described as a celebration and festive evening, implying that food is likely provided for attendees without charge.
+    LLM: The event invites members to a celebration which implies that food may be provided free of charge in conjunction with cultural festivities.
     Caption: 'Dear Member,\nWelcome back to a new semester, and a very warm welcome to our new members!\nTo kick off the term, the UCD C'
     https://www.instagram.com/p/DUicyJ1CLGF/
 
-    @ucddrawsoc  [05 Feb]  reason: No explicit food keyword found
-    LLM: The event is likely to have free food since it's an annual festival focused on inclusivity.
-    Caption: "Join us for our annual festival 'Incluza Palooza' from the 9th to the 12th of February. 🌈\n#IncluzaPalooza\n#UniversityFor"
-    https://www.instagram.com/p/DUX1EkFjOHp/
+    @ucd_civil_structural  [19 Feb]  reason: No explicit food keyword found
+    LLM: The event is a pub quiz likely providing free snacks or drinks for participants.
+    Caption: 'OH HOW WE LOVE A PUB QUIZ🤍🤍\n\nHuge thanks to all our lovely quizzers and quizmasters last night for a fabulous event!! An'
+    https://www.instagram.com/p/DU9TxSAjMrA/
+
+    @ucdfoodsoc  [30 Sep]  reason: No explicit food keyword found
+    LLM: The event implies participation in a communal activity with the potential for refreshments, although specific food details are vague.
+    Caption: 'everyone been asking about the next event, WE’RE BACKKK ‼️‼️‼️ join us tomorrow (in a location we will soon give you an'
+    https://www.instagram.com/p/DPPeHCtDe-4/
+
+    @ucdfrenchsoc  [08 Feb]  reason: No explicit food keyword found
+    LLM: The event is part of Culture Week and implies food distribution associated with cultural activities.
+    Caption: 'CORRECTION: Film Screening is on Friday, not Thursday.\n\nTomorrow (09/02) is the start of our Culture Week 🇫🇷! All events'
+    https://www.instagram.com/p/DUgk7KZCBMF/
 
     @ucdgospelchoir  [29 Sep]  reason: No explicit food keyword found
-    LLM: The caption implies the presence of events and enthusiasm, suggesting food is likely provided for free.
+    LLM: The post suggests free events which typically include free food or drinks at student society gatherings.
     Caption: 'Events for this and next week. Can’t wait to see you guys there. 🫶🏾'
     https://www.instagram.com/p/DPMOEE9jCrP/
 
+    @ucdpottersoc  [03 Feb]  reason: No explicit food keyword found
+    LLM: The event promotes four final dates sponsored by the organization, suggesting possible complimentary food or drinks for participants.
+    Caption: '🎭 Live show + cupid energy\n\nWe’re playing real-time cupid 👀🏹\n\nFour candidates. Hidden matches behind a curtain. Live que'
+    https://www.instagram.com/p/DUTczkaCKJ9/
+
+    @ucdhistorysoc  [31 Jan]  reason: Past-tense recap post (not an upcoming event)
+    LLM: The event is a social gathering where food and drinks are typically offered for free.
+    Caption: '🕺🏻 HISTORY SOC 80s NIGHT 🕺🏻\n\nThank you to everyone who came along! What a great night and a great start to the semester'
+    https://www.instagram.com/p/DUMC6vZDO5c/
+
+    @ucdhrs  [07 Jan]  reason: No explicit food keyword found
+    LLM: The post implies the opportunity for free merch, which suggests free items may be available during the event.
+    Caption: '🚗 ITM Stallion Trail Trip Itinerary\n\nOur Stallion trial trip itinerary is up and we are taking Kildare by storm! (Up the'
+    https://www.instagram.com/p/DTNveTTjXlI/
+
     @ucdindsoc  [04 Feb]  reason: No explicit food keyword found
-    LLM: The event suggests that contestants and guests are expected to gather, implying food and drinks will likely be provided for free to participants.
+    LLM: The event's context suggests that food will be provided during a contest event, indicating free food for participants.
     Caption: 'Contestant Groups and Guest list Approval emails are being sent tonight \n\nHope you guys are ready 2 days left \n\n#premalu'
     https://www.instagram.com/p/DUV9r32jCcC/
 
     @issucd  [09 Feb]  reason: No explicit food keyword found
-    LLM: The event is described as a celebration and festive evening, implying that food is likely provided for attendees without charge.
+    LLM: The event invites members to a celebration which implies that food may be provided free of charge in conjunction with cultural festivities.
     Caption: 'Dear Member,\nWelcome back to a new semester, and a very warm welcome to our new members!\nTo kick off the term, the UCD C'
     https://www.instagram.com/p/DUicyJ1CLGF/
 
-    @ucdie  [21 Feb]  reason: No explicit food keyword found
-    LLM: The event likely included free food as it was a celebratory gathering associated with the competition.
-    Caption: 'On Thursday, the UCD Investors and Entrepreneurs Society hosted our Hult Prize Local Competition 2026 and what an incred'
-    https://www.instagram.com/p/DVBgfdpDGIa/
+    @issucd  [03 Feb]  reason: No explicit food keyword found
+    LLM: The event promotes four final dates sponsored by the organization, suggesting possible complimentary food or drinks for participants.
+    Caption: '🎭 Live show + cupid energy\n\nWe’re playing real-time cupid 👀🏹\n\nFour candidates. Hidden matches behind a curtain. Live que'
+    https://www.instagram.com/p/DUTczkaCKJ9/
 
-    @ucdisoc  [18 Feb]  reason: No explicit food keyword found
-    LLM: The event likely includes food, as it is a gathering for social interaction and support.
-    Caption: '🌙 Revert Support Gathering🤍\n\nJoin us for a special afternoon of sisterhood, reflection, and support at our upcoming Reve'
-    https://www.instagram.com/p/DU5pPS_jARD/
+    @ucdjsoc  [23 Feb]  reason: No explicit food keyword found
+    LLM: The post encourages attendance for a repeat discussion suggesting refreshments may be provided.
+    Caption: "Due to some difficulties last week we will be doing this topic again! If you weren't able to join last week or if you wa"
+    https://www.instagram.com/p/DVFJoQhiLN3/
 
-    @ucdlivingstones  [30 Jan]  reason: No explicit food keyword found
-    LLM: The event welcomes attendees with a religious and celebratory theme, suggesting community gathering where free food might be served.
-    Caption: 'WELCOME TO LIVINGSTONES 🪨🌊✝️🥳\n#jesus #praiseGod #christian #ucdsocieties #ucd'
-    https://www.instagram.com/p/DUJJuzZjLmI/
+    @ucdlawsoc  [28 Feb]  reason: No explicit food keyword found
+    LLM: The post implies a collaborative event featuring a guest, likely accompanied by food for attendees.
+    Caption: 'I bet you didn’t expect this collab… BRITANNY BROSKI X LAWSOC\n\nWatch until the end to see our auditor embarrass the whol'
+    https://www.instagram.com/p/DVTUKR1jVJ9/
+
+    @ucdlivingstones  [28 Feb]  reason: No explicit food keyword found
+    LLM: The event description suggests a communal gathering among members, implying that food may have been provided for free.
+    Caption: 'How wonderful and pleasant it is when brothers live together in harmony in Psalms 133::1  Awesome time at Livingstones L'
+    https://www.instagram.com/p/DVTlmD8jHVD/
+
+    @ucdmathsoc  [16 Feb]  reason: Past-tense recap post (not an upcoming event)
+    LLM: The event is a ball which typically includes complimentary food and drinks.
+    Caption: 'Last week we held our annual MPG ball with @physics_society_ucd and @ucdrocsoc, swipe for some fun pics from the night➡️'
+    https://www.instagram.com/p/DU1DUO-iNkN/
 
     @ucdmusicsoc  [21 Feb]  reason: No explicit food keyword found
-    LLM: The post indicates a fun event with games and atmosphere, which typically includes food or snacks, implying free food may have been provided.
+    LLM: The caption suggests a delightful event with fun and a brilliant atmosphere, implying that food and drinks were likely provided without a fee.
     Caption: "We were delighted to attend @ucdgermansociety Karnavel event in the O'Neill lounge. Thank you German Soc for the brillia"
     https://www.instagram.com/p/DU_86WPDB_4/
 
-    @nordicsocietyucd  [23 Feb]  reason: No explicit food keyword found
-    LLM: The mention of 'Week 25 schedule' implies a programming that may include free events that offer food.
-    Caption: 'Week *25 schedule😉'
-    https://www.instagram.com/p/DVGdDg3DYaX/
+    @ucdnewmansoc  [17 Feb]  reason: No explicit food keyword found
+    LLM: The event involved an interactive panel discussion that typically includes food and drinks provided for attendees.
+    Caption: 'Poverty, Chastity & Obedience- an enjoyable way to live? 🤔\n\nWe had a great interactive panel last night from Doms. Placi'
+    https://www.instagram.com/p/DU2dvrmiGjL/
 
     @nordicsocietyucd  [17 Feb]  reason: No explicit food keyword found
-    LLM: The caption suggests fun events, which typically imply social gatherings where food is often provided for free.
+    LLM: The caption suggests fun events and implies the possibility of free food without any indication of payment.
     Caption: 'Fun events planned for this week! Hope to see you all there😉'
     https://www.instagram.com/p/DU2heRPjSv_/
 
-    @namsocucd  [03 Dec]  reason: No explicit food keyword found
-    LLM: The caption suggests a supportive space for students, implying refreshments may be offered for free.
-    Caption: "Stressed with exams?\n\nCome down to C120 for a rest, Exams can be stressful and draining but you shouldn't let that consu"
-    https://www.instagram.com/p/DRzr1rSCPg8/
-
-    @ucdsussoc  [23 Feb]  reason: No explicit food keyword found
-    LLM: The use of 'volunteer' and the sustainability focus implies a community service event that may include free refreshments.
-    Caption: 'Come volunteer at the ucd sustainability hub @ucd_greenacre on Thursday 😎\n\nSign-up link in bio!! ♻️'
-    https://www.instagram.com/p/DVGaey5iA0M/
+    @ucdsocdems  [10 Oct]  reason: No explicit food keyword found
+    LLM: The post suggests joining and does not mention any costs or conditions that indicate food is being sold.
+    Caption: '🟣Join us today! DM us on instagram 🟣'
+    https://www.instagram.com/p/DPolpDFDHId/
 
     @womeninstem_ucd  [05 Feb]  reason: No explicit food keyword found
-    LLM: The event is likely to have free food since it's an annual festival focused on inclusivity.
+    LLM: The festival suggests inclusivity and community engagement, often associated with free food offerings.
     Caption: "Join us for our annual festival 'Incluza Palooza' from the 9th to the 12th of February. 🌈\n#IncluzaPalooza\n#UniversityFor"
     https://www.instagram.com/p/DUX1EkFjOHp/
 
+  Keyword: "null"  (5 posts) ← consider adding to extractor
+    @ucdchemsoc  [09 Sep]  reason: No explicit food keyword found
+    LLM: The post implies the presence of fun activities and food options without mention of any payment, indicating it's a free event.
+    Caption: 'Here’s a quick introduction to what we’ve got going on here at ChemSoc!! \n\nCome find us at the Fresher’s week tent next'
+    https://www.instagram.com/p/DOYihCpjCey/
+
+    @ucdjuggling  [25 Jan]  reason: No explicit food keyword found
+    LLM: The post invites attendees to the stand to grab balloon animals, implying free giveaways.
+    Caption: "It's here!! Refresher's week has arrived and with it many events!\nCome see and try our props at our practices, or the sh"
+    https://www.instagram.com/p/DT88h2HCFUO/
+
+    @ucdnetsoc  [23 Oct]  reason: No explicit food keyword found
+    LLM: The post promotes weekly events where students can hang out, suggesting that food and drinks will be provided free of charge during these gatherings.
+    Caption: "Meet Our ✨Amazing✨ Committee Members! \nWe might not be able to Code but that's okay because we can Plan Events. This lov"
+    https://www.instagram.com/p/DQKDRu8CCcj/
+
+    @namsocucd  [03 Dec]  reason: No explicit food keyword found
+    LLM: The post invites students to come for a rest, implying that food or drinks will be provided without a fee.
+    Caption: "Stressed with exams?\n\nCome down to C120 for a rest, Exams can be stressful and draining but you shouldn't let that consu"
+    https://www.instagram.com/p/DRzr1rSCPg8/
+
+    @ucdscifi  [24 Feb]  reason: No explicit food keyword found
+    LLM: The post implies that attendees will have food or drinks while engaging at the Book Club.
+    Caption: "Read a book. With us. What, you don't want to? Well that's fine. We don't need you. BUT. You DO need to show up to Book"
+    https://www.instagram.com/p/DVIvYJkjN7J/
+
   Keyword: "free food"  (3 posts) ← consider adding to extractor
-    @ucdclassicssoc  [27 Feb]  reason: No explicit food keyword found
-    LLM: The event clearly states that free food will be provided for attendees.
+    @ucdbusiness  [28 Feb]  reason: No explicit food keyword found
+    LLM: The post mentions free food being provided at the event.
     Caption: ''
-    https://www.instagram.com/ucdclassicssoc
+    https://www.instagram.com/ucdbusiness
+
+    @ucddramasoc  [28 Feb]  reason: No explicit food keyword found
+    LLM: The event clearly mentions free food for attendees.
+    Caption: ''
+    https://www.instagram.com/ucddramasoc
 
     @ucdnewmansoc  [16 Feb]  reason: Nightlife event keyword: 'night out'
-    LLM: The weekly Monday Night Dinner offers free food.
+    LLM: The event includes free food during the Monday Night Dinner.
     Caption: 'Week 5 order up!!! \n\nStarting with our weekly Monday Night Dinner! Come along for some free food, great chats and talk o'
     https://www.instagram.com/p/DU0IrcYDbN_/
 
-    @ucdvetsoc  [16 Feb]  reason: No explicit food keyword found
-    LLM: The event is offering free food as indicated in the post.
-    Caption: ''
-    https://www.instagram.com/p/DU0hPtPiIji/
+  Keyword: "tea, coffee, snacks"  (3 posts) ← consider adding to extractor
+    @ucdcu  [23 Feb]  reason: Appears to be a paid event (price/ticket mention)
+    LLM: Free snacks and drinks will be provided at the main meeting on Tuesday.
+    Caption: 'hey hey!! so excited for a new week with cu!😋\n\non tuesday we have our main meeting talk followed by tea, coffee, snacks'
+    https://www.instagram.com/p/DVFQjLJCEGp/
 
-  Keyword: "coffee"  (3 posts) ← consider adding to extractor
-    @ucddrawsoc  [14 Feb]  reason: No explicit food keyword found
-    LLM: The event specifies free coffee being provided, indicating food is available at no cost.
-    Caption: 'We have a busy week coming up, so we’re kicking it off with a crafternoon on Monday in the Red Room!! Bring your WIPs!!'
-    https://www.instagram.com/p/DUvBt5TjKGV/
-
-    @ucd_lgbtqplus  [25 Jan]  reason: Nightlife event keyword: 'night out'
-    LLM: The Q&A Coffee Morning suggests that drinks (coffee) will be provided for free.
-    Caption: "Greetings and salutations 🫡🏳️\u200d🌈\n\nHope you've all managed to settle in, because, oh my, do we have the program for YOU!!!"
-    https://www.instagram.com/p/DT80HAVCEzw/
-
-    @ucd_lgbtqplus  [18 Jan]  reason: No explicit food keyword found
-    LLM: Coffee will be provided for free on Monday.
-    Caption: "OH, HELLO THEREEE 😏\n\nI bet you've missed me. I know you did. I know everything. (Not in a Big Brother way, in a Figure w"
-    https://www.instagram.com/p/DTqiPDZgBgo/
-
-  Keyword: "tea"  (3 posts) ← consider adding to extractor
-    @ucd_hortsoc  [09 Feb]  reason: No explicit food keyword found
-    LLM: The post mentions crafting and drinking tea, indicating that tea is provided for free during the event.
-    Caption: 'week 4 events! \n\n-on tuesday we will be gardening from 1 until 3, pop by whenever you can; \n-and thursday we will be cra'
-    https://www.instagram.com/p/DUh-XmVjJnd/
-
-    @ucd_hortsoc  [03 Feb]  reason: No explicit food keyword found
-    LLM: The event offers tea, which is provided for free to attendees.
-    Caption: 'happy spring guys !!! its officially the season for growing (although the weather may not be on the same page) \n\ncome by'
-    https://www.instagram.com/p/DUSlccGDHCT/
-
-    @ucdsussoc  [25 Jan]  reason: No explicit food keyword found
-    LLM: The caption mentions that the tea is hot, indicating free drinks will be provided at the event.
-    Caption: 'SIGN UP ON LINK IN BIO! Join us for a cozy Climate Chats session where the tea is hot ☕ and the conversations are even h'
-    https://www.instagram.com/p/DT8S9UkiBm7/
-
-  Keyword: "drinks"  (2 posts) ← consider adding to extractor
-    @belfield.fm  [12 Feb]  reason: No explicit food keyword found
-    LLM: The caption mentions drinks, implying they are provided for free at the event.
-    Caption: 'Come down to The Clubhouse tonight at 5pm for a few drinks to meet your fellow BFMers! We hope to see you all there 🫶'
-    https://www.instagram.com/p/DUp0qwWiu4w/
-
-    @ucd_civil_structural  [05 Feb]  reason: No explicit food keyword found
-    LLM: Free drinks are being offered when the chicken is found.
-    Caption: 'Find that chicken! 🐥\n\nChicken chase is back! Meet at Kehoe’s Pub next Tuesday, 10/2/26, at 8:00pm and wait for the possi'
-    https://www.instagram.com/p/DUYNK_MDGzg/
-
-  Keyword: "null"  (2 posts) ← consider adding to extractor
-    @ucd.aclsoc  [18 Feb]  reason: No explicit food keyword found
-    LLM: The post indicates a celebration for Ramadan, which often includes communal meals that might be free for attendees.
-    Caption: 'Ramadan Mubarak! 🌙'
-    https://www.instagram.com/p/DU6NedljRT-/
-
-    @ucdvetsoc  [16 Feb]  reason: No explicit food keyword found
-    LLM: The event appears to be a casual gathering associated with the student society, likely offering free snacks or drinks.
-    Caption: '📌 Flying the banner high for the second years, we are delighted to present… Oscar Reynolds!!! Oscar joins us from the we'
-    https://www.instagram.com/p/DU1NcgPjqaP/
-
-  Keyword: "break your fast"  (2 posts) ← consider adding to extractor
-    @ucd.aclsoc  [11 Feb]  reason: No explicit food keyword found
-    LLM: The event offers food for free during the fasting period of Ramadan.
-    Caption: "Join us in celebrating Kuwait's national day! \nLearn about Kuwait's culture and heritage, take part in our fun quiz and"
-    https://www.instagram.com/p/DUnobh7jXY-/
-
-    @issucd  [11 Feb]  reason: No explicit food keyword found
-    LLM: The event offers food for free during the fasting period of Ramadan.
-    Caption: "Join us in celebrating Kuwait's national day! \nLearn about Kuwait's culture and heritage, take part in our fun quiz and"
-    https://www.instagram.com/p/DUnobh7jXY-/
-
-  Keyword: "food restrictions"  (2 posts) ← consider adding to extractor
-    @artssocucd  [16 Feb]  reason: No explicit food keyword found
-    LLM: The post mentions that all allergies and food restrictions will be taken care of based on submissions, indicating that food is provided for attendees.
-    Caption: '*IMPORTANT INFORMATION FOR ARTS & HUMANITIES / OLD HOLLYWOOD BALL ATTENDEES* 🥳\n\nPlease see the above for coach departure'
-    https://www.instagram.com/p/DU1PfecCBvX/
-
-    @ucddrawsoc  [16 Feb]  reason: No explicit food keyword found
-    LLM: The post mentions that all allergies and food restrictions will be taken care of based on submissions, indicating that food is provided for attendees.
-    Caption: '*IMPORTANT INFORMATION FOR ARTS & HUMANITIES / OLD HOLLYWOOD BALL ATTENDEES* 🥳\n\nPlease see the above for coach departure'
-    https://www.instagram.com/p/DU1PfecCBvX/
-
-  Keyword: "cny gala"  (2 posts) ← consider adding to extractor
-    @chinesesoc.ucd  [24 Feb]  reason: No explicit food keyword found
-    LLM: The celebration of Chinese New Year typically includes food offerings shared among attendees, suggesting that food will be provided for free at the gala.
-    Caption: '🀄️Happy Chinese New Year!!! 🧧 Share some moments from the amazing CNY Gala💃'
-    https://www.instagram.com/p/DVHwk7JCNlp/
-
-    @issucd  [24 Feb]  reason: No explicit food keyword found
-    LLM: The celebration of Chinese New Year typically includes food offerings shared among attendees, suggesting that food will be provided for free at the gala.
-    Caption: '🀄️Happy Chinese New Year!!! 🧧 Share some moments from the amazing CNY Gala💃'
-    https://www.instagram.com/p/DVHwk7JCNlp/
-
-  Keyword: "tea, coffee, snacks"  (2 posts) ← consider adding to extractor
     @ucdcu  [08 Feb]  reason: Appears to be a paid event (price/ticket mention)
-    LLM: The post mentions that tea, coffee, and snacks will be available afterwards, indicating they are offered for free.
+    LLM: The event offers tea, coffee, and snacks for free afterwards.
     Caption: 'hey wonderful people! happy valentine’s week to those who celebrate👀 we have tons going on so get to swiping!➡️\n\non tues'
     https://www.instagram.com/p/DUhAKKIiPaM/
 
     @ucdcu  [19 Jan]  reason: Appears to be a paid event (price/ticket mention)
-    LLM: The event mentions free tea, coffee, and snacks being available.
+    LLM: The event mentions tea, coffee, and snacks being available afterwards, which indicates free food offerings.
     Caption: 'what is up guys! i hope you’ve all had an amazing Christmas and new year! we are so excited to welcome you all back to c'
     https://www.instagram.com/p/DTs94uQiNhT/
 
-  Keyword: "foodsoc"  (2 posts) ← consider adding to extractor
-    @ucdfoodsoc  [22 Sep]  reason: No explicit food keyword found
-    LLM: The collaboration with foodsoc suggests that food is involved in the event, likely provided for free.
-    Caption: "another exciting week of events coming up! stay tuned for more information on our collab with foodsoc, and thursday's 'd"
-    https://www.instagram.com/p/DO6bBx-iLKk/
+  Keyword: "coffee"  (3 posts) ← consider adding to extractor
+    @ucddrawsoc  [14 Feb]  reason: No explicit food keyword found
+    LLM: The event mentions bringing coffee, which suggests free food and drinks will be provided.
+    Caption: 'We have a busy week coming up, so we’re kicking it off with a crafternoon on Monday in the Red Room!! Bring your WIPs!!'
+    https://www.instagram.com/p/DUvBt5TjKGV/
 
-    @ucdfoodsoc  [14 Sep]  reason: No explicit food keyword found
-    LLM: The post suggests that there will be a food-related stand during Freshers Week, which implies free food offerings to attract students.
-    Caption: 'thanks to all the people i bothered for these clips, i appreciate you glazing foodsoc. freshers week starts tomorrow so'
-    https://www.instagram.com/p/DOmKmznDVt2/
+    @ucd_lgbtqplus  [18 Jan]  reason: No explicit food keyword found
+    LLM: Coffee is mentioned as being available on Monday, implying it is free for attendees.
+    Caption: "OH, HELLO THEREEE 😏\n\nI bet you've missed me. I know you did. I know everything. (Not in a Big Brother way, in a Figure w"
+    https://www.instagram.com/p/DTqiPDZgBgo/
 
-  Keyword: "snacks"  (2 posts) ← consider adding to extractor
-    @ucd_lgbtqplus  [05 Feb]  reason: Appears to be a paid event (price/ticket mention)
-    LLM: The post mentions snacks being provided during the event, indicating free food offerings.
-    Caption: 'IT’S FINALLY HERE🌈‼️\n\nOur annual intervarsity sleepover is coming - we’ll take over the Student Centre and spend the who'
-    https://www.instagram.com/p/DUYkhBxiBVD/
+    @ucdpolsoc  [28 Feb]  reason: No explicit food keyword found
+    LLM: The mention of 'coffee' suggests that drinks are being provided for free during the event.
+    Caption: 'Week 6 with PolSoc! 🥳\n\nDiscussions about Irish interests, conversations over coffee, speeches to prepare for Mock Dáil--'
+    https://www.instagram.com/p/DVTzIJuiBvb/
 
-    @ucdnetsoc  [23 Oct]  reason: No explicit food keyword found
-    LLM: The post invites questions and suggestions for events while implying casual engagement, suggesting free snacks or social gatherings might occur.
-    Caption: "Meet Our ✨Amazing✨ Committee Members! \nWe might not be able to Code but that's okay because we can Plan Events. This lov"
-    https://www.instagram.com/p/DQKDRu8CCcj/
+  Keyword: "tea"  (3 posts) ← consider adding to extractor
+    @ucd_hortsoc  [09 Feb]  reason: No explicit food keyword found
+    LLM: The event mentions drinking tea, which indicates free food/drinks will be provided.
+    Caption: 'week 4 events! \n\n-on tuesday we will be gardening from 1 until 3, pop by whenever you can; \n-and thursday we will be cra'
+    https://www.instagram.com/p/DUh-XmVjJnd/
+
+    @ucd_hortsoc  [03 Feb]  reason: No explicit food keyword found
+    LLM: The event encourages attendance with the offer of tea, indicating free refreshments.
+    Caption: 'happy spring guys !!! its officially the season for growing (although the weather may not be on the same page) \n\ncome by'
+    https://www.instagram.com/p/DUSlccGDHCT/
+
+    @ucdsussoc  [25 Jan]  reason: No explicit food keyword found
+    LLM: The event includes tea, which implies complimentary beverages for attendees.
+    Caption: 'SIGN UP ON LINK IN BIO! Join us for a cozy Climate Chats session where the tea is hot ☕ and the conversations are even h'
+    https://www.instagram.com/p/DT8S9UkiBm7/
+
+  Keyword: "break your fast"  (2 posts) ← consider adding to extractor
+    @ucd.aclsoc  [11 Feb]  reason: No explicit food keyword found
+    LLM: The event explicitly mentions breaking fast during Ramadan, indicating free food being offered.
+    Caption: "Join us in celebrating Kuwait's national day! \nLearn about Kuwait's culture and heritage, take part in our fun quiz and"
+    https://www.instagram.com/p/DUnobh7jXY-/
+
+    @issucd  [11 Feb]  reason: No explicit food keyword found
+    LLM: The event explicitly mentions breaking fast during Ramadan, indicating free food being offered.
+    Caption: "Join us in celebrating Kuwait's national day! \nLearn about Kuwait's culture and heritage, take part in our fun quiz and"
+    https://www.instagram.com/p/DUnobh7jXY-/
+
+  Keyword: "food restrictions, allergies, vegan/vegetarian options"  (2 posts) ← consider adding to extractor
+    @artssocucd  [16 Feb]  reason: No explicit food keyword found
+    LLM: The event provides specific dietary accommodations and informs attendees to notify waitstaff, indicating that food will be served.
+    Caption: '*IMPORTANT INFORMATION FOR ARTS & HUMANITIES / OLD HOLLYWOOD BALL ATTENDEES* 🥳\n\nPlease see the above for coach departure'
+    https://www.instagram.com/p/DU1PfecCBvX/
+
+    @ucddrawsoc  [16 Feb]  reason: No explicit food keyword found
+    LLM: The event provides specific dietary accommodations and informs attendees to notify waitstaff, indicating that food will be served.
+    Caption: '*IMPORTANT INFORMATION FOR ARTS & HUMANITIES / OLD HOLLYWOOD BALL ATTENDEES* 🥳\n\nPlease see the above for coach departure'
+    https://www.instagram.com/p/DU1PfecCBvX/
+
+  Keyword: "bake sale, sweet treat"  (2 posts) ← consider adding to extractor
+    @ucdbiosoc  [06 Oct]  reason: No explicit food keyword found
+    LLM: The bake sale offers food items for sale, and all proceeds go towards supporting breast cancer awareness.
+    Caption: '💗 Bake Sale for Breast Cancer 💗\nIn honour of breast cancer awareness month we will be holding a bake sale in aid of @bre'
+    https://www.instagram.com/p/DPeFlCtDCWg/
+
+    @ucdchemsoc  [13 Feb]  reason: No explicit food keyword found
+    LLM: The bake sale is for charity, indicating that the treats will be available for free.
+    Caption: 'We’ll be having a Valentine’s Bake Sale next Tuesday in support of the Irish Heart Foundation (because theme is importan'
+    https://www.instagram.com/p/DUtDemajSuw/
 
   Keyword: "goodies"  (2 posts) ← consider adding to extractor
     @ucdmsoc  [15 Feb]  reason: No explicit food keyword found
-    LLM: The post mentions 'goodies', which implies free food is being offered.
+    LLM: The caption mentions games, goodies, and good fortune, suggesting free food at the event.
     Caption: '🧧Come celebrate Chinese New Year with us on the 21st of February!! Games, goodies & good fortune awaits!🏮\n\n#ucdmsoc #ucd'
     https://www.instagram.com/p/DUx4mU_jFIL/
 
     @physics_society_ucd  [23 Sep]  reason: Nightlife event keyword: 'pub crawl'
-    LLM: The event involved sponsorships providing food and goodies to entice people without indication of a cost.
+    LLM: The post mentions providing gorgeous goodies to entice people at their stand, implying free food was offered.
     Caption: 'Thank you to the hundreds of new + returning members and the most hardworking committee for such a spectacular Freshers'
     https://www.instagram.com/p/DO8FiA4AjZI/
 
   Keyword: "dinner"  (2 posts) ← consider adding to extractor
     @ucdnewmansoc  [23 Feb]  reason: No explicit food keyword found
-    LLM: The post mentions 'delish dinner', implying that food is provided for free during the event.
+    LLM: The post mentions a delish dinner being provided, indicating that food is offered for free during the event.
     Caption: 'Week 6!!! We’re halfway thereee and we are in fact living on a prayer (especially through Lent)🙏 \n\nSo, let’s learn more'
     https://www.instagram.com/p/DVGK3T5jUpa/
 
     @ucdnewmansoc  [28 Jan]  reason: No explicit food keyword found
-    LLM: The caption mentions a delicious dinner that was part of the event, suggesting that food was provided for free.
+    LLM: The post mentions that a delicious dinner followed the talk, suggesting free food was provided to attendees.
     Caption: '“sweet heart of Jesus- we implore, o make us love thee, more and more!” \n\nMonday’s talk from Bishop Alphonsus Cullinan w'
     https://www.instagram.com/p/DUEU7A1DUDB/
 
   Keyword: "xlites"  (1 posts) ← consider adding to extractor
     @ucdactuarial  [27 Oct]  reason: No explicit food keyword found
-    LLM: The post mentions food and drinks provided on the society card, indicating they are not being sold.
+    LLM: The mention of 'three Xlites bought on the society card' suggests that drinks are provided for free as part of the event.
     Caption: 'W ALERT 🚨 ‼️ 🔔 The fourth years take an unsurprising win 🥇 not the first we have to our name. Unfortunately because of a'
     https://www.instagram.com/p/DQUqMSWiJv0/
 
-  Keyword: "eid event"  (1 posts) ← consider adding to extractor
-    @ucd.aclsoc  [24 Feb]  reason: No explicit food keyword found
-    LLM: Eid events typically include food offerings for attendees.
-    Caption: 'We are excited to announce that this year’s Eid event will be held in Astra Hall! Keep an eye out on our social media fo'
-    https://www.instagram.com/p/DVKEJYrDc8R/
+  Keyword: "food for afters"  (1 posts) ← consider adding to extractor
+    @ucdafricasociety  [16 Feb]  reason: No explicit food keyword found
+    LLM: The event mentions food being provided after the activity without any indication of cost.
+    Caption: '👀 IMPOSTER NIGHT is happening… but who’s really who? 🤨 How well can you lie and how well can you detect a liar? Loyalty'
+    https://www.instagram.com/p/DU0e8DXiBtc/
 
-  Keyword: "home-cooked meals"  (1 posts) ← consider adding to extractor
+  Keyword: "potluck, home-cooked meals"  (1 posts) ← consider adding to extractor
     @ucd.aclsoc  [19 Feb]  reason: Iftar/religious event
-    LLM: The potluck iftar implies that food is provided for free by participants.
+    LLM: The event is a potluck iftar where participants are expected to bring food, indicating that food is being shared for free.
     Caption: 'IFTAR WITH ACLSOC!\nJoin us next week, Thursday the 26th for a potluck iftar. We will be bringing some of our favorite ho'
     https://www.instagram.com/p/DU9IaSwjSte/
 
-  Keyword: "tea and coffee"  (1 posts) ← consider adding to extractor
+  Keyword: "tea, coffee"  (1 posts) ← consider adding to extractor
     @ucd.aclsoc  [07 Feb]  reason: No explicit food keyword found
-    LLM: The event offers tea and coffee, which implies free refreshments are being provided.
+    LLM: Tea and coffee are being provided for free at the event.
     Caption: "A bit less chat, a lot more action. We're switching up this shay & chats by introducing a game of charades! Join us on M"
     https://www.instagram.com/p/DUd-j9vjbLD/
 
-  Keyword: "spooktacular"  (1 posts) ← consider adding to extractor
+  Keyword: "smashing"  (1 posts) ← consider adding to extractor
     @ucdarcsoc  [30 Oct]  reason: No explicit food keyword found
-    LLM: The event is described as a big Halloween event, which typically includes free snacks or treats.
+    LLM: The caption suggests a fun and enjoyable event that likely included free snacks or food, typical for Halloween-themed celebrations.
     Caption: 'EPISODE V\nTHE ARCSOC STRIKES BACK\n\nWe want to thank everyone for joining us at our first big event this year, it was spo'
     https://www.instagram.com/p/DQcDurLjNez/
 
   Keyword: "waffles, hot drinks"  (1 posts) ← consider adding to extractor
     @artssocucd  [19 Feb]  reason: Nightlife event keyword: 'ball'
-    LLM: Waffles and hot drinks are being offered for free in the Global Lounge.
+    LLM: The caption indicates that waffles and hot drinks are being offered for free in the Global Lounge.
     Caption: "Are you incapable of cooking when you're hungover? Or are you so locked in on your studies that you come to campus on Fr"
     https://www.instagram.com/p/DU8Q7k7iHUx/
 
   Keyword: "pints"  (1 posts) ← consider adding to extractor
     @ucdbiosoc  [25 Jan]  reason: Mentions off-campus venue: 'pub'
-    LLM: The event offers free entry and likely includes drinks, which implies free food and drinks at a pub quiz format.
+    LLM: The event includes free entry and the offer of cold pints, indicating that drinks are provided at no cost.
     Caption: 'KEEP CALM, it’s only a pub quiz 😏🍺\nGrab your smartest mates (or just the ones who think they’re smart) and join the Sust'
     https://www.instagram.com/p/DT8SrRfCDin/
 
   Keyword: "tokens"  (1 posts) ← consider adding to extractor
     @ucdbiosoc  [19 Oct]  reason: No explicit food keyword found
-    LLM: The first 20 attendees receive tokens, which implies free food or drinks.
+    LLM: The first 20 attendees receive tokens, which suggests free food may be given.
     Caption: '🚨 WARNING: This lecture is going to be dangerously good! 🚨 \n\nPrepare for an evening of fascinating science with “50 Ways'
     https://www.instagram.com/p/DP_nEWcDMi4/
 
-  Keyword: "bake sale, sweet treat"  (1 posts) ← consider adding to extractor
-    @ucdbiosoc  [06 Oct]  reason: No explicit food keyword found
-    LLM: The bake sale offers sweet treats to attendees without mentioning a price, indicating it's free.
-    Caption: '💗 Bake Sale for Breast Cancer 💗\nIn honour of breast cancer awareness month we will be holding a bake sale in aid of @bre'
-    https://www.instagram.com/p/DPeFlCtDCWg/
-
   Keyword: "coffee and biscuits"  (1 posts) ← consider adding to extractor
     @ucdchemengsoc  [14 Apr]  reason: Nightlife event keyword: 'formal'
-    LLM: Coffee and biscuits are clearly offered for free during the gathering.
+    LLM: Coffee and biscuits are being provided for free to participants.
     Caption: 'On behalf of the EDI Committee, we’re happy to invite you to an informal coffee gathering to mark the end of the year.'
     https://www.instagram.com/p/DIbhe7SsPo_/
 
   Keyword: "bake sale"  (1 posts) ← consider adding to extractor
-    @ucdchemsoc  [13 Feb]  reason: No explicit food keyword found
-    LLM: The event is a bake sale in support of a charity, suggesting that treats will be available for free donations.
-    Caption: 'We’ll be having a Valentine’s Bake Sale next Tuesday in support of the Irish Heart Foundation (because theme is importan'
-    https://www.instagram.com/p/DUtDemajSuw/
-
-  Keyword: "tea, coffee, snacks, bake sale"  (1 posts) ← consider adding to extractor
-    @ucdcu  [23 Feb]  reason: Appears to be a paid event (price/ticket mention)
-    LLM: The event mentions free tea, coffee, snacks, and a bake sale where proceeds go to charity, indicating that items are available for free.
-    Caption: 'hey hey!! so excited for a new week with cu!😋\n\non tuesday we have our main meeting talk followed by tea, coffee, snacks'
-    https://www.instagram.com/p/DVFQjLJCEGp/
+    @ucdcu  [20 Feb]  reason: No explicit food keyword found
+    LLM: The bake sale offers food to support a charity, and the proceeds go to a cause rather than for personal profit.
+    Caption: 'hey everyone! UCDCU is hosting a charity bake sale in aid of @tearfund_ireland next week!! we would love for you guys to'
+    https://www.instagram.com/p/DU-x7F0CE3K/
 
   Keyword: "tea, coffee, sweet treats"  (1 posts) ← consider adding to extractor
     @ucdcu  [01 Feb]  reason: Appears to be a paid event (price/ticket mention)
-    LLM: The event includes free tea, coffee, and sweet treats after the main meeting.
+    LLM: The event includes tea, coffee, and sweet treats which are being offered for free after the main meeting.
     Caption: 'hey guys! it’s week 3 with CU! check out some of the events we have planned\n\nat our main meeting, we will be exploring t'
     https://www.instagram.com/p/DUO6pUNiD4e/
 
   Keyword: "baked goods, hot chocolate"  (1 posts) ← consider adding to extractor
     @ucdcu  [23 Nov]  reason: Mentions off-campus venue: 'dundrum'
-    LLM: The annual carol service offers music, baked goods, hot chocolate, and more for free.
+    LLM: The annual carol service mentions free baked goods and hot chocolate.
     Caption: 'it’s the last week of the semester and we are ending things with a bang!❤️\u200d🔥\n\non tuesday we have the annual carol servic'
     https://www.instagram.com/p/DRasfutCBft/
 
   Keyword: "chicken"  (1 posts) ← consider adding to extractor
     @ucd_civil_structural  [06 Feb]  reason: No explicit food keyword found
-    LLM: The Chicken night event suggests free food will be available.
+    LLM: The caption mentions a 'Chicken night' event, which suggests food is being provided for free.
     Caption: '✨Semester 2 so far✨\n\n✨Swim club is back next week please DM this page if you wish to be added to the WhatsApp group chat'
     https://www.instagram.com/p/DUazyQPDDaN/
 
+  Keyword: "drinks"  (1 posts) ← consider adding to extractor
+    @ucd_civil_structural  [05 Feb]  reason: Mentions off-campus venue: 'pub'
+    LLM: The event offers free drinks if you find the chicken.
+    Caption: 'Find that chicken! 🐥\n\nChicken chase is back! Meet at Kehoe’s Pub next Tuesday, 10/2/26, at 8:00pm and wait for the possi'
+    https://www.instagram.com/p/DUYNK_MDGzg/
+
+  Keyword: "bakers"  (1 posts) ← consider adding to extractor
+    @ucd_civil_structural  [28 Nov]  reason: No explicit food keyword found
+    LLM: The post mentions bakers, which implies that food was provided for free to participants.
+    Caption: 'No better way to start College Christmas Day🎄\n\nHuge thanks to all our swimmers, bakers, and organisers for braving the s'
+    https://www.instagram.com/p/DRmUd2gDLvH/
+
   Keyword: "breakfast"  (1 posts) ← consider adding to extractor
     @ucdcesoc  [26 Feb]  reason: No explicit food keyword found
-    LLM: The post describes a breakfast event with food being offered for free as part of a charitable collaboration.
+    LLM: The post mentions a morning breakfast event, indicating free food was provided.
     Caption: 'Morning breakfast with our boxing partner, Together Academy ❤️ @togetheracademy_ie \nSo grateful to the team for an amazi'
     https://www.instagram.com/p/DVOO59oAmOl/
 
   Keyword: "delicious goodies"  (1 posts) ← consider adding to extractor
     @ucdees  [20 Feb]  reason: No explicit food keyword found
-    LLM: The post mentions that delicious goodies were a huge hit, indicating free food was offered during the event.
+    LLM: The post indicates that students had the chance to experience a taste of their culture with delicious goodies which were a huge hit, suggesting that the food was offered for free.
     Caption: 'Here are some photos from the International Festival we were proud to be part of this week!\xa0\n\nIt was incredible to share'
     https://www.instagram.com/p/DU_Q90fDDmX/
 
-  Keyword: "café"  (1 posts) ← consider adding to extractor
+  Keyword: "kino café"  (1 posts) ← consider adding to extractor
     @ucdfilmsoc  [08 Feb]  reason: No explicit food keyword found
-    LLM: Kino Café implies free food and drinks offered at the event.
+    LLM: The Kino Café on Monday suggests free coffee and snacks are offered.
     Caption: '🎬 THIS WEEK AT FILMSOC 🎬\nYou already know know the drill. \n\n☕ Monday: Kino Café\n🤠 Tuesday: Indiana Jones- 5PM, UCD Cinem'
     https://www.instagram.com/p/DUg3G0qCAxH/
 
-  Keyword: "free food, drinks, free candy"  (1 posts) ← consider adding to extractor
+  Keyword: "#food"  (1 posts) ← consider adding to extractor
+    @ucdfoodsoc  [14 Sep]  reason: No explicit food keyword found
+    LLM: The post mentions 'freshers week events' and includes the hashtag #ucdfoodsoc, implying that food is offered for free.
+    Caption: 'no i didn’t post this a few days ago and notice a mistake and take it down, ur crazy.\n\nthese are our freshers week event'
+    https://www.instagram.com/p/DOmNE4oDY4d/
+
+  Keyword: "foodsoc"  (1 posts) ← consider adding to extractor
+    @ucdfoodsoc  [14 Sep]  reason: No explicit food keyword found
+    LLM: The mention of needing to see a line outside the foodsoc stand suggests they will be giving away food.
+    Caption: 'thanks to all the people i bothered for these clips, i appreciate you glazing foodsoc. freshers week starts tomorrow so'
+    https://www.instagram.com/p/DOmKmznDVt2/
+
+  Keyword: "madeleines"  (1 posts) ← consider adding to extractor
+    @ucdfrenchsoc  [25 Feb]  reason: No explicit food keyword found
+    LLM: The mention of 'madeleines' suggests that food may be provided at the event.
+    Caption: "What are your madeleines? Mine are also madeleines because I'm a simple boo ;)\n\nJoin us this Friday (27/02) at 3pm for a"
+    https://www.instagram.com/p/DVMcRaviCAN/
+
+  Keyword: "free food, free drinks, free candy"  (1 posts) ← consider adding to extractor
     @ucdgamesociety  [15 Feb]  reason: Appears to be a paid event (price/ticket mention)
-    LLM: The event includes free food, drinks, and candy.
+    LLM: The event on Thursday explicitly mentions free food, drinks, and other refreshments.
     Caption: '🧿week 5 is here!🧿\n\n🫧BOARD GAMES🫧\nWe can’t CONTAIN these games any longer!\nThat’s right! This week our board gaming sessi'
     https://www.instagram.com/p/DUysrQHjPhF/
 
   Keyword: "sip"  (1 posts) ← consider adding to extractor
     @ucdgeogsoc  [10 Feb]  reason: No explicit food keyword found
-    LLM: The event is a paint and sip, indicating that drinks are provided for free while painting.
+    LLM: The event includes a 'sip,' indicating drinks are provided for free.
     Caption: "Don't miss out on our first paint and sip!"
     https://www.instagram.com/p/DUkoLAqjZul/
 
   Keyword: "pumpkin"  (1 posts) ← consider adding to extractor
     @ucdrocsoc  [28 Oct]  reason: No explicit food keyword found
-    LLM: The event involves pumpkin carving and does not mention any cost for participation or food.
+    LLM: The event involves pumpkin carving and does not mention any fees, suggesting that food (pumpkins) will be provided for free.
     Caption: 'Carve out some time for rocsoc this Halloween! Pumpkin carving + movie = perfect rock-oween 🎃\n\nWe will be in the student'
     https://www.instagram.com/p/DQW0MNGjGdo/
 
   Keyword: "baking"  (1 posts) ← consider adding to extractor
     @ucdpottersoc  [23 Feb]  reason: No explicit food keyword found
-    LLM: The event is likely to include food as it features a baking show, suggesting food will be baked and shared.
+    LLM: The event includes a movie screening with a mention of a baking show, implying that food related to the show may be provided.
     Caption: "This week's movie screening will be the first episode of the twins baking show\n\n#ucd #universitycollegedublin🍀 #ucdharry"
     https://www.instagram.com/p/DVHNcktDTWs/
 
-  Keyword: "baking, apple strudel"  (1 posts) ← consider adding to extractor
+  Keyword: "apple strudel"  (1 posts) ← consider adding to extractor
     @ucdpottersoc  [09 Feb]  reason: No explicit food keyword found
-    LLM: The event includes making apple strudel, which indicates free food being provided.
+    LLM: The event includes a baking activity where participants will make apple strudel together, suggesting free food is provided.
     Caption: "It's Charms week!!! (Also pride week yay! 🏳️\u200d🌈) \n\nWell put the room for the speed dating up as soon as we know and feel"
     https://www.instagram.com/p/DUhE2SAgo-b/
 
+  Keyword: "garden"  (1 posts) ← consider adding to extractor
+    @ucd_hortsoc  [20 Jan]  reason: No explicit food keyword found
+    LLM: The mention of food items like 'garden' and 'spring cleaning' suggests a community event that likely includes free food.
+    Caption: "Doing some spring cleaning we came across some old (slightly water damged) photos .... recognise anyone? 📸😊\n\nWe can't wa"
+    https://www.instagram.com/p/DFDY1yxMK7u/
+
+  Keyword: "iftaar"  (1 posts) ← consider adding to extractor
+    @ucdisoc  [28 Feb]  reason: Iftar/religious event
+    LLM: The event is a sisters' iftaar, which implies free food is provided for attendees to break their fast.
+    Caption: 'Some gatherings do more than fill a room. \nThey fill hearts.\n\nPerfecting Ihsaan: Beyond Ramadan is a sisters’ iftaar by'
+    https://www.instagram.com/p/DVUCmrrDuFt/
+
   Keyword: "potluck, food"  (1 posts) ← consider adding to extractor
     @ucdisoc  [22 Feb]  reason: Iftar/religious event
-    LLM: The potluck encourages participants to bring food, indicating that food will be shared freely among attendees.
+    LLM: The event is a potluck where participants are encouraged to bring food, suggesting that food will be shared freely among attendees.
     Caption: 'Join us for 🎀 sisters’ pilates & potluck for Iftar 😋 — the perfect sisterhood combo 💕\n\n🎀 Pilates classes:\n📍 Harmony Stud'
     https://www.instagram.com/p/DVEYKE2DaWl/
 
   Keyword: "3-course meal"  (1 posts) ← consider adding to extractor
     @ucdisoc  [20 Feb]  reason: Iftar/religious event
-    LLM: The event offers a mouthwatering 3-course meal included for all attendees.
+    LLM: The event offers a mouthwatering 3-course meal as part of the activities for attendees.
     Caption: 'Perfecting Ihsaan - Beyond Ramadan: A Sisters’ Iftaar 💗\n\nJoin us as we explore what it truly means to live with excellen'
     https://www.instagram.com/p/DU_bN31DZjx/
 
   Keyword: "iftar"  (1 posts) ← consider adding to extractor
     @ucdisoc  [14 Feb]  reason: Iftar/religious event
-    LLM: Iftar will be provided for all players, indicating free food.
+    LLM: Iftar is provided for all players, indicating free food is included.
     Caption: 'Brothers Iftar Cup 26’ ⚽️🏆\n\n📅 Date: 28/02/26\n📍 Location: UCD 5 a side pitches, (1-3)\n⏰ Time: 10:00am - 7:00pm\n🍽 Iftar wi'
     https://www.instagram.com/p/DUvKkG5jXHh/
 
-  Keyword: "refreshments"  (1 posts) ← consider adding to extractor
-    @ucdjsoc  [23 Feb]  reason: No explicit food keyword found
-    LLM: The caption suggests a casual invitation to attend and learn, indicating potential availability of refreshments at the event.
-    Caption: "Due to some difficulties last week we will be doing this topic again! If you weren't able to join last week or if you wa"
-    https://www.instagram.com/p/DVFJoQhiLN3/
-
-  Keyword: "asian market crawl"  (1 posts) ← consider adding to extractor
-    @ucdjsoc  [18 Feb]  reason: No explicit food keyword found
-    LLM: The event is a market crawl, which implies food sampling or tastings likely offered for free.
-    Caption: 'Thanks so much to everyone who came to the Asian Market Crawl. We hope you all had a great time. ✨\n\nTo hear about more f'
-    https://www.instagram.com/p/DU6lIrMiDGK/
-
   Keyword: "pizza, snacks"  (1 posts) ← consider adding to extractor
     @ucdjuggling  [30 Nov]  reason: Mentions other college: 'tcd'
-    LLM: The event offers free pizza and snacks to attendees.
+    LLM: The event mentions providing pizza and snacks at no cost.
     Caption: "As the end of the semester draws near, it's time for our annual Christmas party!\n\nUCD Juggling and TCD Circus are collab"
     https://www.instagram.com/p/DRrvTlTCC1y/
 
   Keyword: "🍻"  (1 posts) ← consider adding to extractor
     @kevinbarrycumann  [23 Feb]  reason: No explicit food keyword found
-    LLM: The event mentions a meet-up in a clubhouse with beer emoji, indicating drinks are likely provided for free.
+    LLM: The post mentions meeting at the clubhouse with drinks implied to be available without a fee.
     Caption: '⚽🔥 5-A-Side Showdown KBC v Wolfetones🔥⚽\n\nCome meet the teams at the UCD Clubhouse pres at 8PM 🍻\n\nBefore what’s sure to b'
     https://www.instagram.com/p/DVGXtpnjEVN/
 
-  Keyword: "apple juice"  (1 posts) ← consider adding to extractor
+  Keyword: "lattes"  (1 posts) ← consider adding to extractor
     @ucd_lgbtqplus  [22 Feb]  reason: No explicit food keyword found
-    LLM: The mention of 'apple juice' suggests that drinks will be provided for free at the events.
+    LLM: The event mentions offering lattes, which implies a free food/drink offering.
     Caption: "Hiya divas ✨\n\nWe hope you've all been well and rested, and if you haven't, then make sure to rest RIGHT NOW! YES, NOW! O"
     https://www.instagram.com/p/DVEuwqQAD-W/
 
-  Keyword: "cookie"  (1 posts) ← consider adding to extractor
+  Keyword: "cookie decorating"  (1 posts) ← consider adding to extractor
     @ucd_lgbtqplus  [08 Feb]  reason: Food activity workshop/competition (not free food)
-    LLM: Cookie decorating implies free food will be provided during the activity.
+    LLM: The cookie decorating event suggests free food since there is no mention of a cost for participating.
     Caption: 'Hey there, fellow yearners 😌🫶🏻\n\n❗SPEED DATING has been changed to SPEED FRIENDING❗\n\nYearning times lie ahead, and so do'
     https://www.instagram.com/p/DUgm4I5AOL0/
 
-  Keyword: "tea, coffee"  (1 posts) ← consider adding to extractor
-    @ucdlitsoc  [26 Jan]  reason: No explicit food keyword found
-    LLM: The event offers free tea and coffee during the book swap event.
-    Caption: '✨ 𝚁𝙴𝙵𝚁𝙴𝚂𝙷𝙴𝚁𝚂 𝚆𝙴𝙴𝙺! ✨ \n📅 𝙼𝚘𝚗 𝟸𝟼 𝙹𝚊𝚗 — 𝙵𝚛𝚒 𝟹𝟶 𝙹𝚊𝚗 𝙲𝚘𝚖𝚎 𝚐𝚎𝚝 𝚒𝚗𝚟𝚘𝚕𝚟𝚎𝚍 𝚊𝚗𝚍 𝚓𝚘𝚒𝚗 𝚝𝚑𝚎 𝚜𝚘𝚌𝚒𝚎𝚝𝚢! \n\n📍 𝚃𝚄𝙴𝚂𝙳𝙰𝚈\n • 𝚁𝚎𝚏𝚛𝚎𝚜𝚑𝚎𝚛𝚜’ 𝙵𝚊𝚒𝚛'
-    https://www.instagram.com/p/DT-MFrNCDdQ/
+  Keyword: "snacks"  (1 posts) ← consider adding to extractor
+    @ucd_lgbtqplus  [05 Feb]  reason: Appears to be a paid event (price/ticket mention)
+    LLM: The event includes snacks provided for attendees, which implies free food.
+    Caption: 'IT’S FINALLY HERE🌈‼️\n\nOur annual intervarsity sleepover is coming - we’ll take over the Student Centre and spend the who'
+    https://www.instagram.com/p/DUYkhBxiBVD/
 
-  Keyword: "delicious food"  (1 posts) ← consider adding to extractor
-    @ucdlivingstones  [20 Feb]  reason: No explicit food keyword found
-    LLM: The event includes delicious food, suggesting it is provided for free.
-    Caption: "For the boys 📢📢\nGather up Lads, we got something special for you...\n\nJoin us for a Lad's hangout with fun and intense ga"
-    https://www.instagram.com/p/DU_mLdjDDe8/
+  Keyword: "açai breakfast"  (1 posts) ← consider adding to extractor
+    @ucdlnh  [28 Feb]  reason: No explicit food keyword found
+    LLM: The post mentions an Açai Breakfast, suggesting food is being provided for free during the event.
+    Caption: 'We are so excited to announce our events for Finlay Week this year! From a Journalling Workshop ✍ to Açai Breakfast 🍓, w'
+    https://www.instagram.com/p/DVT4jorjFlA/
 
   Keyword: "ayam gepuk"  (1 posts) ← consider adding to extractor
     @ucdmsoc  [25 Feb]  reason: Iftar/religious event
-    LLM: Food is being served for breaking the fast, indicating that it is provided free of charge.
+    LLM: The event includes a free serving of food for attendees.
     Caption: 'Join us this Ramadan to spend a wonderful Iftar together 🌙\n\nWe will be breaking the fast with a scrumptious serving of a'
     https://www.instagram.com/p/DVLrdT2DGG_/
 
   Keyword: "overfed"  (1 posts) ← consider adding to extractor
     @ucdmsoc  [24 Feb]  reason: No explicit food keyword found
-    LLM: The caption implies a celebratory event with food, suggesting the offering of free food during the Chinese New Year celebration.
+    LLM: The event mentions being 'overfed', indicating that food was likely provided for free.
     Caption: 'at a very chinese time of our lives 🤑🧧🐎 \nCNY done right- loud, lucky & slightly overfed!! \ns/o @ucdmsoc @mmiireland @mys'
     https://www.instagram.com/p/DVI-y36CKOM/
 
   Keyword: "goods"  (1 posts) ← consider adding to extractor
     @ucdmsoc  [12 Feb]  reason: No explicit food keyword found
-    LLM: The post indicates that pre-ordered goods can be collected for free at the booth.
+    LLM: The post mentions collecting pre-ordered goods, implying that food items are being distributed without charge.
     Caption: 'POV: you edited your content into a reality TV show… 📺 \n\nReminder to collect your pre-ordered goods at our booth in the'
     https://www.instagram.com/p/DUq6YUuDe-y/
 
   Keyword: "pizza, cans"  (1 posts) ← consider adding to extractor
     @ucdmathsoc  [22 Feb]  reason: Appears to be a paid event (price/ticket mention)
-    LLM: Free pizza and cans are being offered at the event.
+    LLM: Pizza and cans are being offered for free at the event.
     Caption: 'Countdown and cans is back baby!\n\nJoin us this Wednesday for some pizza, cans, and a bit of countdown🔥\n\n*This is a free'
     https://www.instagram.com/p/DVESSBvCCso/
 
-  Keyword: "🍸"  (1 posts) ← consider adding to extractor
-    @ucdmathsoc  [27 Jan]  reason: No explicit food keyword found
-    LLM: The caption mentions that the first drink is on them, indicating free drinks.
-    Caption: "We're hosting a refreshers mixer this Thursday! Come celebrate (or commiserate) exam results with us upstairs in the clu"
-    https://www.instagram.com/p/DUBRAZ-CO6Y/
-
-  Keyword: "wine and cheesers"  (1 posts) ← consider adding to extractor
+  Keyword: "wine and cheese"  (1 posts) ← consider adding to extractor
     @ucdmedsoc  [03 Feb]  reason: No explicit food keyword found
-    LLM: The event named 'Wine and Cheesers' suggests that food (wine and cheese) is provided for participants.
+    LLM: The event is titled 'Wine and Cheesers,' implying free wine and cheese was provided.
     Caption: 'Did it really happen if there were no photos?🤗 Well ain’t it a good thing we had a camera on site to capture every. sing'
     https://www.instagram.com/p/DUTnnVgjeRr/
 
-  Keyword: "food, drinks"  (1 posts) ← consider adding to extractor
-    @ucdmusicsoc  [22 Feb]  reason: No explicit food keyword found
-    LLM: The event mentions a jam session at a location serving drinks, indicating a social atmosphere likely to feature free food.
-    Caption: 'Tuesday is officially the biggest day of the week! 🎸🔥\n\nWe’ve got a packed schedule coming your way, and we’re still buzz'
-    https://www.instagram.com/p/DVEVvlaDGce/
-
-  Keyword: "free food, drinks"  (1 posts) ← consider adding to extractor
+  Keyword: "free food, drinks, more candy than you can possibly eat"  (1 posts) ← consider adding to extractor
     @ucdmusicsoc  [08 Feb]  reason: Appears to be a paid event (price/ticket mention)
-    LLM: The post explicitly states that there will be lots of free food available at the event.
+    LLM: The event is explicitly offering free food and drinks for attendees.
     Caption: '‼️REDUCED TICKET PRICES FOR KARNEVAL‼️\n\nwe found a way to make tickets cheaper for you so now there’s no reason not to c'
     https://www.instagram.com/p/DUgN78EDRSn/
 
   Keyword: "meal"  (1 posts) ← consider adding to extractor
     @ucdnewmansoc  [01 Feb]  reason: No explicit food keyword found
-    LLM: The event includes a meal as part of its offerings, suggesting that food is provided for attendees.
+    LLM: The caption mentions a meal included in the event, suggesting free food is provided.
     Caption: '🕺let’s get this party started💃\n\nOn the 7th of February, in the Gresham Hotel, be there or be a literal square- the BIGGE'
     https://www.instagram.com/p/DUOAxiOCPoM/
 
   Keyword: "baked goods"  (1 posts) ← consider adding to extractor
     @nordicsocietyucd  [09 Nov]  reason: Mentions off-campus venue: 'night out'
-    LLM: The caption mentions enjoying baked goods, which implies food being provided for free at the event.
+    LLM: The caption mentions enjoying baked goods at an event, indicating that food is provided for free.
     Caption: 'Well 10 events! Finals are slowly creeping up on us, but they’re not here yet! Time to enjoy my to date favorite baked g'
     https://www.instagram.com/p/DQ1uzhoCKAZ/
 
   Keyword: "free goodies"  (1 posts) ← consider adding to extractor
     @namsocucd  [01 Dec]  reason: No explicit food keyword found
-    LLM: The event includes loads of FREE goodies, indicating free food is being offered.
+    LLM: The post mentions loads of FREE goodies, indicating free food is available.
     Caption: 'FINAL WEEK OF 2025🥲\n\nWe have 2 big things for you.\nAll NAMSOC Members get free entry this Monday, Tuesday, Wednesday and'
     https://www.instagram.com/p/DRvH5cgjR07/
 
-  Keyword: "sweet treats, snacks"  (1 posts) ← consider adding to extractor
+  Keyword: "bake sale, treats, snack"  (1 posts) ← consider adding to extractor
     @pharmtoxucd  [06 Feb]  reason: Appears to be a paid event (price/ticket mention)
-    LLM: The bake sale is indicated as a support event where attendees can get snacks, implying that the food is being given for free.
+    LLM: The bake sale implies that food will be available for purchase, but it encourages support, which suggests donations may be welcomed as well.
     Caption: 'Sweet treats, good vibes ✨\npharmtox bake sale is happening Next week Monday the 9th 🍩\ncome support + get a snack\nIf anyo'
     https://www.instagram.com/p/DUafA8kjZpK/
 
   Keyword: "caffeine, biscuits"  (1 posts) ← consider adding to extractor
     @physics_society_ucd  [12 Sep]  reason: Nightlife event keyword: 'ball'
-    LLM: The post explicitly mentions 'Regular free caffeine ☕️ and biscuits 🍪', indicating free food is offered.
+    LLM: The post mentions regular free caffeine and biscuits as part of the offerings.
     Caption: 'We know that the beauty of physics requires convincing. Convincing yourself of laws that make sense mathematically, as w'
     https://www.instagram.com/p/DOgUK50gkwt/
 
+  Keyword: "ice cream"  (1 posts) ← consider adding to extractor
+    @physics_society_ucd  [09 Feb]  reason: Appears to be a paid event (price/ticket mention)
+    LLM: Liquid Nitrogen Ice Cream is being sold for free as part of a demonstration.
+    Caption: 'Who’s ready for week 23?! We sure are ;)\n\nAnd what a fine array of events we have in store for you, bright, starry-eyed'
+    https://www.instagram.com/p/DUhCRbaAhj-/
+
   Keyword: "coffee, tea"  (1 posts) ← consider adding to extractor
     @ucdscisoc  [16 Feb]  reason: Appears to be a paid event (price/ticket mention)
-    LLM: The event specifically mentions free coffee or tea being offered.
+    LLM: The event offers free coffee and tea to attendees.
     Caption: '☕ COFE MORNING ☕\n\nAfter the chaos of Science Day and SciBall ticket sales, we’re slowing things down this week with a Co'
     https://www.instagram.com/p/DU0bkwnitpj/
 
+  Keyword: "food, snacks, drinks"  (1 posts) ← consider adding to extractor
+    @ucdsussoc  [23 Feb]  reason: No explicit food keyword found
+    LLM: The post suggests a volunteer event at a sustainability hub, which commonly offers free snacks or drinks to participants.
+    Caption: 'Come volunteer at the ucd sustainability hub @ucd_greenacre on Thursday 😎\n\nSign-up link in bio!! ♻️'
+    https://www.instagram.com/p/DVGaey5iA0M/
+
   Keyword: "☕️"  (1 posts) ← consider adding to extractor
     @ucdsussoc  [22 Feb]  reason: No explicit food keyword found
-    LLM: The event provides free drinks (indicated by the coffee cup emoji) for attendees.
+    LLM: The event includes complimentary coffee as indicated by the coffee emoji in the caption.
     Caption: 'Join us for our second Climate Chats of the semester on Tuesday 24 February, from 2-3pm! ☕️ 🌎 Register your interest thr'
     https://www.instagram.com/p/DVDmv-CiLrr/
 
 
 🟡 FALSE POSITIVES (13) — classifier accepted, LLM says NOT a food event
 
+  @ucdarcsoc  [25 Jan]
+  LLM: Coffee and treats are offered, but a cash payment of €2 is required for membership sign-up.
+  Caption: '🪩 REFRESHERS WEEK EVENTS🪩\n\nWelcome back everyone! Get ready to be refreshed this week with delightful coffee morning in'
+  https://www.instagram.com/p/DT8K2DOjLhz/
+
   @ucdcesoc  [03 Feb]
-  LLM: The event is a panel discussion and does not mention any free food or drinks being provided.
+  LLM: The post does not indicate that food or drinks will be provided for free, and there is no mention of any cost.
   Caption: 'Dreaming of starting your own business? Want to hear from the best on how they did it? 🚀\n\nOur entrepreneurship panel has'
   https://www.instagram.com/p/DUS13HqDdFd/
 
-  @ucdfilmsoc  [09 Feb]
-  LLM: The post does not indicate that free food or drinks are being offered.
-  Caption: '🍿 OCM’s 🍿\n\nOur Wonderful OCM’s who keep everything running behind the scenes.\n\n#film #ucdfilmsoc #ucdcinema'
-  https://www.instagram.com/p/DUiNNTPCMsW/
-
   @ucdgamesociety  [22 Feb]
-  LLM: The post does not indicate that food or drinks are being offered for free.
+  LLM: The post does not mention any free food or drinks being offered.
   Caption: '💗WEEK 6💗\n\n🍬BOARD GAMES\n- Ready. Set. BOARD GAMES!\nThis week our board games are all about SPEED. We will be playing fast'
   https://www.instagram.com/p/DVEJEvnDFUJ/
 
   @ucditaliansoc  [17 Feb]
-  LLM: The event involves selling Italian treats, which implies a cost rather than offering free food.
+  LLM: The event involves selling Italian treats to raise funds, indicating food will be sold rather than given for free.
   Caption: 'Ciao! 🇮🇹✨\n\nThis Wednesday we’re bringing a taste of Italy to the International Market! Come support Società Italiana and'
   https://www.instagram.com/p/DU29YL1jQ10/
 
   @ucdjsoc  [18 Feb]
-  LLM: The event does not mention any food or drinks being offered for free.
+  LLM: The caption does not mention any free food or drinks being provided.
   Caption: 'Tomorrow is another Language class and we will be going over how to count things. Like in english, we have *sheets* of p'
   https://www.instagram.com/p/DU6XrUlCJuO/
 
-  @ucdjsoc  [17 Feb]
-  LLM: The food items are being sold, which indicates it is not a free food event.
-  Caption: 'We will be having a table at the International Festival Stalls in the Atrium! We will be selling matcha cheesecake and m'
-  https://www.instagram.com/p/DU2t1eCiJZK/
+  @ucdlawsoc  [23 Feb]
+  LLM: The event does not indicate that food or drinks were provided for free.
+  Caption: 'We were delighted to honour Joe Duffy with honorary life membership\n\n‘Never lose the run of yourself’ was the advice he'
+  https://www.instagram.com/p/DVGipoOjKNW/
 
   @ucdlitsoc  [16 Feb]
-  LLM: The post is about a job application and does not mention any free food or drinks being offered.
+  LLM: The post is a job hiring announcement and does not mention any food or drinks being offered.
   Caption: '‼️ WE’RE HIRING ‼️\n\nWe’re looking for a Graphic Designer to join our team. You’ll be creating engaging Instagram content'
   https://www.instagram.com/p/DU0bWefDO2c/
 
   @ucdmedsoc  [18 Feb]
-  LLM: The post does not mention any free food or drinks being provided during the event.
+  LLM: The caption does not mention any food or drinks being offered for free.
   Caption: '🚨Rescheduled🚨\nMedSoc is excited to announce that Ireland’s Chief State Pathologist, Professor Linda Mulligan will be joi'
   https://www.instagram.com/p/DU6H0uADZjo/
 
   @ucdnewmansoc  [24 Feb]
-  LLM: The post discusses the purpose of Lent and does not indicate any free food offering.
+  LLM: The post discusses the purpose of Lent and does not clearly indicate that food or drinks are being offered for free.
   Caption: 'prayer, fasting and almsgiving?!? i thought i just had to give up sweets :( \n\nFollowing on from last weeks talk, we seem'
   https://www.instagram.com/p/DVIoF64iFzl/
 
   @namsocucd  [11 Feb]
-  LLM: The caption discusses healthcare issues and does not mention any food or drinks being offered.
+  LLM: The post discusses healthcare issues and does not indicate any food or drinks being offered for free.
   Caption: 'While Ireland is certainly special for its dual-healthcare system - a ‘balance’ of private and public, there is much to'
   https://www.instagram.com/p/DUnwf7HjZvO/
 
+  @pharmtoxucd  [10 Feb]
+  LLM: The caption does not mention any food or drinks being offered for free.
+  Caption: 'Meet the 25/26 pharmtox team! Yes I know we’re late but better late than never! Four in the frame, a whole committee beh'
+  https://www.instagram.com/p/DUlemrrjM8W/
+
   @ucdphdsociety  [13 Oct]
-  LLM: No free food or drinks are mentioned in the event details.
+  LLM: No food or drinks are being provided for free, as attendees are encouraged to bring their own snacks.
   Caption: '🏖️ Coastal Walk: Malahide to Portmarnock 🏖️\n\nJoin us for a scenic weekend walk along the coast!\n\nStart: Malahide dart st'
   https://www.instagram.com/p/DPv55xSiMXe/
 
   @ucdpolsoc  [18 Feb]
-  LLM: The caption discusses economic and political topics without mentioning any food or drinks being offered for free.
+  LLM: The post discusses economic and political development in Ireland and does not mention any food or drinks being offered.
   Caption: 'The economic and political development of Ireland since joining the European Economic Community in 1973 has been sensati'
   https://www.instagram.com/p/DU5wr5yDdP-/
 
-  @psychsocietyucd  [12 Feb]
-  LLM: The baked goods are being sold for €1-€3, which means it is not a free food event.
-  Caption: "Valentine's day is coming our way 💘\nIn Harmony studio @ 1pm (come before all is gone!!) \n\nIn order to celebrate this sea"
-  https://www.instagram.com/p/DUpt2DWCIwF/
 
-
-🕐 TIME MISSES (69) — LLM found time, extractor did not
+🕐 TIME MISSES (70) — LLM found time, extractor did not
 
   @ucdafricasociety  LLM time: 10:00
   Caption: 'Brunch & Vibes is callingggg 🥞☕️\nA well deserved treat from us to you come down and bring a friend too 🤍\n📅 17th Feb (Tue'
@@ -2095,13 +2153,9 @@ LLM COMPARISON  —  101 true-pos | 108 false-neg | 13 false-pos
   Caption: 'This Thursday EES is teaming up with @ucd.aclsoc and we couldn’t be more excited.\n\nExpect delicious desserts, cozy vibes'
   https://www.instagram.com/p/DUdKk04jOX-/
 
-  @ucd.aclsoc  LLM time: null
+  @ucd.aclsoc  LLM time: 19:00
   Caption: 'Join us this Wednesday evening for games night! Take part in a competitive Seen Jeem and Stop the Bus or enjoy a more re'
   https://www.instagram.com/p/DUMPqCMDRxT/
-
-  @ucdarcsoc  LLM time: 13:00
-  Caption: '🪩 REFRESHERS WEEK EVENTS🪩\n\nWelcome back everyone! Get ready to be refreshed this week with delightful coffee morning in'
-  https://www.instagram.com/p/DT8K2DOjLhz/
 
   @artssocucd  LLM time: 11:00
   Caption: "TUESDAY COFFEE MORNING! AGAIN! And this time it's final; our coffee mornings for this term will be held in Newman Baseme"
@@ -2191,7 +2245,7 @@ LLM COMPARISON  —  101 true-pos | 108 false-neg | 13 false-pos
   Caption: "Join us next Tuesday (17/02) for our weekly 🥐 hit!\n\n⏱️1pm to 2pm -📍Harmony Studio\n\nWe're looking forward to seeing you ♥"
   https://www.instagram.com/p/DUyinsUCA-j/
 
-  @ucdfrenchsoc  LLM time: null
+  @ucdfrenchsoc  LLM time: 00:00
   Caption: 'Like we say in French "On change pas une équipe qui gagne !" Join us for our usual free coffee and croissants :).\n\n📍Red'
   https://www.instagram.com/p/DUTrH4siKui/
 
@@ -2215,7 +2269,7 @@ LLM COMPARISON  —  101 true-pos | 108 false-neg | 13 false-pos
   Caption: 'Ciao! 💌\nJoin us for a cosy Valentine’s Day morning of card making and pastries at Brava Lounge 🥐✨\nCome along to get crea'
   https://www.instagram.com/p/DUoNCXGDSd9/
 
-  @ucdlawsoc  LLM time: 00:00
+  @ucdlawsoc  LLM time: null
   Caption: 'FLOAT EU DEBATE TUESDAY 24TH IN THE FITZGERALD CHAMBER!! \n\nWith guests:\nCllr. Michael Clark\nDean of Law Imelda Maher\nBar'
   https://www.instagram.com/p/DVHOEIlDZ55/
 
@@ -2243,6 +2297,10 @@ LLM COMPARISON  —  101 true-pos | 108 false-neg | 13 false-pos
   Caption: '𝚆𝚎𝚎𝚔 𝟺 𝚠𝚒𝚝𝚑 𝙻𝚒𝚝𝚜𝚘𝚌 🎞️📔\n\n☕️ 𝙼𝚘𝚗𝚍𝚊𝚢 — 𝙹𝚘𝚒𝚗 𝚞𝚜 𝚏𝚘𝚛 𝚊 𝚌𝚘𝚏𝚏𝚎𝚎 𝚖𝚘𝚛𝚗𝚒𝚗𝚐 𝚝𝚘 𝚜𝚝𝚊𝚛𝚝 𝚘𝚏𝚏 𝚝𝚑𝚎 𝚠𝚎𝚎𝚔. 𝙷𝚊𝚛𝚖𝚘𝚗𝚢 𝚂𝚝𝚞𝚍𝚒𝚘, 𝟷𝟶𝚊𝚖. \u200b\n\n🖋️ 𝚃𝚑𝚞𝚛'
   https://www.instagram.com/p/DUhEULsiI-M/
 
+  @ucdlitsoc  LLM time: 11:00
+  Caption: '✨ 𝚁𝙴𝙵𝚁𝙴𝚂𝙷𝙴𝚁𝚂 𝚆𝙴𝙴𝙺! ✨ \n📅 𝙼𝚘𝚗 𝟸𝟼 𝙹𝚊𝚗 — 𝙵𝚛𝚒 𝟹𝟶 𝙹𝚊𝚗 𝙲𝚘𝚖𝚎 𝚐𝚎𝚝 𝚒𝚗𝚟𝚘𝚕𝚟𝚎𝚍 𝚊𝚗𝚍 𝚓𝚘𝚒𝚗 𝚝𝚑𝚎 𝚜𝚘𝚌𝚒𝚎𝚝𝚢! \n\n📍 𝚃𝚄𝙴𝚂𝙳𝙰𝚈\n • 𝚁𝚎𝚏𝚛𝚎𝚜𝚑𝚎𝚛𝚜’ 𝙵𝚊𝚒𝚛'
+  https://www.instagram.com/p/DT-MFrNCDdQ/
+
   @ucdlitsoc  LLM time: 12:00
   Caption: '🗞️ 𝚆𝙴𝙴𝙺 𝟷 𝚆𝙸𝚃𝙷 𝙻𝙸𝚃𝚂𝙾𝙲\n\n 🗞️ 𝚆𝚎𝚕𝚌𝚘𝚖𝚎 𝚋𝚊𝚌𝚔!! 📚\n\n✨ 𝚆𝚎’𝚛𝚎 𝚜𝚝𝚊𝚛𝚝𝚒𝚗𝚐 𝚝𝚑𝚎 𝚜𝚎𝚖𝚎𝚜𝚝𝚎𝚛 𝚠𝚒𝚝𝚑 𝚝𝚠𝚘 𝚟𝚎𝚛𝚢 𝚒𝚖𝚙𝚘𝚛𝚝𝚊𝚗𝚝 𝚎𝚟𝚎𝚗𝚝𝚜: \n\n𝙼𝙾𝙽𝙳𝙰𝚈 🍕 𝙰𝚛'
   https://www.instagram.com/p/DTrz4DgiKKz/
@@ -2255,9 +2313,17 @@ LLM COMPARISON  —  101 true-pos | 108 false-neg | 13 false-pos
   Caption: '✨ This Week at Livingstones ✨\nHello everyone, welcome back to a new week! We’ve got some exciting events coming up and w'
   https://www.instagram.com/p/DVGdU-mDDcK/
 
+  @ucdlivingstones  LLM time: 19:00
+  Caption: 'For the ladies.. 💐💐\nFebruary may be known as the month of love…\nBut God’s love doesn’t fade when the calendar turns.\n\nJo'
+  https://www.instagram.com/p/DU8BicujALr/
+
   @ucdlivingstones  LLM time: 18:15
   Caption: "Join us for a special Valentine's Day event this Wednesday at 6:15 pm in  Room FS-G01 in the Agriculture Building. We'll"
   https://www.instagram.com/p/DUg649JjAYO/
+
+  @ucdmathsoc  LLM time: null
+  Caption: "We're hosting a refreshers mixer this Thursday! Come celebrate (or commiserate) exam results with us upstairs in the clu"
+  https://www.instagram.com/p/DUBRAZ-CO6Y/
 
   @ucdmechsoc  LLM time: 17:00
   Caption: 'Dear 3rd Years!!\nChoosing your Masters? 🤔🎓\n\nJoin Mech Soc for our Masters Stream Information Night - hear from current m'
@@ -2319,10 +2385,6 @@ LLM COMPARISON  —  101 true-pos | 108 false-neg | 13 false-pos
   Caption: 'You know it, you love it! 🙌\n\nPolsoc is BACK with our weekly coffee morning tomorrow, Wednesday the 21st from 10am to 12p'
   https://www.instagram.com/p/DU2z_yMCEhk/
 
-  @ucdpolsoc  LLM time: 10:00
-  Caption: 'Week 5 with Polsoc is HERE! 💥\n\nWe have a jam packed week of events for you guys, from our MEP panel with Aodhan O’Riorda'
-  https://www.instagram.com/p/DUyvKzpCFKv/
-
   @psychsocietyucd  LLM time: 14:30
   Caption: 'GAMES DAY GAMES DAY ‼️‼️🗣️🗣️🗣️\n\nGuys come to some chillaxed game time where to get to play your favourite board games an'
   https://www.instagram.com/p/DVIseNViMcG/
@@ -2373,14 +2435,6 @@ LLM COMPARISON  —  101 true-pos | 108 false-neg | 13 false-pos
   @ucd.aclsoc  LLM location: Harmony Studio
   Caption: 'This Thursday EES is teaming up with @ucd.aclsoc and we couldn’t be more excited.\n\nExpect delicious desserts, cozy vibes'
   https://www.instagram.com/p/DUdKk04jOX-/
-
-  @ucd.aclsoc  LLM location: null
-  Caption: 'Join us this Wednesday evening for games night! Take part in a competitive Seen Jeem and Stop the Bus or enjoy a more re'
-  https://www.instagram.com/p/DUMPqCMDRxT/
-
-  @ucdarcsoc  LLM location: Richview cafeteria
-  Caption: '🪩 REFRESHERS WEEK EVENTS🪩\n\nWelcome back everyone! Get ready to be refreshed this week with delightful coffee morning in'
-  https://www.instagram.com/p/DT8K2DOjLhz/
 
   @artssocucd  LLM location: Newman Basement
   Caption: "TUESDAY COFFEE MORNING! AGAIN! And this time it's final; our coffee mornings for this term will be held in Newman Baseme"
@@ -2502,7 +2556,7 @@ LLM COMPARISON  —  101 true-pos | 108 false-neg | 13 false-pos
   Caption: 'THB WOMEN’S CONTRIBUTIONS TO HISTORY HAVE BEEN ERASED 🖋️💪\n\nThey say “Behind every great man is a great woman” but what h'
   https://www.instagram.com/p/DVE0ERHjX2M/
 
-  @ucdlnh  LLM location: Newman Building
+  @ucdlnh  LLM location: Theatre L, Newman Building
   Caption: 'LnH Coffee Morning today! ☕️\n\nMake sure to join us today outside Theatre L in the Newman Building from 11:45am for some'
   https://www.instagram.com/p/DVN42ckjXXk/
 
@@ -2518,6 +2572,10 @@ LLM COMPARISON  —  101 true-pos | 108 false-neg | 13 false-pos
   Caption: '𝚆𝚎𝚎𝚔 𝟻 𝚠𝚒𝚝𝚑 𝙻𝚒𝚝𝚂𝚘𝚌! 📚✨ \n\n𝙷𝚎𝚛𝚎 𝚒𝚜 𝚎𝚟𝚎𝚛𝚢𝚝𝚑𝚒𝚗𝚐 𝚑𝚊𝚙𝚙𝚎𝚗𝚒𝚗𝚐 𝚘𝚟𝚎𝚛 𝚝𝚑𝚎 𝚗𝚎𝚡𝚝 𝚏𝚎𝚠 𝚍𝚊𝚢𝚜:\xa0 \u200b \n\n• 𝙼𝚘𝚗𝚍𝚊𝚢: 𝙲𝚘𝚏𝚏𝚎𝚎 𝙼𝚘𝚛𝚗𝚒𝚗𝚐! ☕ | 𝙱𝚕𝚞𝚎 𝚁𝚘'
   https://www.instagram.com/p/DU2z6EoCCrE/
 
+  @ucdlitsoc  LLM location: Red Room
+  Caption: '✨ 𝚁𝙴𝙵𝚁𝙴𝚂𝙷𝙴𝚁𝚂 𝚆𝙴𝙴𝙺! ✨ \n📅 𝙼𝚘𝚗 𝟸𝟼 𝙹𝚊𝚗 — 𝙵𝚛𝚒 𝟹𝟶 𝙹𝚊𝚗 𝙲𝚘𝚖𝚎 𝚐𝚎𝚝 𝚒𝚗𝚟𝚘𝚕𝚟𝚎𝚍 𝚊𝚗𝚍 𝚓𝚘𝚒𝚗 𝚝𝚑𝚎 𝚜𝚘𝚌𝚒𝚎𝚝𝚢! \n\n📍 𝚃𝚄𝙴𝚂𝙳𝙰𝚈\n • 𝚁𝚎𝚏𝚛𝚎𝚜𝚑𝚎𝚛𝚜’ 𝙵𝚊𝚒𝚛'
+  https://www.instagram.com/p/DT-MFrNCDdQ/
+
   @ucdlitsoc  LLM location: Global Lounge
   Caption: '🗞️ 𝚆𝙴𝙴𝙺 𝟷 𝚆𝙸𝚃𝙷 𝙻𝙸𝚃𝚂𝙾𝙲\n\n 🗞️ 𝚆𝚎𝚕𝚌𝚘𝚖𝚎 𝚋𝚊𝚌𝚔!! 📚\n\n✨ 𝚆𝚎’𝚛𝚎 𝚜𝚝𝚊𝚛𝚝𝚒𝚗𝚐 𝚝𝚑𝚎 𝚜𝚎𝚖𝚎𝚜𝚝𝚎𝚛 𝚠𝚒𝚝𝚑 𝚝𝚠𝚘 𝚟𝚎𝚛𝚢 𝚒𝚖𝚙𝚘𝚛𝚝𝚊𝚗𝚝 𝚎𝚟𝚎𝚗𝚝𝚜: \n\n𝙼𝙾𝙽𝙳𝙰𝚈 🍕 𝙰𝚛'
   https://www.instagram.com/p/DTrz4DgiKKz/
@@ -2526,13 +2584,21 @@ LLM COMPARISON  —  101 true-pos | 108 false-neg | 13 false-pos
   Caption: '🗞️ 𝙱𝚁𝙴𝙰𝙺𝙸𝙽𝙶 𝙽𝙴𝚆𝚂 🗞️ 𝙸𝚝’𝚜 𝙼𝙸𝚇𝙴𝚁 𝚃𝙸𝙼𝙴! \n\n🍕 𝚃𝚑𝚎 𝚂𝚄 𝚒𝚜 𝚑𝚘𝚜𝚝𝚒𝚗𝚐 𝚊𝚗 𝙰𝚛𝚝𝚜 & 𝙷𝚞𝚖𝚊𝚗𝚒𝚝𝚒𝚎𝚜 𝙼𝚒𝚡𝚎𝚛 𝚝𝚑𝚒𝚜 𝙼𝚘𝚗𝚍𝚊𝚢! \n\n𝙰𝚛𝚝𝚜 & 𝙷𝚞𝚖𝚊𝚗𝚒𝚝𝚒𝚎𝚜 𝚜'
   https://www.instagram.com/p/DTql9-djsmR/
 
-  @ucdlivingstones  LLM location: Agriculture Science Building
+  @ucdlivingstones  LLM location: Room G-24, Agriculture Science Building, UCD
   Caption: '✨ This Week at Livingstones ✨\nHello everyone, welcome back to a new week! We’ve got some exciting events coming up and w'
   https://www.instagram.com/p/DVGdU-mDDcK/
+
+  @ucdlivingstones  LLM location: Harmony Studio
+  Caption: 'For the ladies.. 💐💐\nFebruary may be known as the month of love…\nBut God’s love doesn’t fade when the calendar turns.\n\nJo'
+  https://www.instagram.com/p/DU8BicujALr/
 
   @ucdlivingstones  LLM location: Room FS-G01 in the Agriculture Building
   Caption: "Join us for a special Valentine's Day event this Wednesday at 6:15 pm in  Room FS-G01 in the Agriculture Building. We'll"
   https://www.instagram.com/p/DUg649JjAYO/
+
+  @ucdmathsoc  LLM location: clubhouse
+  Caption: "We're hosting a refreshers mixer this Thursday! Come celebrate (or commiserate) exam results with us upstairs in the clu"
+  https://www.instagram.com/p/DUBRAZ-CO6Y/
 
   @ucdmechsoc  LLM location: Room 121, Engineering Building
   Caption: 'Dear 3rd Years!!\nChoosing your Masters? 🤔🎓\n\nJoin Mech Soc for our Masters Stream Information Night - hear from current m'
@@ -2582,7 +2648,7 @@ LLM COMPARISON  —  101 true-pos | 108 false-neg | 13 false-pos
   Caption: 'this week brings our long awaited EGM, so if you have any interest in being on the committee or deciding who will be, pl'
   https://www.instagram.com/p/DUT7P1kDIZn/
 
-  @physics_society_ucd  LLM location: Meeting Rooms in the Student Centre
+  @physics_society_ucd  LLM location: Student Centre
   Caption: 'Hey PhysSoc ⚛️🌟\n\nBelated short but sweet itinerary for this week mloves 💥💃 \n\nCome by Meeting Rooms in the Student Centre'
   https://www.instagram.com/p/DVKKNQUAi39/
 
@@ -2594,17 +2660,13 @@ LLM COMPARISON  —  101 true-pos | 108 false-neg | 13 false-pos
   Caption: 'Is it magic? ✨ Or is it something even better… #physics \n\nCome witness the wonders of liquid nitrogen as we, your humble'
   https://www.instagram.com/p/DUjlG4WAkuc/
 
-  @ucdpolsoc  LLM location: Newman Theater L
+  @ucdpolsoc  LLM location: in front of Newman Theater
   Caption: "Polsoc coffee morning! ☕\n\nMake sure to join us for this week's coffee morning in front of Newman Theater L!\n\n #ucdsocial"
   https://www.instagram.com/p/DVJMKU1CGN2/
 
-  @ucdpolsoc  LLM location: outside Theatre L, Newman building
+  @ucdpolsoc  LLM location: Theatre L, Newman building
   Caption: 'You know it, you love it! 🙌\n\nPolsoc is BACK with our weekly coffee morning tomorrow, Wednesday the 21st from 10am to 12p'
   https://www.instagram.com/p/DU2z_yMCEhk/
-
-  @ucdpolsoc  LLM location: outside of Theatre L in Newman
-  Caption: 'Week 5 with Polsoc is HERE! 💥\n\nWe have a jam packed week of events for you guys, from our MEP panel with Aodhan O’Riorda'
-  https://www.instagram.com/p/DUyvKzpCFKv/
 
   @psychsocietyucd  LLM location: Harmony Studio
   Caption: 'GAMES DAY GAMES DAY ‼️‼️🗣️🗣️🗣️\n\nGuys come to some chillaxed game time where to get to play your favourite board games an'

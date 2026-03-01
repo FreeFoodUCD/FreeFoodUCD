@@ -324,6 +324,11 @@ async def _scrape_all_posts_async():
                                 batch_event_ids.extend(nlp_result.get("event_ids", []))
                         except Exception as nlp_error:
                             logger.error(f"NLP processing failed for post {post.id}: {nlp_error}")
+                            # F6: Mark as nlp_failed so reprocess_nlp_failed_posts() can retry.
+                            # Do NOT set processed=True — that would permanently skip this post.
+                            post.nlp_failed = True
+                            post.nlp_error = str(nlp_error)[:500]
+                            post.processed = False
 
                         logger.info(f"New post from @{handle_lower}: {post_data['url']}")
                     except Exception as post_error:
@@ -460,6 +465,11 @@ async def _scrape_society_posts_async(society_id: str):
                             society_event_ids.extend(nlp_result.get('event_ids', []))
                     except Exception as nlp_error:
                         logger.error(f"NLP processing failed for post {post.id}: {nlp_error}")
+                        # F6: Mark as nlp_failed so reprocess_nlp_failed_posts() can retry.
+                        # Do NOT set processed=True — that would permanently skip this post.
+                        post.nlp_failed = True
+                        post.nlp_error = str(nlp_error)[:500]
+                        post.processed = False
 
                     logger.info(f"New post from @{society.instagram_handle}: {post_data['url']}")
                 except Exception as post_error:
@@ -581,50 +591,71 @@ async def _process_scraped_content_async(content_type: str, content_id: str):
             ev_start = seg_event_data['start_time']
             ev_location = seg_event_data.get('location', '').lower().strip()
 
-            # ±1 hour duplicate check
-            dup_result = await session.execute(
-                select(Event).where(
-                    Event.start_time >= ev_start - timedelta(hours=1),
-                    Event.start_time <= ev_start + timedelta(hours=1),
-                    Event.is_active == True,
-                )
-            )
             is_duplicate = False
-            for ex in dup_result.scalars().all():
-                ex_loc = (ex.location or '').lower().strip()
-                if ev_location and ex_loc:
-                    if ev_location in ex_loc or ex_loc in ev_location:
-                        is_duplicate = True
-                        logger.info(f"Duplicate event (segment {seg_idx}): {ex.title} at {ex.start_time}")
-                        break
-                elif not ev_location and not ex_loc:
-                    if ex.title.lower() in seg_event_data['title'].lower() or \
-                       seg_event_data['title'].lower() in ex.title.lower():
-                        is_duplicate = True
-                        logger.info(f"Duplicate event by title (segment {seg_idx}): {ex.title}")
-                        break
 
-            # Fallback: society-level same-day dedup (catches reminder posts).
-            # Excludes events already created from this same post (sibling segments).
-            if not is_duplicate:
-                day_start = ev_start.replace(hour=0, minute=0, second=0, microsecond=0)
-                same_day_conds = [
-                    Event.society_id == content.society_id,
-                    Event.start_time >= day_start,
-                    Event.start_time < day_start + timedelta(days=1),
-                    Event.is_active == True,
-                ]
-                if created_this_run_uuids:
-                    same_day_conds.append(~Event.id.in_(created_this_run_uuids))
-                same_day_events = (
-                    await session.execute(select(Event).where(*same_day_conds))
-                ).scalars().all()
-                if same_day_events:
-                    is_duplicate = True
-                    logger.info(
-                        f"Same-day society dedup (segment {seg_idx}): society {content.society_id} "
-                        f"already has event on {day_start.date()} — skipping '{seg_event_data['title']}'"
+            if ev_start is not None:
+                # ±1 hour duplicate check (only possible when we have a start time)
+                dup_result = await session.execute(
+                    select(Event).where(
+                        Event.start_time >= ev_start - timedelta(hours=1),
+                        Event.start_time <= ev_start + timedelta(hours=1),
+                        Event.is_active == True,
                     )
+                )
+                for ex in dup_result.scalars().all():
+                    ex_loc = (ex.location or '').lower().strip()
+                    if ev_location and ex_loc:
+                        if ev_location in ex_loc or ex_loc in ev_location:
+                            is_duplicate = True
+                            logger.info(f"Duplicate event (segment {seg_idx}): {ex.title} at {ex.start_time}")
+                            break
+                    elif not ev_location and not ex_loc:
+                        if ex.title.lower() in seg_event_data['title'].lower() or \
+                           seg_event_data['title'].lower() in ex.title.lower():
+                            is_duplicate = True
+                            logger.info(f"Duplicate event by title (segment {seg_idx}): {ex.title}")
+                            break
+
+                # Fallback: society-level same-day dedup (catches reminder posts).
+                # Excludes events already created from this same post (sibling segments).
+                if not is_duplicate:
+                    day_start = ev_start.replace(hour=0, minute=0, second=0, microsecond=0)
+                    same_day_conds = [
+                        Event.society_id == content.society_id,
+                        Event.start_time >= day_start,
+                        Event.start_time < day_start + timedelta(days=1),
+                        Event.is_active == True,
+                    ]
+                    if created_this_run_uuids:
+                        same_day_conds.append(~Event.id.in_(created_this_run_uuids))
+                    same_day_events = (
+                        await session.execute(select(Event).where(*same_day_conds))
+                    ).scalars().all()
+                    if same_day_events:
+                        is_duplicate = True
+                        logger.info(
+                            f"Same-day society dedup (segment {seg_idx}): society {content.society_id} "
+                            f"already has event on {day_start.date()} — skipping '{seg_event_data['title']}'"
+                        )
+            else:
+                # No start_time — skip time-based dedup, do title-only dedup
+                logger.info(
+                    f"Event '{seg_event_data['title']}' has no start_time (date TBC) — "
+                    f"skipping time-based dedup, using title dedup only"
+                )
+                title_lower = seg_event_data['title'].lower()
+                title_dup_result = await session.execute(
+                    select(Event).where(
+                        Event.society_id == content.society_id,
+                        Event.start_time == None,
+                        Event.is_active == True,
+                    )
+                )
+                for ex in title_dup_result.scalars().all():
+                    if ex.title.lower() in title_lower or title_lower in ex.title.lower():
+                        is_duplicate = True
+                        logger.info(f"Duplicate no-time event by title (segment {seg_idx}): {ex.title}")
+                        break
 
             if is_duplicate:
                 continue

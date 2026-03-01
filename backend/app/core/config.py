@@ -59,15 +59,20 @@ class Settings(BaseSettings):
     # Email allowlist (comma-separated; if set, only these addresses receive event emails)
     NOTIFICATION_TEST_EMAILS: str = ""
 
-    # NLP / Classification
-    # Set USE_SCORING_PIPELINE=false in Railway env vars to revert to pure rule-based
-    # without redeploying (emergency rollback switch).
-    USE_SCORING_PIPELINE: bool = True
-    # OpenAI key for Phase B LLM fallback (optional; Phase A does not require it)
-    OPENAI_API_KEY: Optional[str] = None
-    # B6: Vision LLM fallback — fires when Tesseract yields <20 chars and images are available.
-    # Set USE_VISION_FALLBACK=false in Railway env vars to disable without redeploying.
-    USE_VISION_FALLBACK: bool = True
+    # NLP / Classification (Phase E — Gemini-first)
+    # Gemini Flash is the primary classifier. Set USE_GEMINI=true in Railway env vars to activate.
+    # Set USE_GEMINI=false as an emergency kill switch — all posts will be rejected (no LLM).
+    GEMINI_API_KEY: Optional[str] = None
+    USE_GEMINI: bool = False
+    # Plausibility window for Gemini datetime validation (days)
+    GEMINI_MAX_FUTURE_DAYS: int = 30
+
+    # Langfuse observability (F1 — Phase F)
+    # Optional: if keys are absent, Langfuse is silently disabled (graceful degradation).
+    # Sign up free at https://cloud.langfuse.com — 50k events/month free tier.
+    LANGFUSE_PUBLIC_KEY: Optional[str] = None
+    LANGFUSE_SECRET_KEY: Optional[str] = None
+    LANGFUSE_HOST: str = "https://cloud.langfuse.com"
     
     @model_validator(mode='after')
     def check_admin_key(self):

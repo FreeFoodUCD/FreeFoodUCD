@@ -604,6 +604,38 @@ export default function AdminDashboard() {
     setLoading(false);
   };
 
+  const submitEventFeedback = async (
+    eventId: string,
+    feedbackType: 'correct' | 'false_positive' | 'false_negative',
+  ) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${BASE_URL}/api/v1/admin/events/${eventId}/feedback`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Key': adminKey,
+        },
+        body: JSON.stringify({ feedback_type: feedbackType }),
+      });
+      if (response.ok) {
+        const labels: Record<string, string> = {
+          correct: '✅ Marked correct',
+          false_positive: '🚫 Marked false positive — event deactivated',
+          false_negative: '⚠️ Marked false negative',
+        };
+        setMessage(labels[feedbackType] || '✅ Feedback submitted');
+        loadUpcomingEvents();
+      } else {
+        setMessage('❌ Failed to submit feedback');
+      }
+    } catch (error) {
+      setMessage('❌ Error submitting feedback');
+      console.error('Error submitting event feedback:', error);
+    }
+    setLoading(false);
+  };
+
   const submitPostFeedback = async (postId: string, isCorrect: boolean, notes?: string) => {
     setLoading(true);
     try {
@@ -862,7 +894,7 @@ export default function AdminDashboard() {
                       <p className="text-sm text-gray-700 mb-3">{event.description}</p>
                     )}
 
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       <button
                         onClick={() => sendReminder(event.id)}
                         disabled={loading}
@@ -877,6 +909,33 @@ export default function AdminDashboard() {
                       >
                         Delete Event
                       </button>
+                      {/* F4: NLP feedback buttons */}
+                      <div className="ml-auto flex gap-1">
+                        <button
+                          onClick={() => submitEventFeedback(event.id, 'correct')}
+                          disabled={loading}
+                          title="This event was correctly identified as free food"
+                          className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded hover:bg-green-200 disabled:opacity-50 border border-green-300"
+                        >
+                          ✓ Correct
+                        </button>
+                        <button
+                          onClick={() => submitEventFeedback(event.id, 'false_positive')}
+                          disabled={loading}
+                          title="This event was accepted but is NOT free food — will deactivate it"
+                          className="px-3 py-1 bg-orange-100 text-orange-800 text-sm rounded hover:bg-orange-200 disabled:opacity-50 border border-orange-300"
+                        >
+                          ✗ False Positive
+                        </button>
+                        <button
+                          onClick={() => submitEventFeedback(event.id, 'false_negative')}
+                          disabled={loading}
+                          title="This event was missed by the classifier"
+                          className="px-3 py-1 bg-yellow-100 text-yellow-800 text-sm rounded hover:bg-yellow-200 disabled:opacity-50 border border-yellow-300"
+                        >
+                          ⚠ False Negative
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))

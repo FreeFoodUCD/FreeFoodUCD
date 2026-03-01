@@ -36,6 +36,7 @@ class EventResponse(BaseModel):
     end_time: Optional[datetime] = None
     source_type: str
     confidence_score: Optional[float] = None
+    members_only: bool = False
     society: SocietyInfo
     created_at: datetime
     
@@ -169,6 +170,7 @@ async def get_events(
                 end_time=event.end_time,
                 source_type=event.source_type,
                 confidence_score=event.confidence_score,
+                members_only=bool((event.extracted_data or {}).get('members_only', False)),
                 society=SocietyInfo(
                     id=event.society.id,
                     name=event.society.name,
@@ -215,6 +217,7 @@ async def get_event(
         end_time=event.end_time,
         source_type=event.source_type,
         confidence_score=event.confidence_score,
+        members_only=bool((event.extracted_data or {}).get('members_only', False)),
         society=SocietyInfo(
             id=event.society.id,
             name=event.society.name,

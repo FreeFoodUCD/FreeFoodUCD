@@ -15,8 +15,9 @@ logger = logging.getLogger(__name__)
 class DateParser:
     """Robust date parser with comprehensive pattern matching and validation."""
     
-    def __init__(self, timezone: pytz.timezone):
+    def __init__(self, timezone: pytz.timezone, max_future_days: int = 90):
         self.timezone = timezone
+        self.max_future_days = max_future_days
         
         # Month name mappings (full and abbreviated)
         self.month_map = {
@@ -108,8 +109,8 @@ class DateParser:
                 logger.debug(f"Invalid candidate rejected: {pattern_type} -> {date.strftime('%A %d/%m/%Y')}")
         
         if not valid_candidates:
-            logger.info("No valid date candidates found, using reference date")
-            return reference_date
+            logger.info("No valid date candidates found, returning None")
+            return None
         
         # Sort by confidence (highest first), then by date (earliest first)
         valid_candidates.sort(key=lambda x: (-x[2], x[1]))
@@ -456,8 +457,8 @@ class DateParser:
         if date < ref_date - timedelta(days=1):
             return False
         
-        # Must not be more than 90 days in the future
-        if date > ref_date + timedelta(days=90):
+        # Must not be more than max_future_days in the future
+        if date > ref_date + timedelta(days=self.max_future_days):
             return False
         
         return True

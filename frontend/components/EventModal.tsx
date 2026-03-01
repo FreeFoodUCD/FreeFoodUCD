@@ -126,8 +126,15 @@ export default function EventModal({ event, isOpen, onClose }: EventModalProps) 
           </button>
 
           <div className="pr-12">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/20 rounded-full text-sm font-bold mb-4">
-              {event.source_type === 'story' ? '📸 Story' : '📱 Post'}
+            <div className="flex items-center gap-2 flex-wrap mb-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/20 rounded-full text-sm font-bold">
+                {event.source_type === 'story' ? '📸 Story' : '📱 Post'}
+              </div>
+              {event.members_only && (
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-400/90 text-amber-900 rounded-full text-sm font-bold">
+                  🔒 Members only
+                </div>
+              )}
             </div>
             <h2 id={MODAL_TITLE_ID} className="text-2xl md:text-3xl font-bold mb-3 leading-tight break-words">{event.title}</h2>
             <div className="flex items-center gap-2 text-white/90 min-w-0">
