@@ -17,6 +17,7 @@ function SignupContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [resendStatus, setResendStatus] = useState<'idle' | 'sending' | 'sent'>('idle');
 
   useEffect(() => {
     if (emailFromUrl) {
@@ -36,12 +37,23 @@ function SignupContent() {
       setStep('verify');
     } catch (err: any) {
       if (err.message === 'already_signed_up' || err.message?.includes('already exists')) {
-        setError('looks like this email is already registered — check your inbox!');
+        setError("you're already signed up!");
       } else {
         setError('something went wrong — try again in a moment');
       }
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleResend = async () => {
+    setResendStatus('sending');
+    try {
+      await api.signup({ email });
+      setResendStatus('sent');
+      setTimeout(() => setResendStatus('idle'), 3000);
+    } catch {
+      setResendStatus('idle');
     }
   };
 
@@ -197,6 +209,18 @@ function SignupContent() {
                 >
                   ← use different email
                 </Link>
+
+                <p className="mt-3 text-sm text-text-lighter">
+                  didn't get it?{' '}
+                  <button
+                    type="button"
+                    onClick={handleResend}
+                    disabled={resendStatus !== 'idle'}
+                    className="text-text-light hover:text-text font-bold transition-colors disabled:opacity-50"
+                  >
+                    {resendStatus === 'sending' ? 'sending...' : resendStatus === 'sent' ? 'sent!' : 'resend code'}
+                  </button>
+                </p>
               </form>
             </div>
           )}
