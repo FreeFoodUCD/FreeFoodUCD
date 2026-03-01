@@ -320,8 +320,8 @@ async def _scrape_all_posts_async():
 
                         try:
                             nlp_result = await _process_scraped_content_async("post", str(post.id))
-                            if nlp_result.get("event_created") and nlp_result.get("event_id"):
-                                batch_event_ids.append(nlp_result["event_id"])
+                            if nlp_result.get("event_created"):
+                                batch_event_ids.extend(nlp_result.get("event_ids", []))
                         except Exception as nlp_error:
                             logger.error(f"NLP processing failed for post {post.id}: {nlp_error}")
 
@@ -456,8 +456,8 @@ async def _scrape_society_posts_async(society_id: str):
                     # Process NLP synchronously (no Celery on Railway)
                     try:
                         nlp_result = await _process_scraped_content_async('post', str(post.id))
-                        if nlp_result.get('event_created') and nlp_result.get('event_id'):
-                            society_event_ids.append(nlp_result['event_id'])
+                        if nlp_result.get('event_created'):
+                            society_event_ids.extend(nlp_result.get('event_ids', []))
                     except Exception as nlp_error:
                         logger.error(f"NLP processing failed for post {post.id}: {nlp_error}")
 
@@ -552,118 +552,104 @@ async def _process_scraped_content_async(content_type: str, content_id: str):
         if not content or not text:
             logger.warning(f"No text found for {content_type} {content_id}")
             return {"error": "Content not found or empty"}
-        
-        # Extract event with post timestamp for better date validation
+
         post_timestamp = content.detected_at if hasattr(content, 'detected_at') else None
         logger.info(f"Processing {content_type} {content_id} with {len(text)} chars")
-        event_data = extractor.extract_event(text, content_type, post_timestamp)
-        
-        if event_data:
-            # Check for duplicate events (same time + location within 1 hour window)
-            start_time = event_data['start_time']
-            location = event_data.get('location', '').lower().strip()
-            
-            # Query for similar events within ±1 hour
-            time_window_start = start_time - timedelta(hours=1)
-            time_window_end = start_time + timedelta(hours=1)
-            
-            duplicate_query = select(Event).where(
-                Event.start_time >= time_window_start,
-                Event.start_time <= time_window_end,
-                Event.is_active == True
-            )
-            result = await session.execute(duplicate_query)
-            existing_events = result.scalars().all()
-            
-            # Check if any existing event has similar location
-            is_duplicate = False
-            for existing in existing_events:
-                existing_location = (existing.location or '').lower().strip()
-                # Consider duplicate if locations match or one is empty
-                if location and existing_location:
-                    # Simple string matching (could be improved with fuzzy matching)
-                    if location in existing_location or existing_location in location:
-                        is_duplicate = True
-                        logger.info(f"Duplicate event detected: {existing.title} at {existing.start_time}")
-                        break
-                elif not location and not existing_location:
-                    # Both have no location, check if titles are similar
-                    existing_title = existing.title.lower()
-                    new_title = event_data['title'].lower()
-                    if existing_title in new_title or new_title in existing_title:
-                        is_duplicate = True
-                        logger.info(f"Duplicate event detected (by title): {existing.title}")
-                        break
-            
-            # Fallback: society-level same-day dedup (catches reminder posts that
-            # extract a slightly different time, bypassing the ±1 hour window)
-            if not is_duplicate:
-                today_start = start_time.replace(hour=0, minute=0, second=0, microsecond=0)
-                today_end = today_start + timedelta(days=1)
-                same_day_query = select(Event).where(
-                    Event.society_id == content.society_id,
-                    Event.start_time >= today_start,
-                    Event.start_time < today_end,
-                    Event.is_active == True
+
+        # A11: Segment multi-event schedule posts; falls back to [text] for normal posts
+        segments = extractor.segment_post_text(text)
+        logger.info(f"Post split into {len(segments)} segment(s)")
+
+        created_event_ids = []
+        # Track UUIDs flushed in this run so same-day dedup doesn't block sibling segments
+        created_this_run_uuids = []
+
+        for seg_idx, segment in enumerate(segments):
+            seg_event_data = extractor.extract_event(segment, content_type, post_timestamp)
+            if not seg_event_data:
+                continue
+
+            ev_start = seg_event_data['start_time']
+            ev_location = seg_event_data.get('location', '').lower().strip()
+
+            # ±1 hour duplicate check
+            dup_result = await session.execute(
+                select(Event).where(
+                    Event.start_time >= ev_start - timedelta(hours=1),
+                    Event.start_time <= ev_start + timedelta(hours=1),
+                    Event.is_active == True,
                 )
-                same_day_result = await session.execute(same_day_query)
-                same_day_events = same_day_result.scalars().all()
+            )
+            is_duplicate = False
+            for ex in dup_result.scalars().all():
+                ex_loc = (ex.location or '').lower().strip()
+                if ev_location and ex_loc:
+                    if ev_location in ex_loc or ex_loc in ev_location:
+                        is_duplicate = True
+                        logger.info(f"Duplicate event (segment {seg_idx}): {ex.title} at {ex.start_time}")
+                        break
+                elif not ev_location and not ex_loc:
+                    if ex.title.lower() in seg_event_data['title'].lower() or \
+                       seg_event_data['title'].lower() in ex.title.lower():
+                        is_duplicate = True
+                        logger.info(f"Duplicate event by title (segment {seg_idx}): {ex.title}")
+                        break
+
+            # Fallback: society-level same-day dedup (catches reminder posts).
+            # Excludes events already created from this same post (sibling segments).
+            if not is_duplicate:
+                day_start = ev_start.replace(hour=0, minute=0, second=0, microsecond=0)
+                same_day_conds = [
+                    Event.society_id == content.society_id,
+                    Event.start_time >= day_start,
+                    Event.start_time < day_start + timedelta(days=1),
+                    Event.is_active == True,
+                ]
+                if created_this_run_uuids:
+                    same_day_conds.append(~Event.id.in_(created_this_run_uuids))
+                same_day_events = (
+                    await session.execute(select(Event).where(*same_day_conds))
+                ).scalars().all()
                 if same_day_events:
                     is_duplicate = True
                     logger.info(
-                        f"Same-day society dedup triggered: society {content.society_id} "
-                        f"already has event on {today_start.date()} — skipping '{event_data['title']}'"
+                        f"Same-day society dedup (segment {seg_idx}): society {content.society_id} "
+                        f"already has event on {day_start.date()} — skipping '{seg_event_data['title']}'"
                     )
 
             if is_duplicate:
-                # Mark content as processed but don't create duplicate event
-                content.processed = True
-                content.is_free_food = True
-                await session.commit()
-                logger.info(f"Skipped duplicate event: {event_data['title']} at {start_time}")
-                return {
-                    "event_created": False,
-                    "reason": "duplicate",
-                    "title": event_data['title']
-                }
+                continue
 
-            # Create event (no duplicate found)
+            # Create event for this segment
             event = Event(
                 society_id=content.society_id,
-                title=event_data['title'],
-                description=event_data.get('description'),
-                location=event_data.get('location'),
-                location_building=event_data.get('location_building'),
-                location_room=event_data.get('location_room'),
-                start_time=event_data['start_time'],
-                end_time=event_data.get('end_time'),
+                title=seg_event_data['title'],
+                description=seg_event_data.get('description'),
+                location=seg_event_data.get('location'),
+                location_building=seg_event_data.get('location_building'),
+                location_room=seg_event_data.get('location_room'),
+                start_time=ev_start,
+                end_time=seg_event_data.get('end_time'),
                 source_type=content_type,
                 source_id=content.id,
-                confidence_score=event_data['confidence_score'],
-                raw_text=event_data['raw_text'],
-                extracted_data=event_data.get('extracted_data', {})
+                confidence_score=seg_event_data['confidence_score'],
+                raw_text=seg_event_data['raw_text'],
+                extracted_data=seg_event_data.get('extracted_data', {}),
             )
-            
             session.add(event)
-            
-            # Mark content as processed
-            content.processed = True
-            content.is_free_food = True
-            
-            await session.commit()
-            await session.refresh(event)
+            await session.flush()
+            created_this_run_uuids.append(event.id)
+            created_event_ids.append(str(event.id))
+            logger.info(f"Event created (segment {seg_idx}): '{event.title}' at {ev_start}")
 
-            return {
-                "event_created": True,
-                "event_id": str(event.id),
-                "confidence": event_data['confidence_score']
-            }
+        # Mark post as processed
+        content.processed = True
+        content.is_free_food = len(created_event_ids) > 0
+        await session.commit()
+
+        if created_event_ids:
+            return {"event_created": True, "event_ids": created_event_ids}
         else:
-            # Mark as processed but not free food
-            content.processed = True
-            content.is_free_food = False
-            await session.commit()
-            
-            return {"event_created": False}
+            return {"event_created": False, "event_ids": []}
 
 # Made with Bob

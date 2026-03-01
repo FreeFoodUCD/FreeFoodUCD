@@ -183,6 +183,10 @@ class EventExtractor:
             # Implied-free event types (cultural norm at UCD — these events always have food)
             'welcome reception', 'freshers fair', "fresher's fair",
             'open evening',
+            # German/international social terms
+            'kaffeeklatsch',
+            # Food sampling events
+            'free samples', 'handing out samples',
         ]
         # Weak food indicators — only count if "free", "provided", or "complimentary"
         # (or other context modifiers) also appears somewhere in the text
@@ -448,7 +452,7 @@ class EventExtractor:
             'rathmines', 'ranelagh', 'dundrum', 'city centre',
             'dublin 2', 'dublin 4', 'dublin mountains',
             # Social outings
-            'night out', 'pub crawl',
+            'pub crawl',
         ]
 
     # Words in off_campus_venues that need word-boundary matching (too short/generic otherwise)
@@ -457,7 +461,7 @@ class EventExtractor:
     def load_nightlife_keywords(self) -> List[str]:
         """Load list of nightlife event keywords to reject."""
         return [
-            'ball', 'gala', 'formal', 'pub crawl', 'night out',
+            'ball', 'gala', 'formal', 'pub crawl',
             'nightclub', 'club night', 'bar crawl',
             'pre drinks', 'afters', 'sesh', 'going out'
         ]
@@ -1067,8 +1071,34 @@ class EventExtractor:
         all_food = list(dict.fromkeys(matched_strong + matched_ctx + matched_weak))
         return {'result': 'accepted', 'reason': 'Accepted', 'matched_keywords': all_food[:8]}
 
+    # ========== Multi-event Segmentation (A11) ==========
+
+    def segment_post_text(self, text: str) -> List[str]:
+        """
+        Split a multi-event schedule post into individual event segments.
+
+        Splits on blank lines followed by an ALL-CAPS heading (≥5 chars) or a
+        day-of-week name.  Guards:
+        - Each segment must be ≥ 80 characters (filters line-noise)
+        - Maximum 6 segments per post
+        - Falls back to [text] if 0 or 1 segment produced (no regression)
+        """
+        # Pattern: blank line(s) followed by ALL-CAPS word (≥5 chars) or day-of-week
+        _SEG_PATTERN = re.compile(
+            r'\n\n+(?=[A-Z][A-Z\s]{4,}\n|'
+            r'(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday))',
+            re.IGNORECASE,
+        )
+        parts = _SEG_PATTERN.split(text)
+        # Filter noise and cap (50 chars: enough to remove 1-word OCR fragments
+        # while keeping real schedule entries like "COFFEE MORNING\nNewman 8:30-9:30am")
+        segments = [p.strip() for p in parts if len(p.strip()) >= 50][:6]
+        if len(segments) <= 1:
+            return [text]
+        return segments
+
     # ========== Event Detail Extraction (called AFTER classification) ==========
-    
+
     def extract_event(self, text: str, source_type: str = 'post', post_timestamp: Optional[datetime] = None) -> Optional[Dict]:
         """
         Extract event details from text.
@@ -1091,6 +1121,12 @@ class EventExtractor:
             if llm_hints is None:
                 return None
             logger.info("ACCEPT: LLM fallback approved borderline post")
+
+        # B5: Skip posts where time is explicitly TBC/TBA — the society will post again with details
+        _tbc_patterns = [r'\btbc\b', r'\btba\b', r'\bto\s+be\s+confirmed\b', r'\bto\s+be\s+announced\b']
+        if any(re.search(p, text, re.IGNORECASE) for p in _tbc_patterns):
+            logger.info("SKIP: Time/details TBC — post deferred pending follow-up from society")
+            return None
 
         # Extract event details
         local_post_ts = None
