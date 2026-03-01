@@ -55,9 +55,9 @@ export default function Home() {
     } catch (err: any) {
       setSubmitStatus('error');
       if (err.message === 'already_signed_up' || err.message?.includes('already exists')) {
-        setErrorMessage("you're already signed up! check your inbox for event notifications.");
+        setErrorMessage("you're already signed up");
       } else {
-        setErrorMessage('something went wrong — try again or use the sign-up page');
+        setErrorMessage('something went wrong, try again or use the sign-up page');
       }
       console.error('Signup error:', err);
     } finally {
@@ -128,7 +128,7 @@ export default function Home() {
               {submitStatus === 'success' && (
                 <div className="flex items-center gap-3 text-accent-text bg-accent/10 px-5 py-4 rounded-2xl border-2 border-accent/30">
                   <Check className="w-6 h-6 flex-shrink-0" />
-                  <span className="font-semibold text-lg">check your email — we just sent you a 6-digit code</span>
+                  <span className="font-semibold text-lg">check your email, we just sent you a 6-digit code</span>
                 </div>
               )}
 
@@ -168,7 +168,7 @@ export default function Home() {
           {error && (
             <div className="text-center py-16 bg-white rounded-3xl shadow-soft">
               <p className="text-2xl mb-3">⚠️</p>
-              <p className="text-lg text-text-light font-semibold">couldn't load events — check back in a moment</p>
+              <p className="text-lg text-text-light font-semibold">couldn't load events. check back in a moment</p>
             </div>
           )}
 
@@ -176,7 +176,7 @@ export default function Home() {
             <div className="text-center py-16 bg-white rounded-3xl shadow-soft">
               <p className="text-2xl mb-3">🍽️</p>
               <p className="text-lg text-text-light font-semibold">no free food events in the next 24 hours</p>
-              <p className="text-sm text-text-lighter mt-2 font-medium">check back later — we'll email you the moment something drops</p>
+              <p className="text-sm text-text-lighter mt-2 font-medium">check back later. we'll email you the moment something drops</p>
             </div>
           )}
 

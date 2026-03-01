@@ -122,7 +122,7 @@ export function FilterBar({
           >
             <h3 className="text-lg font-bold mb-4">Filter by Society</h3>
             <p className="text-sm text-text-light">
-              society filtering is coming soon — for now you'll see all events from all 78 societies.
+              society filtering is coming soon. for now you'll see all events from all 78 societies.
             </p>
             <button
               onClick={() => setShowSocietyFilter(false)}

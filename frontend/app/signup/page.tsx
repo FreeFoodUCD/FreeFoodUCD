@@ -39,7 +39,7 @@ function SignupContent() {
       if (err.message === 'already_signed_up' || err.message?.includes('already exists')) {
         setError("you're already signed up!");
       } else {
-        setError('something went wrong — try again in a moment');
+        setError('something went wrong, try again in a moment');
       }
     } finally {
       setIsSubmitting(false);
@@ -67,9 +67,9 @@ function SignupContent() {
       setStep('success');
     } catch (err: any) {
       if (err.message?.includes('expired')) {
-        setError('that code has expired — go back and request a new one');
+        setError('that code has expired. go back and request a new one');
       } else {
-        setError('that code didn\'t work — double-check it and try again');
+        setError('that code didn\'t work. double-check it and try again');
       }
     } finally {
       setIsSubmitting(false);
