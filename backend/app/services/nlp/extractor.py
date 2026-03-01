@@ -187,10 +187,8 @@ class EventExtractor:
             'kaffeeklatsch',
             # Food sampling events
             'free samples', 'handing out samples',
-            # General treat terms
-            'goodies',
             # Specific pastries / foods (audit FNs)
-            'madeleines', 'apple strudel', 'acai bowl',
+            'madeleines', 'apple strudel',
         ]
         # Weak food indicators — only count if "free", "provided", or "complimentary"
         # (or other context modifiers) also appears somewhere in the text
@@ -198,6 +196,8 @@ class EventExtractor:
             'food', 'lunch', 'dinner', 'breakfast', 'drinks', 'drink',
             'snack', 'tea', 'coffee',
             'refreshers',   # demoted: "Refreshers Week" posts have no food mention
+            # Specific food items that need free-provision context
+            'goodies', 'acai bowl', 'açaí bowl',
         ]
         # Context modifiers that make weak food keywords count as sufficient evidence.
         # Extends the original {"free", "provided", "complimentary"} set.
@@ -724,6 +724,7 @@ class EventExtractor:
             # Carry vision-extracted text forward for date/time/location extraction
             if hints.get('text'):
                 hints['_vision_text'] = hints['text']
+            hints['_stage'] = 'vision_llm'
             return hints
 
         # Text path: existing grey-zone behaviour (weak food keyword only)
@@ -734,6 +735,7 @@ class EventExtractor:
         if not hints or not hints.get('food'):
             return None
 
+        hints['_stage'] = 'llm_text'
         return hints
 
     def _is_other_college(self, text: str) -> bool:
@@ -1142,7 +1144,7 @@ class EventExtractor:
 
         Splits on blank lines followed by an ALL-CAPS heading (≥5 chars) or a
         day-of-week name.  Guards:
-        - Each segment must be ≥ 80 characters (filters line-noise)
+        - Each segment must be ≥ 50 characters (filters line-noise)
         - Maximum 6 segments per post
         - Falls back to [text] if 0 or 1 segment produced (no regression)
         """
@@ -1185,13 +1187,21 @@ class EventExtractor:
             Dictionary with event details or None if classification fails
         """
         # First, classify the event
+        _stage = None
+        _llm_called = False
+        _llm_food = None
         llm_hints = None
-        if not self.classify_event(text):
+        if self.classify_event(text):
+            _stage = 'rule_based'
+        else:
+            _llm_called = True
             llm_hints = self._try_llm_fallback(
                 text, image_urls=image_urls, ocr_low_yield=ocr_low_yield
             )
             if llm_hints is None:
                 return None
+            _stage = llm_hints.pop('_stage', 'llm_text')
+            _llm_food = llm_hints.get('food', True)
             logger.info("ACCEPT: LLM fallback approved borderline post")
             # B6: If vision LLM extracted text from the image, inject it so that
             # the rule-based date/time/location parsers below can use it.
@@ -1220,9 +1230,8 @@ class EventExtractor:
         # Fill time gap with LLM hint if rule-based found nothing
         if time is None and llm_hints and llm_hints.get('time'):
             try:
-                from datetime import time as dt_time
                 h, m = map(int, llm_hints['time'].split(':'))
-                time = dt_time(h, m)
+                time = {'hour': h, 'minute': m}
                 time_range = {'start': time, 'end': None}
             except Exception:
                 pass
@@ -1269,6 +1278,9 @@ class EventExtractor:
                 'location_found': location is not None,
                 'members_only': self._is_members_only(text),
                 'llm_assisted': llm_hints is not None,
+                'stage_reached': _stage,
+                'llm_called': _llm_called,
+                'llm_food': _llm_food,
             }
         }
     

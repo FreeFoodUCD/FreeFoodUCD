@@ -517,6 +517,38 @@ test_cases = [
         False,
         "A14: 'annual ball' compound nightlife keyword → REJECT"
     ),
+
+    # ── Keyword demotions: goodies + acai bowl now weak ──────────────────────
+    (
+        "We'll have goodies for everyone at Thursday's social",
+        True,
+        "KW-1: 'we'll have goodies' — provision regex fires → ACCEPT",
+    ),
+    (
+        "Goodies and prizes up for grabs at our quiz night",
+        False,
+        "KW-2: 'goodies' = prizes context, no free-provision signal → REJECT",
+    ),
+    (
+        "Free acai bowl for all attendees at the wellness fair",
+        True,
+        "KW-3: 'free acai bowl' — 'free' fires weak trigger → ACCEPT",
+    ),
+    (
+        "Try our new acai bowl at the campus café — only €6",
+        False,
+        "KW-4: acai bowl for sale, no free context → REJECT",
+    ),
+    (
+        "Açaí bowl provided at our sports society recovery session",
+        True,
+        "KW-5: 'açaí bowl' + 'provided' context modifier → ACCEPT",
+    ),
+    (
+        "Açaí bowl €7 at the UCD food market this Saturday",
+        False,
+        "KW-6: açaí bowl for sale → REJECT",
+    ),
 ]
 
 passed = 0
@@ -909,10 +941,69 @@ _run_b6(
 
 print(f"\nB6 vision fallback results: {b6_passed}/{b6_passed + b6_failed} passed, {b6_failed} failed")
 
+# ── B2 Classification Decision Logging ──────────────────────────────────────
+print("\n" + "="*60)
+print("B2 CLASSIFICATION DECISION LOGGING TESTS")
+print("="*60)
+
+b2_passed = 0
+b2_failed = 0
+
+def _b2_assert(description: str, condition: bool):
+    global b2_passed, b2_failed
+    if condition:
+        b2_passed += 1
+        print(f"[PASS] {description}")
+    else:
+        b2_failed += 1
+        print(f"[FAIL] {description}")
+
+# B2-1: Rule-based accept — stage_reached='rule_based', llm_called=False, llm_food=None
+_b2_caption1 = "Free pizza at Newman Building this Friday 6pm!"
+_b2_result1 = extractor.extract_event(_b2_caption1)
+_b2_assert("B2-1: stage_reached='rule_based'",
+           _b2_result1 is not None and _b2_result1['extracted_data']['stage_reached'] == 'rule_based')
+_b2_assert("B2-1: llm_called=False",
+           _b2_result1 is not None and _b2_result1['extracted_data']['llm_called'] == False)
+_b2_assert("B2-1: llm_food=None",
+           _b2_result1 is not None and _b2_result1['extracted_data']['llm_food'] is None)
+
+# B2-2: LLM text path — stage_reached='llm_text', llm_called=True, llm_food=True
+# "Join us for our weekly coffee catch-up" — 'coffee' is weak, no modifier, no images
+# Mock classify_and_extract to return food=True so event is accepted via text LLM path
+import app.services.nlp.llm_classifier as _llm_mod_b2
+
+_b2_caption2 = "Join us for our weekly coffee catch-up"
+_b2_mock_llm = MagicMock()
+_b2_mock_llm.classify_and_extract.return_value = {
+    'food': True, 'location': 'Newman Building', 'time': '13:00'
+}
+
+_original_getter_b2 = _llm_mod_b2.get_llm_classifier
+_llm_mod_b2.get_llm_classifier = lambda: _b2_mock_llm
+try:
+    with patch('app.services.nlp.extractor.settings') as _b2_mock_settings:
+        _b2_mock_settings.USE_SCORING_PIPELINE = True
+        _b2_mock_settings.OPENAI_API_KEY = "sk-fake"
+        _b2_mock_settings.USE_VISION_FALLBACK = True
+        _b2_result2 = extractor.extract_event(_b2_caption2)
+finally:
+    _llm_mod_b2.get_llm_classifier = _original_getter_b2
+
+_b2_assert("B2-2: stage_reached='llm_text'",
+           _b2_result2 is not None and _b2_result2['extracted_data']['stage_reached'] == 'llm_text')
+_b2_assert("B2-2: llm_called=True",
+           _b2_result2 is not None and _b2_result2['extracted_data']['llm_called'] == True)
+_b2_assert("B2-2: llm_food=True",
+           _b2_result2 is not None and _b2_result2['extracted_data']['llm_food'] == True)
+
+print(f"\nB2 decision logging results: {b2_passed}/{b2_passed + b2_failed} passed, {b2_failed} failed")
+
 # ── Grand total ───────────────────────────────────────────────────────────────
 print("\n" + "="*60)
-total_all = len(test_cases) + len(b5_tests) + len(a11_tests) + 1 + total_sc + b6_passed + b6_failed
+total_all = len(test_cases) + len(b5_tests) + len(a11_tests) + 1 + total_sc + b6_passed + b6_failed + b2_passed + b2_failed
 passed_all = sum(1 for _, exp, _ in test_cases if extractor.classify_event(_) == exp)  # recount inline
 # Use the already-accumulated counters
 print(f"GRAND TOTAL: classify={passed}/{len(test_cases)}, B5={b5_passed}/{len(b5_tests)+1}, "
-      f"A11={a11_passed}/{len(a11_tests)+1}, SC={sc_passed}/{total_sc}, B6={b6_passed}/{b6_passed+b6_failed}")
+      f"A11={a11_passed}/{len(a11_tests)+1}, SC={sc_passed}/{total_sc}, "
+      f"B6={b6_passed}/{b6_passed+b6_failed}, B2={b2_passed}/{b2_passed+b2_failed}")
