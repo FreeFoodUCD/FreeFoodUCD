@@ -540,6 +540,11 @@ class EventExtractor:
             logger.debug("REJECT: Food activity workshop")
             return False
 
+        # A7: NOT a social-media giveaway/contest
+        if self._is_giveaway_contest(clean_text):
+            logger.debug("REJECT: Giveaway/contest")
+            return False
+
         # A5: Staff/committee-only filter
         if self._is_staff_only(clean_text):
             logger.debug("REJECT: Staff/committee-only event")
@@ -801,7 +806,20 @@ class EventExtractor:
                 logger.debug(f"Found nightlife keyword: {keyword}")
                 return True
         return False
-    
+
+    def _is_giveaway_contest(self, text: str) -> bool:
+        """Reject social-media giveaway/contest posts.
+        These are entry-based competitions, not free food provision at an event.
+        """
+        patterns = [
+            r'\bgiveaway\b',
+            r'\benter\s+to\s+win\b',
+            r'\bchance\s+to\s+win\b',
+            r'\bprize\s+draw\b',
+            r'\bsweepstakes?\b',
+        ]
+        return any(re.search(p, text, re.IGNORECASE) for p in patterns)
+
     def _is_food_activity(self, text: str) -> bool:
         """
         Reject food-making workshops/competitions where food is the activity
@@ -1001,6 +1019,10 @@ class EventExtractor:
                             'matched_keywords': [kw]}
             return {'result': 'rejected', 'reason': 'Food activity workshop/competition (not free food)',
                     'matched_keywords': []}
+
+        # Giveaway/contest
+        if self._is_giveaway_contest(clean_text):
+            return {'result': 'rejected', 'reason': 'Social media giveaway or contest', 'matched_keywords': []}
 
         # Staff only
         if self._is_staff_only(clean_text):

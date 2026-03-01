@@ -417,6 +417,14 @@ test_cases = [
         False,
         "CTX-1: 'food' weak keyword + no provision context → REJECT"
     ),
+    # A7: Social-media giveaway — food keyword present but it's a contest entry
+    (
+        "Giveaway Time!!! We are doing a Giveaway for a box of chocolate fudge brownies. "
+        "How to Enter: 1) Follow this account 2) Share this post to your story "
+        "3) Tag 3 friends in the comments. Giveaway Winner will be announced March 2nd 1pm!",
+        False,
+        "G1: social media giveaway — 'giveaway' keyword → reject despite 'chocolate'"
+    ),
 ]
 
 passed = 0
