@@ -252,10 +252,8 @@ async def get_recent_posts(
         feedback_result = await db.execute(feedback_query)
         feedback = feedback_result.scalar_one_or_none()
 
-        # Compute classification details
+        # Classification details not available at display time (computed during NLP processing)
         classification_details = None
-        if post.caption:
-            classification_details = extractor.get_classification_details(post.caption)
 
         post_data = {
             "id": post_id_str,
