@@ -34,7 +34,7 @@ resend==0.8.0
 
 # LLM
 openai>=1.30.0
-google-generativeai>=0.8.0
+google-genai>=1.0.0
 
 # Observability (F1 — Phase F)
 # Langfuse: LLM tracing + human feedback. Gracefully disabled if keys absent.

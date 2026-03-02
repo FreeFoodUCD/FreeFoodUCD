@@ -195,15 +195,13 @@ class GeminiClassifier:
 
     def __init__(self, api_key: str, redis_url: str):
         try:
-            import google.generativeai as genai
-            genai.configure(api_key=api_key)
-            self._genai = genai
-            # Model is created per-call with dynamic system instruction (date injection)
+            from google import genai as google_genai
+            self._client = google_genai.Client(api_key=api_key)
             self._api_key = api_key
         except ImportError:
             raise ImportError(
-                "google-generativeai package not installed. "
-                "Run: pip install google-generativeai>=0.8.0"
+                "google-genai package not installed. "
+                "Run: pip install google-genai>=1.0.0"
             )
         self._redis = redis_lib.from_url(redis_url, decode_responses=False)
 
@@ -241,7 +239,8 @@ class GeminiClassifier:
         Redis-cached 7 days. Cache key includes today's date so stale date context
         doesn't persist across days.
         """
-        import google.generativeai as genai
+        from google import genai as google_genai
+        from google.genai import types as genai_types
 
         image_urls = image_urls or []
         now = datetime.now()
@@ -281,27 +280,25 @@ class GeminiClassifier:
             caption_for_gemini = text[:1000] + "\n...\n" + text[-400:]
         parts: list = [f"Caption: {caption_for_gemini}"]
 
-        # Attach images as inline_data (base64) — NOT file_uri which requires GCS URIs.
-        # Instagram CDN URLs are plain HTTPS; we download and encode them here.
+        # Attach images as inline_data (bytes) — NOT file_uri which requires GCS URIs.
+        # Instagram CDN URLs are plain HTTPS; we download them here.
+        contents = [parts[0]]  # caption string first
         for url in image_urls[:3]:
             try:
                 resp = httpx.get(url, timeout=8, follow_redirects=True)
                 resp.raise_for_status()
                 mime = resp.headers.get("content-type", "image/jpeg").split(";")[0].strip()
-                b64 = base64.b64encode(resp.content).decode("utf-8")
-                parts.append({"inline_data": {"mime_type": mime, "data": b64}})
+                contents.append(genai_types.Part.from_bytes(data=resp.content, mime_type=mime))
                 logger.debug(f"Attached image ({len(resp.content)} bytes, {mime}): {url[:60]}")
             except Exception as img_exc:
                 logger.debug(f"Skipping image {url}: {img_exc}")
 
         try:
-            model = genai.GenerativeModel(
-                model_name="gemini-2.0-flash",
-                system_instruction=system_prompt,
-            )
-            response = model.generate_content(
-                parts,
-                generation_config=genai.GenerationConfig(
+            response = self._client.models.generate_content(
+                model="gemini-2.0-flash",
+                contents=contents,
+                config=genai_types.GenerateContentConfig(
+                    system_instruction=system_prompt,
                     response_mime_type="application/json",
                     temperature=0,
                     max_output_tokens=200,
